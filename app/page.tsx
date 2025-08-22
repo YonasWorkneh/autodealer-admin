@@ -229,8 +229,9 @@ export default function page() {
             </Card>
           </div>
           <div className="grid grid-cols-2 gap-6">
-            <div>
-              <Card className="p-10 shadow-none max-h-full">
+            {/* Top selling cars */}
+            <div className="h-full">
+              <Card className="p-10 shadow-none h-full">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold">Top Cars</h3>
                   <div className="flex space-x-2 text-sm ml-4">
@@ -256,9 +257,6 @@ export default function page() {
                       Month
                     </Button>
                   </div>
-                  <Button variant="ghost" size="icon">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
                 </div>
 
                 <div className="space-y-3">
@@ -293,13 +291,13 @@ export default function page() {
                       time: "2.4M",
                       img: "/dzire.webp",
                     },
-                    {
-                      name: "Toyota ",
-                      artist: "Land Cruiser 70",
-                      album: "2024",
-                      time: "12M",
-                      img: "/v8.png",
-                    },
+                    // {
+                    //   name: "Toyota ",
+                    //   artist: "Land Cruiser 70",
+                    //   album: "2024",
+                    //   time: "12M",
+                    //   img: "/v8.png",
+                    // },
                     {
                       name: "Jetour",
                       artist: "T1",
@@ -335,78 +333,77 @@ export default function page() {
             </div>
 
             {/* New Inventory */}
-            <div>
-              <div>
-                {/* Latest Inventory */}
-                <Card className="max-h-full">
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle>Latest Inventory</CardTitle>
-                    <Link
-                      href={"/listing"}
-                      className="group bg-zinc-800 hover:bg-zinc-900 text-white py-2 text-sm w-fit cursor-pointer flex gap-2 items-center px-3 rounded-full"
+
+            <div className="h-full">
+              {/* Latest Inventory */}
+              <Card className="h-full">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle>Latest Inventory</CardTitle>
+                  <Link
+                    href={"/listing"}
+                    className="group bg-zinc-800 hover:bg-zinc-900 text-white py-2 text-sm w-fit cursor-pointer flex gap-2 items-center px-3 rounded-full"
+                  >
+                    <span>View more</span>
+                    <span className="group-hover:translate-x-1 transition-all">
+                      →
+                    </span>
+                  </Link>
+                </CardHeader>
+                <CardContent>
+                  <div className="relative mb-4">
+                    <img
+                      src="/id6-orange.png"
+                      alt="Volkwagen ID6 Electric"
+                      className="w-3/4 max-h-[225px] object-cover rounded-lg"
+                    />
+                    <div className="absolute bottom-2 left-2 bg-black rounded-full p-2">
+                      <CarFront className="w-4 h-4 text-white" />
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <p className="text-sm text-black/70">Model</p>
+                      <h3 className="font-semibold">Volkswagen ID6</h3>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-black/70">Price</p>
+                      <p className="font-semibold">5,000,000</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge
+                      variant="secondary"
+                      className="bg-black text-white rounded-full"
                     >
-                      <span>View more</span>
-                      <span className="group-hover:translate-x-1 transition-all">
-                        →
-                      </span>
-                    </Link>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="relative mb-4">
-                      <img
-                        src="/id6-orange.png"
-                        alt="Volkwagen ID6 Electric"
-                        className="w-3/4 h-auto object-cover rounded-lg"
-                      />
-                      <div className="absolute bottom-2 left-2 bg-black rounded-full p-2">
-                        <CarFront className="w-4 h-4 text-white" />
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <p className="text-sm text-black/70">Model</p>
-                        <h3 className="font-semibold">Volkswagen ID6</h3>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm text-black/70">Price</p>
-                        <p className="font-semibold">5,000,000</p>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <Badge
-                        variant="secondary"
-                        className="bg-black text-white rounded-full"
-                      >
-                        Vokswagen
-                      </Badge>
-                      <Badge
-                        variant="secondary"
-                        className="bg-black text-white rounded-full"
-                      >
-                        Smart AC
-                      </Badge>
-                      <Badge
-                        variant="secondary"
-                        className="bg-black text-white rounded-full"
-                      >
-                        Diesel
-                      </Badge>
-                      <Badge
-                        variant="secondary"
-                        className="bg-black text-white rounded-full"
-                      >
-                        Electric
-                      </Badge>
-                      <Badge
-                        variant="secondary"
-                        className="bg-black text-white rounded-full"
-                      >
-                        5
-                      </Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+                      Vokswagen
+                    </Badge>
+                    <Badge
+                      variant="secondary"
+                      className="bg-black text-white rounded-full"
+                    >
+                      Smart AC
+                    </Badge>
+                    <Badge
+                      variant="secondary"
+                      className="bg-black text-white rounded-full"
+                    >
+                      Diesel
+                    </Badge>
+                    <Badge
+                      variant="secondary"
+                      className="bg-black text-white rounded-full"
+                    >
+                      Electric
+                    </Badge>
+                    <Badge
+                      variant="secondary"
+                      className="bg-black text-white rounded-full"
+                    >
+                      5
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>

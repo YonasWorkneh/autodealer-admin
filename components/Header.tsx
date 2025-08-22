@@ -35,7 +35,7 @@ export default function Header() {
               alt="user-img"
               className="size-10 rounded-full object-cover"
             />
-            <p className="text-sm">Hello, Yonasd</p>
+            <p className="text-sm">Hello, Yonas</p>
           </div>
           <div className="text-gray-500 bg-white rounded-full p-2 text-sm">
             22 May

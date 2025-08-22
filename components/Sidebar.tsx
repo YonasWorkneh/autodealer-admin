@@ -8,6 +8,7 @@ import {
   ChartNoAxesCombined,
   LayoutDashboard,
   LogOut,
+  PackageCheck,
   Settings,
   Users,
 } from "lucide-react";
@@ -21,7 +22,7 @@ export default function Sidebar() {
     { label: "Dashboard", href: "/", icon: LayoutDashboard },
     { label: "Cars", href: "/listing", icon: CarFront },
     { label: "Users", href: "/users", icon: Users },
-    // { label: "Analytics", href: "/report", icon: ChartNoAxesCombined },
+    { label: "Enterprise", href: "/enterprise", icon: PackageCheck },
   ];
   const pathName = usePathname();
   return (
