@@ -25,8 +25,14 @@ export default function Sidebar() {
     { label: "Enterprise", href: "/enterprise", icon: PackageCheck },
   ];
   const pathName = usePathname();
+  const isAuthPage = pathName.includes("signin") || pathName.includes("signup");
+  if (isAuthPage) return null;
   return (
-    <aside className="w-20 bg-black flex flex-col items-center py-6 space-y-6 fixed left-0 top-0 h-full z-10">
+    <aside
+      className={`w-20 bg-black flex flex-col items-center py-6 space-y-6 fixed left-0 top-0 h-full z-10 ${
+        isAuthPage && "hidden"
+      }`}
+    >
       <div className="w-8 h-8 rounded-lg flex flex-col items-center justify-center">
         <Image src={"/wheel copy.png"} alt="logo" width={100} height={100} />
         <p className="text-xs text-white mt-2">DEALER</p>
@@ -37,12 +43,6 @@ export default function Sidebar() {
             link.href === "/"
               ? pathName === link.href
               : pathName.includes(link.href);
-          console.log(link.href);
-          console.log("path");
-          console.log(pathName);
-          console.log(active);
-          console.log("other Link");
-
           return (
             <Link
               href={link.href}

@@ -5,16 +5,21 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
+import { cookies } from "next/headers";
+import Protected from "./Protected";
 
 export const metadata: Metadata = {
   title: "E-Car-ADMIN",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const isLogged = !!cookieStore.get("access")?.value;
+
   return (
     <html lang="en">
       <head>
@@ -29,12 +34,16 @@ html {
       </head>
       <body>
         <div className="root">
-          {/* sidebar */}
-          <Sidebar />
-          <main className="flex-1 ml-16 overflow-y-auto max-h-screen p-4 py-0 bg-white pt-20">
-            <Header />
-            <div className="root">{children}</div>
-          </main>
+          <Protected isLogged={isLogged}>
+            <>
+              {/* sidebar */}
+              <Sidebar />
+              <main className="flex-1 ml-16 overflow-y-auto max-h-screen p-4 py-0 bg-white pt-20">
+                <Header />
+                <div className="root">{children}</div>
+              </main>
+            </>
+          </Protected>
         </div>
       </body>
     </html>

@@ -8,7 +8,6 @@ interface SignInParams {
 
 export const signin = async (data: SignInParams) => {
   try {
-    console.log(process.env.BASE_API_URL);
     const res = await fetch(`${process.env.BASE_API_URL}/auth/login`, {
       method: "POST",
       headers: {

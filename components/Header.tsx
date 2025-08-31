@@ -1,10 +1,16 @@
+"use client";
+
 import React from "react";
 import { Input } from "./ui/input";
 import { Bell, Search } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
+  const pathName = usePathname();
+  const isAuthPage = pathName.includes("signin") || pathName.includes("signup");
+  if (isAuthPage) return null;
   return (
     <div
       className="flex items-center justify-between mb-6 px-6 fixed top-0 w-[calc(100%-80px)] left-20 bg-white/70  z-50 py-4"
