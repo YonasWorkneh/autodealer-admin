@@ -30,12 +30,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -56,25 +50,6 @@ import {
 } from "recharts";
 
 export default function page() {
-  const [activeTab, setActiveTab] = useState("dashboard");
-
-  const sidebarItems = [
-    { id: "dashboard", label: "Dashboard", icon: BarChart3, active: true },
-    { id: "leads", label: "Leads", icon: Users },
-    { id: "messages", label: "Messages", icon: MessageSquare, badge: "3" },
-    { id: "inventory", label: "Inventory", icon: Package },
-    { id: "test-drives", label: "Test Drives", icon: TestTube },
-    { id: "services", label: "Services", icon: Wrench },
-    { id: "reports", label: "Reports", icon: FileText },
-    { id: "payments", label: "Payments", icon: CreditCard },
-    { id: "settings", label: "Settings", icon: Settings },
-  ];
-
-  const bookingItems = [
-    { id: "calendar", label: "Calendar", icon: Calendar },
-    { id: "waiting-list", label: "Waiting List", icon: FileText },
-  ];
-
   const metrics = [
     {
       title: "Total Cars",

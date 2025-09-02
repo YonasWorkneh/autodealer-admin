@@ -6,10 +6,12 @@ import { Bell, Search } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useUserStore } from "@/store/user";
 
 export default function Header() {
   const pathName = usePathname();
   const isAuthPage = pathName.includes("signin") || pathName.includes("signup");
+  const { user } = useUserStore();
   if (isAuthPage) return null;
   return (
     <div
@@ -41,7 +43,7 @@ export default function Header() {
               alt="user-img"
               className="size-10 rounded-full object-cover"
             />
-            <p className="text-sm">Hello, Yonas</p>
+            <p className="text-sm">Hello, {user.first_name}</p>
           </div>
           <div className="text-gray-500 bg-white rounded-full p-2 text-sm">
             22 May

@@ -18,25 +18,24 @@ export async function GET() {
     if (!response.ok) throw new Error("Error updating tokens");
     const data = await response.json();
     outside = data;
-    if (data.refresh || data.access)
+    if (!data.refresh || !data.access)
       throw new Error("tokens are not available");
     cookieStore.set({
       name: "access",
       value: data?.access,
-      httpOnly: true, // 🔑 makes it HttpOnly
-      secure: true, // only over HTTPS
-      sameSite: "strict", // prevent CSRF
-      path: "/", // send on all requests
+      secure: true, 
+      sameSite: "strict", 
+      path: "/", 
       maxAge: 60 * 15, // 15 minutes
     });
     cookieStore.set({
       name: "refresh",
       value: data?.refresh,
-      httpOnly: true, // 🔑 makes it HttpOnly
-      secure: true, // only over HTTPS
-      sameSite: "strict", // prevent CSRF
-      path: "/", // send on all requests
-      maxAge: 60 * 60 * 24 * 30, // 30d minutes
+
+      secure: true, 
+      sameSite: "strict", 
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30, 
     });
     const res = await fetch(`${api}/auth/user/`, {
       headers: { Authorization: `Bearer ${data?.access}` },
@@ -53,8 +52,8 @@ export async function GET() {
     );
   } catch (err: any) {
     console.error(err.message);
-    return Response.json(
-      JSON.stringify({
+    return (
+      Response.json({
         ok: false,
         message: err.message,
         outside,

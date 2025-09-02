@@ -57,9 +57,12 @@ export default function Sidebar() {
         })}
       </div>
       <div className="flex gap-10 flex-col text-white absolute bottom-10">
-        <button className="text-white hover:bg-[#fff] hover:text-black cursor-pointer size-10 rounded-full grid place-items-center">
+        <Link
+          href={"/settings"}
+          className="text-white hover:bg-[#fff] hover:text-black cursor-pointer size-10 rounded-full grid place-items-center"
+        >
           <Settings className="size-5" />
-        </button>
+        </Link>
         <button className="text-white hover:bg-[#fff] hover:text-black cursor-pointer size-10 rounded-full grid place-items-center">
           <LogOut className="size-5" />
         </button>
