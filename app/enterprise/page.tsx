@@ -42,12 +42,20 @@ const contacts = [
 export default function ContactsPage() {
   return (
     <div className="p-6">
-      <div className="">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {contacts.map((contact) => (
-            <EnterpriseCard key={contact.id} contact={contact} />
-          ))}
-        </div>
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-semibold text-foreground mb-2">
+          Enterprise plans
+        </h1>
+        <p className="text-muted-foreground">
+          Manage enterprises — monitor access & activities of enterprise plan
+          users.
+        </p>
+      </div>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {contacts.map((contact) => (
+          <EnterpriseCard key={contact.id} contact={contact} />
+        ))}
       </div>
     </div>
   );
