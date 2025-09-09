@@ -33,10 +33,13 @@ export default function Sidebar() {
         isAuthPage && "hidden"
       }`}
     >
-      <div className="w-8 h-8 rounded-lg flex flex-col items-center justify-center">
+      <Link
+        href={"/"}
+        className="w-8 h-8 rounded-lg flex flex-col items-center justify-center"
+      >
         <Image src={"/wheel copy.png"} alt="logo" width={100} height={100} />
         <p className="text-xs text-white mt-2">DEALER</p>
-      </div>
+      </Link>
       <div className="flex flex-col space-y-10 my-30">
         {links.map((link) => {
           const active =

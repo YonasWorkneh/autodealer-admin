@@ -133,7 +133,7 @@ export default function CarForm() {
           <Input placeholder="Year" {...form.register("year")} />
           <Input placeholder="Mileage" {...form.register("mileage")} />
           <Select onValueChange={(val) => form.setValue("condition", val)}>
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Condition" />
             </SelectTrigger>
             <SelectContent>
@@ -153,7 +153,7 @@ export default function CarForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input placeholder="Price" {...form.register("price")} />
           <Select onValueChange={(val) => form.setValue("currency", val)}>
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Currency" />
             </SelectTrigger>
             <SelectContent>
@@ -165,7 +165,7 @@ export default function CarForm() {
             </SelectContent>
           </Select>
           <Select onValueChange={(val) => form.setValue("fuelType", val)}>
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Fuel Type" />
             </SelectTrigger>
             <SelectContent>
@@ -177,7 +177,7 @@ export default function CarForm() {
             </SelectContent>
           </Select>
           <Select onValueChange={(val) => form.setValue("transmission", val)}>
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Transmission" />
             </SelectTrigger>
             <SelectContent>
@@ -193,7 +193,7 @@ export default function CarForm() {
             {...form.register("engine")}
           />
           <Select onValueChange={(val) => form.setValue("driveType", val)}>
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Drive Type" />
             </SelectTrigger>
             <SelectContent>
@@ -205,7 +205,7 @@ export default function CarForm() {
             </SelectContent>
           </Select>
           <Select onValueChange={(val) => form.setValue("bodyType", val)}>
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Body Type" />
             </SelectTrigger>
             <SelectContent>
@@ -258,8 +258,7 @@ export default function CarForm() {
           {...form.register("features")}
           cols={7}
           rows={7}
-          className="columns-7 rows-7"
-
+          className="h-[150px]"
         />
       </section>
 
