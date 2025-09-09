@@ -17,12 +17,12 @@ export const signin = async (data: SignInParams) => {
     });
     if (!res.ok) throw new Error("Something went wrong");
     const user = await res.json();
-    if (!user.access)
+    if (!user?.access)
       throw new Error("Error trying to log you in. Please try again.");
     const cookiess = await cookies();
     cookiess.set({
       name: "access",
-      value: user.access,
+      value: user?.access,
       httpOnly: true, // 🔑 makes it HttpOnly
       secure: true, // only over HTTPS
       sameSite: "strict", // prevent CSRF
@@ -31,7 +31,7 @@ export const signin = async (data: SignInParams) => {
     });
     cookiess.set({
       name: "refresh",
-      value: user.refresh,
+      value: user?.refresh,
       httpOnly: true, // 🔑 makes it HttpOnly
       secure: true, // only over HTTPS
       sameSite: "strict", // prevent CSRF
