@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Plus, Save, X } from "lucide-react";
+import { ArrowLeft, Plus, X } from "lucide-react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
-import { Label } from "@/components/ui/label";
 
 import Image from "next/image";
 import { useState } from "react";
@@ -97,9 +96,9 @@ export default function CarForm() {
   };
 
   return (
-    <div className="p-6 space-y-8 grid grid-cols-2 gap-4">
+    <div className="p-4 md:p-6 space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between col-span-2">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <Link href="/listing" className="cursor-pointer">
           <Button
             variant="ghost"
@@ -109,14 +108,10 @@ export default function CarForm() {
             Back
           </Button>
         </Link>
-        <div className="flex gap-2">
-          {/* <Button variant="outline" className="cursor-pointer">
-            <Save className="h-4 w-4 mr-2" />
-            Save Draft
-          </Button> */}
+        <div className="flex gap-2 w-full md:w-auto">
           <Button
             onClick={form.handleSubmit(onSubmit)}
-            className="cursor-pointer rounded-full "
+            className="cursor-pointer rounded-full w-full md:w-auto"
           >
             Submit Car
           </Button>
@@ -124,7 +119,7 @@ export default function CarForm() {
       </div>
 
       {/* General Information */}
-      <section className="bg-gray-50 p-6 rounded-lg space-y-4">
+      <section className="bg-gray-50 p-4 md:p-6 rounded-lg space-y-4">
         <h2 className="text-lg font-semibold">General Information</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input placeholder="Listing Title" {...form.register("title")} />
@@ -148,7 +143,7 @@ export default function CarForm() {
       </section>
 
       {/* Pricing & Specifications */}
-      <section className="bg-gray-50 p-6 rounded-lg space-y-4">
+      <section className="bg-gray-50 p-4 md:p-6 rounded-lg space-y-4">
         <h2 className="text-lg font-semibold">Pricing & Specifications</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input placeholder="Price" {...form.register("price")} />
@@ -220,7 +215,7 @@ export default function CarForm() {
       </section>
 
       {/* Additional Details */}
-      <section className="bg-gray-50 p-6 rounded-lg space-y-4">
+      <section className="bg-gray-50 p-4 md:p-6 rounded-lg space-y-4">
         <h2 className="text-lg font-semibold">Additional Details</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input placeholder="VIN / Chassis Number" {...form.register("vin")} />
@@ -256,18 +251,17 @@ export default function CarForm() {
         <Textarea
           placeholder="List features (comma separated: Airbags, Sunroof, Bluetooth, etc.)"
           {...form.register("features")}
-          cols={7}
-          rows={7}
+          rows={6}
           className="h-[150px]"
         />
       </section>
 
       {/* Uploads */}
-      <section className="bg-gray-50 p-6 rounded-lg space-y-4">
+      <section className="bg-gray-50 p-4 md:p-6 rounded-lg space-y-4">
         <h2 className="text-lg font-semibold">Uploads</h2>
         <div className="flex flex-wrap gap-4">
           {images.map((file, idx) => (
-            <div key={idx} className="relative w-32 h-32">
+            <div key={idx} className="relative w-28 h-28 md:w-32 md:h-32">
               <Image
                 src={URL.createObjectURL(file)}
                 alt={`car-${idx}`}
@@ -283,9 +277,9 @@ export default function CarForm() {
               </button>
             </div>
           ))}
-          <label className="w-32 h-32 border-2 border-dashed flex flex-col items-center justify-center rounded-lg cursor-pointer hover:bg-gray-100">
+          <label className="w-28 h-28 md:w-32 md:h-32 border-2 border-dashed flex flex-col items-center justify-center rounded-lg cursor-pointer hover:bg-gray-100">
             <Plus className="h-6 w-6 text-gray-500" />
-            <span className="text-sm text-gray-500">Add</span>
+            <span className="text-xs md:text-sm text-gray-500">Add</span>
             <input
               type="file"
               className="hidden"

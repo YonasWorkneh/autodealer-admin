@@ -15,7 +15,6 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -24,23 +23,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
-
-const sidebarItems = [
-  { icon: Grid3X3, label: "Dashboard", active: true },
-  { icon: Car, label: "Listing", active: false },
-  { icon: Calendar, label: "Calendar", active: false },
-  { icon: TrendingUp, label: "Deals", active: false },
-  { icon: Users, label: "Tracking", active: false },
-  { icon: BarChart3, label: "Active Bids", active: false },
-  { icon: BarChart3, label: "Statistics", active: false },
-  { icon: TrendingUp, label: "Transaction", active: false },
-];
-
-const otherMenuItems = [
-  { icon: Search, label: "Search" },
-  { icon: Settings, label: "Settings" },
-  { icon: HelpCircle, label: "Help Center" },
-];
 
 const cars = [
   {
@@ -75,7 +57,7 @@ const cars = [
     name: "BYD-Song",
     style: "Song",
     type: "Auto",
-    color: "brown",
+    color: "Brown",
     price: "285,892",
     image: "/byd.png",
   },
@@ -99,26 +81,26 @@ const cars = [
   },
 ];
 
-export default function page() {
+export default function Page() {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
     <div className="flex h-screen bg-background">
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col overflow-y-auto">
         {/* Header */}
-        <div className="border-b border-border p-6">
+        <div className="border-b border-border p-4 md:p-6">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
               Available Cars
             </h1>
-            <div className="flex justify-between items-center">
-              <p className="text-muted-foreground">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-0">
+              <p className="text-muted-foreground text-sm md:text-base">
                 Manage your car listings &mdash; Add, edit and delete cars.
               </p>
               <Link
                 href={"/listing/new"}
-                className="group bg-zinc-800 hover:bg-zinc-900 text-white py-2 text-sm w-fit cursor-pointer flex gap-2 items-center px-3 rounded-full"
+                className="group bg-zinc-800 hover:bg-zinc-900 text-white py-2 text-sm w-full md:w-fit cursor-pointer flex justify-center md:justify-start gap-2 items-center px-3 rounded-full"
               >
                 <span>Add New</span>
                 <span className="group-hover:translate-x-1 transition-all">
@@ -130,20 +112,18 @@ export default function page() {
         </div>
 
         {/* Dashboard Content */}
-        <div className="flex-1 p-6">
-          {/* Available Cars Section */}
-
+        <div className="flex-1 p-4 md:p-6">
           {/* Cars Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {cars.map((car) => (
               <Card
                 key={car.id}
-                className="overflow-hidden hover:shadow-lg transition-shadow cursor-flow relative"
+                className="overflow-hidden hover:shadow-lg transition-shadow relative"
               >
                 <DropdownMenu>
                   <DropdownMenuTrigger
                     asChild
-                    className="absolute top-2 right-2 z-50 cursor-pointer "
+                    className="absolute top-2 right-2 z-50 cursor-pointer"
                   >
                     <Button
                       variant="ghost"
@@ -153,25 +133,23 @@ export default function page() {
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="">
-                    <DropdownMenuItem className="">
-                      View Details
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="">Export</DropdownMenuItem>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>View Details</DropdownMenuItem>
+                    <DropdownMenuItem>Export</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <div className="relative">
-                  <div className="flex justify-center">
-                    <img
-                      src={car.image || "/placeholder.svg"}
-                      alt={car.name}
-                      className="w-1/2 h-auto object-cover"
-                    />
-                  </div>
+                <div className="relative flex justify-center">
+                  <img
+                    src={car.image || "/placeholder.svg"}
+                    alt={car.name}
+                    className="w-2/3 md:w-1/2 h-auto object-cover"
+                  />
                 </div>
-                <CardContent className="p-4">
-                  <h3 className="font-semibold text-lg mb-3">{car.name}</h3>
-                  <div className="flex justify-between text-sm text-muted-foreground mb-4">
+                <CardContent className="p-3 md:p-4">
+                  <h3 className="font-semibold text-base md:text-lg mb-2 md:mb-3">
+                    {car.name}
+                  </h3>
+                  <div className="flex flex-col gap-1 md:flex-row md:justify-between text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">
                     <span>
                       Style:{" "}
                       <span className="text-foreground">{car.style}</span>
@@ -184,7 +162,9 @@ export default function page() {
                       <span className="text-foreground">{car.color}</span>
                     </span>
                   </div>
-                  <div className="text-2xl font-bold">$ {car.price}</div>
+                  <div className="text-xl md:text-2xl font-bold">
+                    $ {car.price}
+                  </div>
                 </CardContent>
               </Card>
             ))}
