@@ -1,26 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Search,
-  Settings,
-  Bell,
-  Filter,
-  MoreHorizontal,
-  Users,
-  TrendingUp,
-  Car,
-  DollarSign,
-  Calendar,
-  FileText,
-  MessageSquare,
-  Package,
-  TestTube,
-  Wrench,
-  BarChart3,
-  CreditCard,
-  CarFront,
-} from "lucide-react";
+import { CarFront, Users, Car, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -49,7 +30,7 @@ import {
   YAxis,
 } from "recharts";
 
-export default function page() {
+export default function Page() {
   const metrics = [
     {
       title: "Total Cars",
@@ -101,286 +82,259 @@ export default function page() {
   ];
 
   return (
-    <div className="min-h-screen">
-      <div className="flex">
-        {/* Main Content */}
-        <div className="flex-1 p-6">
-          {/* Metrics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {metrics.map((metric, index) => {
-              const Icon = metric.icon;
-              return (
-                <Card key={index}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium flex justify-between w-full">
-                      <span>{metric.title}</span>
-                      <Icon className="w-6 h-6" />
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="text-2xl font-bold">{metric.value}</div>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <span
-                        className={`font-medium ${
-                          metric.positive ? "text-green-400" : "text-red-400"
-                        }`}
-                      >
-                        {metric.change}
-                      </span>
-                      <span className="">{metric.comparison}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            {/* Sales Trend */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Sales & Revenue Trend</CardTitle>
-                <CardDescription>
-                  Monthly sales volume and revenue performance
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ChartContainer
-                  config={{
-                    sales: { label: "Sales", color: "var(--chart-1)" },
-                    revenue: { label: "Revenue", color: "var(--chart-2)" },
-                  }}
-                  className="h-[300px]"
-                >
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={salesData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" />
-                      <YAxis />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <Bar dataKey="sales" fill="black" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
-              </CardContent>
-            </Card>
-
-            {/* Customer Segments */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Popular cars</CardTitle>
-                <CardDescription>Distribution of popular cars</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ChartContainer
-                  config={{
-                    new: { label: "New Customers", color: "black" },
-                    returning: { label: "Returning", color: "#222" },
-                    referrals: { label: "Referrals", color: "#000" },
-                  }}
-                  className="h-[300px]"
-                >
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={customerData}
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={80}
-                        // fill="#8884d8"
-                        dataKey="value"
-                        label={({ segment, value }) => `${segment}: ${value}%`}
-                      >
-                        {customerData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
-              </CardContent>
-            </Card>
-          </div>
-          <div className="grid grid-cols-2 gap-6">
-            {/* Top selling cars */}
-            <div className="h-full">
-              <Card className="p-10 shadow-none h-full">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold">Top Cars</h3>
-                  <div className="flex space-x-2 text-sm ml-4">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-black/70 cursor-pointer rounded-full bg-gray-100"
-                    >
-                      Today
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-gray-400 cursor-pointer rounded-full"
-                    >
-                      Week
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-gray-400 cursor-pointer rounded-full"
-                    >
-                      Month
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3">
-                    <span className="text-sm text-gray-500 w-4">#</span>
-                    <span className="text-sm text-gray-500 flex-1">
-                      Make/model
-                    </span>
-                    <span className="text-sm text-gray-500">Year</span>
-                    <span className="text-sm text-gray-500">Price</span>
-                  </div>
-
-                  {[
-                    {
-                      name: "Volkswagen",
-                      artist: "ID6",
-                      album: "2023",
-                      time: "5M",
-                      img: "/id6-orange.png",
-                    },
-                    {
-                      name: "BYD",
-                      artist: "Song",
-                      album: "2024",
-                      time: "3.1M",
-                      img: "/byd.png",
-                    },
-                    {
-                      name: "Suzuki",
-                      artist: "Dzire",
-                      album: "2020",
-                      time: "2.4M",
-                      img: "/dzire.webp",
-                    },
-                    // {
-                    //   name: "Toyota ",
-                    //   artist: "Land Cruiser 70",
-                    //   album: "2024",
-                    //   time: "12M",
-                    //   img: "/v8.png",
-                    // },
-                    {
-                      name: "Jetour",
-                      artist: "T1",
-                      album: "2024",
-                      time: "6M",
-                      img: "/jetour.png",
-                    },
-                  ].map((car, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center space-x-3 py-2"
-                    >
-                      <span className="text-sm w-4">{index + 1}</span>
-                      <Image
-                        src={car.img}
-                        alt={car.name + "-image"}
-                        width={100}
-                        height={100}
-                        className="w-20 h-auto"
-                      />
-                      <div className="flex-1">
-                        <div className="text-sm font-medium">{car.name}</div>
-                        <div className="text-xs text-gray-500">
-                          {car.artist}
-                        </div>
-                      </div>
-                      <span className="text-sm text-gray-500">{car.album}</span>
-                      <span className="text-sm text-gray-500">{car.time}</span>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            </div>
-
-            {/* New Inventory */}
-
-            <div className="h-full">
-              {/* Latest Inventory */}
-              <Card className="h-full">
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle>Latest Inventory</CardTitle>
-                  <Link
-                    href={"/listing"}
-                    className="group bg-zinc-800 hover:bg-zinc-900 text-white py-2 text-sm w-fit cursor-pointer flex gap-2 items-center px-3 rounded-full"
-                  >
-                    <span>View more</span>
-                    <span className="group-hover:translate-x-1 transition-all">
-                      →
-                    </span>
-                  </Link>
+    <div className="min-h-screen p-4 sm:p-6">
+      <div className="flex flex-col">
+        {/* Metrics Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
+          {metrics.map((metric, index) => {
+            const Icon = metric.icon;
+            return (
+              <Card key={index}>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium flex justify-between w-full">
+                    <span>{metric.title}</span>
+                    <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="relative mb-4">
-                    <img
-                      src="/id6-orange.png"
-                      alt="Volkwagen ID6 Electric"
-                      className="w-3/4 max-h-[225px] object-cover rounded-lg"
-                    />
-                    <div className="absolute bottom-2 left-2 bg-black rounded-full p-2">
-                      <CarFront className="w-4 h-4 text-white" />
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="text-xl sm:text-2xl font-bold">
+                      {metric.value}
                     </div>
                   </div>
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <p className="text-sm text-black/70">Model</p>
-                      <h3 className="font-semibold">Volkswagen ID6</h3>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm text-black/70">Price</p>
-                      <p className="font-semibold">5,000,000</p>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge
-                      variant="secondary"
-                      className="bg-black text-white rounded-full"
+                  <div className="flex items-center gap-2 text-xs sm:text-sm">
+                    <span
+                      className={`font-medium ${
+                        metric.positive ? "text-green-400" : "text-red-400"
+                      }`}
                     >
-                      Vokswagen
-                    </Badge>
-                    <Badge
-                      variant="secondary"
-                      className="bg-black text-white rounded-full"
-                    >
-                      Smart AC
-                    </Badge>
-                    <Badge
-                      variant="secondary"
-                      className="bg-black text-white rounded-full"
-                    >
-                      Diesel
-                    </Badge>
-                    <Badge
-                      variant="secondary"
-                      className="bg-black text-white rounded-full"
-                    >
-                      Electric
-                    </Badge>
-                    <Badge
-                      variant="secondary"
-                      className="bg-black text-white rounded-full"
-                    >
-                      5
-                    </Badge>
+                      {metric.change}
+                    </span>
+                    <span>{metric.comparison}</span>
                   </div>
                 </CardContent>
               </Card>
+            );
+          })}
+        </div>
+
+        {/* Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          {/* Sales Trend */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Sales & Revenue Trend</CardTitle>
+              <CardDescription>
+                Monthly sales volume and revenue performance
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer
+                config={{
+                  sales: { label: "Sales", color: "var(--chart-1)" },
+                  revenue: { label: "Revenue", color: "var(--chart-2)" },
+                }}
+                className="h-[250px] sm:h-[300px]"
+              >
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={salesData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey="sales" fill="black" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+
+          {/* Customer Segments */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Popular cars</CardTitle>
+              <CardDescription>Distribution of popular cars</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer
+                config={{
+                  new: { label: "New Customers", color: "black" },
+                  returning: { label: "Returning", color: "#222" },
+                  referrals: { label: "Referrals", color: "#000" },
+                }}
+                className="h-[250px] sm:h-[300px]"
+              >
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={customerData}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      dataKey="value"
+                      label={({ segment, value }) => `${segment}: ${value}%`}
+                    >
+                      {customerData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Cars & Inventory */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Top Cars */}
+          <Card className="p-4 sm:p-6 shadow-none h-full">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
+              <h3 className="text-base sm:text-lg font-semibold">Top Cars</h3>
+              <div className="flex flex-wrap gap-2 text-xs sm:text-sm">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-black/70 rounded-full bg-gray-100"
+                >
+                  Today
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-400 rounded-full"
+                >
+                  Week
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-400 rounded-full"
+                >
+                  Month
+                </Button>
+              </div>
             </div>
-          </div>
+
+            <div className="overflow-x-auto">
+              <div className="min-w-[400px] space-y-3">
+                <div className="flex items-center space-x-3 text-xs sm:text-sm">
+                  <span className="w-4">#</span>
+                  <span className="flex-1">Make/model</span>
+                  <span className="hidden sm:inline">Year</span>
+                  <span>Price</span>
+                </div>
+
+                {[
+                  {
+                    name: "Volkswagen",
+                    artist: "ID6",
+                    album: "2023",
+                    time: "5M",
+                    img: "/id6-orange.png",
+                  },
+                  {
+                    name: "BYD",
+                    artist: "Song",
+                    album: "2024",
+                    time: "3.1M",
+                    img: "/byd.png",
+                  },
+                  {
+                    name: "Suzuki",
+                    artist: "Dzire",
+                    album: "2020",
+                    time: "2.4M",
+                    img: "/dzire.webp",
+                  },
+                  {
+                    name: "Jetour",
+                    artist: "T1",
+                    album: "2024",
+                    time: "6M",
+                    img: "/jetour.png",
+                  },
+                ].map((car, index) => (
+                  <div key={index} className="flex items-center space-x-3 py-2">
+                    <span className="w-4 text-xs sm:text-sm">{index + 1}</span>
+                    <Image
+                      src={car.img}
+                      alt={car.name}
+                      width={100}
+                      height={100}
+                      className="w-16 sm:w-20 h-auto object-contain"
+                    />
+                    <div className="flex-1">
+                      <div className="text-xs sm:text-sm font-medium">
+                        {car.name}
+                      </div>
+                      <div className="text-[10px] sm:text-xs text-gray-500">
+                        {car.artist}
+                      </div>
+                    </div>
+                    <span className="hidden sm:inline text-xs sm:text-sm text-gray-500">
+                      {car.album}
+                    </span>
+                    <span className="text-xs sm:text-sm text-gray-500">
+                      {car.time}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
+
+          {/* Latest Inventory */}
+          <Card className="h-full">
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <CardTitle>Latest Inventory</CardTitle>
+              <Link
+                href={"/listing"}
+                className="group bg-zinc-800 hover:bg-zinc-900 text-white py-2 text-xs sm:text-sm w-fit cursor-pointer flex gap-2 items-center px-3 rounded-full"
+              >
+                <span>View more</span>
+                <span className="group-hover:translate-x-1 transition-all">
+                  →
+                </span>
+              </Link>
+            </CardHeader>
+            <CardContent>
+              <div className="relative mb-4">
+                <img
+                  src="/id6-orange.png"
+                  alt="Volkwagen ID6 Electric"
+                  className="w-full max-h-[200px] sm:max-h-[225px] object-cover rounded-lg"
+                />
+                <div className="absolute bottom-2 left-2 bg-black rounded-full p-2">
+                  <CarFront className="w-4 h-4 text-white" />
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                <div>
+                  <p className="text-xs sm:text-sm text-black/70">Model</p>
+                  <h3 className="font-semibold">Volkswagen ID6</h3>
+                </div>
+                <div className="text-left sm:text-right">
+                  <p className="text-xs sm:text-sm text-black/70">Price</p>
+                  <p className="font-semibold">5,000,000</p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {["Volkswagen", "Smart AC", "Diesel", "Electric", "5"].map(
+                  (tag, idx) => (
+                    <Badge
+                      key={idx}
+                      variant="secondary"
+                      className="bg-black text-white rounded-full text-xs sm:text-sm"
+                    >
+                      {tag}
+                    </Badge>
+                  )
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
