@@ -4,6 +4,9 @@ import React, { ReactElement, useEffect, useState } from "react";
 import Loading from "./loading";
 import { useUserStore } from "@/store/user";
 import { useRouter } from "next/navigation";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 export default function Protected({
   children,
@@ -36,5 +39,9 @@ export default function Protected({
     setTimeout(() => setIsMounted(true), 2000);
   }, []);
   if (!isMounted) return <Loading />;
-  return <div>{children}</div>;
+  return (
+    <div>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </div>
+  );
 }

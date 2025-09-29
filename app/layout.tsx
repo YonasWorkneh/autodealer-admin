@@ -19,7 +19,7 @@ export default async function RootLayout({
 }>) {
   const cookieStore = await cookies();
   const isLogged = !!cookieStore.get("access")?.value;
-  console.log(cookieStore.get("access")?.value);
+
   console.log("authenticated", isLogged);
 
   return (
@@ -40,7 +40,7 @@ html {
             <>
               {/* sidebar */}
               <Sidebar />
-              <main className="flex-1 md:ml-16 overflow-y-auto max-h-screen p-4 py-0 bg-white pt-20">
+              <main className="flex-1 md:ml-16 max-h-screen p-4 py-0 bg-white pt-20">
                 <Header />
                 <div className="root">{children}</div>
               </main>

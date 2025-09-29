@@ -139,7 +139,11 @@ export default function Sidebar() {
               <Link
                 href={"/settings"}
                 onClick={() => setIsOpen(false)}
-                className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10"
+                className={`flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 ${
+                  pathName.includes("/settings")
+                    ? "!bg-white text-black"
+                    : "text-white hover:bg-white/10"
+                }`}
               >
                 <Settings className="h-5 w-5" /> Settings
               </Link>

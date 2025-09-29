@@ -29,6 +29,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { usePopularCars } from "@/hooks/cars";
+import { formatPrice } from "@/lib/utils";
 
 export default function Page() {
   const metrics = [
@@ -81,8 +83,10 @@ export default function Page() {
     { segment: "Hyundai", value: 20, color: "#222" },
   ];
 
+  const { data: popularCars } = usePopularCars();
+
   return (
-    <div className="min-h-screen p-4 sm:p-6">
+    <div className="p-4 sm:p-6">
       <div className="flex flex-col">
         {/* Metrics Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
@@ -226,61 +230,42 @@ export default function Page() {
                   <span>Price</span>
                 </div>
 
-                {[
-                  {
-                    name: "Volkswagen",
-                    artist: "ID6",
-                    album: "2023",
-                    time: "5M",
-                    img: "/id6-orange.png",
-                  },
-                  {
-                    name: "BYD",
-                    artist: "Song",
-                    album: "2024",
-                    time: "3.1M",
-                    img: "/byd.png",
-                  },
-                  {
-                    name: "Suzuki",
-                    artist: "Dzire",
-                    album: "2020",
-                    time: "2.4M",
-                    img: "/dzire.webp",
-                  },
-                  {
-                    name: "Jetour",
-                    artist: "T1",
-                    album: "2024",
-                    time: "6M",
-                    img: "/jetour.png",
-                  },
-                ].map((car, index) => (
-                  <div key={index} className="flex items-center space-x-3 py-2">
-                    <span className="w-4 text-xs sm:text-sm">{index + 1}</span>
-                    <Image
-                      src={car.img}
-                      alt={car.name}
-                      width={100}
-                      height={100}
-                      className="w-16 sm:w-20 h-auto object-contain"
-                    />
-                    <div className="flex-1">
-                      <div className="text-xs sm:text-sm font-medium">
-                        {car.name}
+                {popularCars?.map((car, index) => {
+                  const image =
+                    car.images.find((image) => image.is_featured) ||
+                    car.images[0];
+                  return (
+                    <div
+                      key={index}
+                      className="flex items-center space-x-3 py-2"
+                    >
+                      <span className="w-4 text-xs sm:text-sm">
+                        {index + 1}
+                      </span>
+                      <Image
+                        src={image.image_url}
+                        alt={image.caption || ""}
+                        width={100}
+                        height={100}
+                        className="w-16 sm:w-20 h-auto object-contain rounded-sm"
+                      />
+                      <div className="flex-1">
+                        <div className="text-xs sm:text-sm font-medium">
+                          {car.make + " " + car.model}
+                        </div>
+                        {/* <div className="text-[10px] sm:text-xs text-gray-500">
+                          {car.}
+                        </div> */}
                       </div>
-                      <div className="text-[10px] sm:text-xs text-gray-500">
-                        {car.artist}
-                      </div>
+                      <span className="hidden sm:inline text-xs sm:text-sm text-gray-500">
+                        {car.year}
+                      </span>
+                      <span className="text-xs sm:text-sm text-gray-500">
+                        {formatPrice(car.price, true)}
+                      </span>
                     </div>
-                    <span className="hidden sm:inline text-xs sm:text-sm text-gray-500">
-                      {car.album}
-                    </span>
-                    <span className="text-xs sm:text-sm text-gray-500">
-                      {car.time}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </Card>

@@ -5,8 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Camera, Info, User } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function AccountSettingsPage() {
   const [formData, setFormData] = useState({
@@ -18,11 +29,14 @@ export default function AccountSettingsPage() {
   return (
     <div className="p-6">
       <div className="max-w-4xl">
+        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-black mb-2">
             Account Settings
           </h1>
-          <p className="text-gray-600">Edit your name, avatar etc.</p>
+          <p className="text-muted-foreground">
+            Edit your personal information and manage account security.
+          </p>
         </div>
 
         <Card className="border border-gray-200">
@@ -30,108 +44,113 @@ export default function AccountSettingsPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Form Fields */}
               <div className="lg:col-span-2 space-y-6">
+                {/* Name */}
                 <div className="space-y-2">
-                  <Label
-                    htmlFor="name"
-                    className="text-sm font-medium text-black"
-                  >
-                    Your Name
-                  </Label>
+                  <Label htmlFor="name">Your Name</Label>
                   <Input
                     id="name"
                     value={formData.name}
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
                     }
-                    className="border-gray-200 focus:border-black focus:ring-black py-8"
+                    className="py-6"
                   />
                 </div>
 
+                {/* Email */}
                 <div className="space-y-2">
-                  <Label
-                    htmlFor="email"
-                    className="text-sm font-medium text-black"
-                  >
-                    Email Address
-                  </Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
-                      }
-                      className="border-gray-200 focus:border-black focus:ring-black py-8"
-                    />
-                  </div>
+                  <Label htmlFor="email">Email Address</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                    className="py-6"
+                  />
                 </div>
 
+                {/* Password */}
                 <div className="space-y-2">
-                  <Label
-                    htmlFor="password"
-                    className="text-sm font-medium text-black"
-                  >
-                    Password
-                  </Label>
+                  <Label htmlFor="password">Password</Label>
                   <div className="flex gap-2">
                     <Input
                       id="password"
                       type="password"
                       value={formData.password}
                       readOnly
-                      className="border-gray-200 bg-gray-50 py-8"
+                      className="bg-gray-50 py-6"
                     />
-                    <Button
-                      variant="ghost"
-                      className="text-blue-500 hover:text-blue-600"
-                    >
+                    <Button variant="outline" className="text-sm">
                       Change
                     </Button>
                   </div>
                 </div>
               </div>
 
-              {/* Avatar Section */}
+              {/* Avatar */}
               <div className="flex flex-col items-center space-y-4 relative h-fit">
-                <Avatar className="w-24 h-24 bg-gray-200">
-                  <AvatarFallback className="bg-gray-200">
+                <Avatar className="w-24 h-24">
+                  <AvatarImage
+                    src="/placeholder-avatar.png"
+                    alt="User avatar"
+                  />
+                  <AvatarFallback>
                     <User className="w-12 h-12 text-gray-400" />
                   </AvatarFallback>
                 </Avatar>
-                <Button className="bg-black hover:bg-gray-800 text-white absolute bottom-0 left-[calc(50%-15px)] rounded-full">
-                  <Camera />
-                </Button>
+
+                {/* Upload button */}
+                <label
+                  htmlFor="avatar-upload"
+                  className="cursor-pointer absolute bottom-0 left-[calc(50%-18px)] bg-black hover:bg-gray-800 text-white p-2 rounded-full"
+                >
+                  <Camera className="h-4 w-4" />
+                </label>
+                <input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                />
               </div>
             </div>
 
             {/* Delete Account Section */}
             <div className="mt-12 pt-8 border-t border-gray-200">
-              <Button className="text-red-500 mb-2 bg-gray-100 hover:bg-gray-200 cursor-pointer">
-                Delete account
-              </Button>
-              {/* <p className="text-gray-600 text-sm mb-1">
-                You will receive an email to confirm your decision.
-              </p>*/}
-              <div className="flex items-center jusify-between gap-2">
-                <span>
-                  <Info size={18} className="" />
-                </span>
-                <p className="text-gray-600 text-sm ">
-                  Please note, that all your data will be permanently erased.
-                </p>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive">Delete Account</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you sure you want to delete your account?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action is irreversible. All your data will be
+                      permanently erased.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction className="bg-red-500 hover:bg-red-600">
+                      Yes, delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              <div className="flex items-center gap-2 mt-3 text-muted-foreground text-sm">
+                <Info size={16} />
+                <span>All your data will be permanently erased.</span>
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-4 justify-end">
-              <Button
-                variant="outline"
-                className="px-8 border-gray-300 text-gray-700 hover:bg-gray-50 bg-transparent"
-              >
-                Cancel
-              </Button>
-              <Button className="bg-black hover:bg-gray-800 text-white px-8">
+            <div className="flex gap-4 justify-end mt-10">
+              <Button variant="outline">Cancel</Button>
+              <Button className="bg-black hover:bg-gray-800 text-white">
                 Save
               </Button>
             </div>

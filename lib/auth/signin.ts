@@ -27,7 +27,6 @@ export const signin = async (data: SignInParams) => {
       secure: true, // only over HTTPS
       sameSite: "strict", // prevent CSRF
       path: "/", // send on all requests
-      maxAge: 60 * 15, // 15 minutes
     });
     cookiess.set({
       name: "refresh",
@@ -36,7 +35,6 @@ export const signin = async (data: SignInParams) => {
       secure: true, // only over HTTPS
       sameSite: "strict", // prevent CSRF
       path: "/", // send on all requests
-      maxAge: 60 * 60 * 24 * 30, // 30d minutes
     });
 
     return user;
@@ -48,7 +46,6 @@ export const signin = async (data: SignInParams) => {
 
 export const getUser = async (id: number) => {
   try {
-    console.log(process.env.BASE_API_URL);
     const res = await fetch(
       `${process.env.BASE_API_URL}/users/user-profiles/${id}`
     );

@@ -43,7 +43,7 @@ export default function SignIn() {
   };
 
   return (
-    <Card className="w-[450px]">
+    <Card className="w-[380px] sm:w-[450px]">
       <CardHeader>
         <Link
           href={"/"}
@@ -67,42 +67,6 @@ export default function SignIn() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
-          <div className="grid grid-cols-2 gap-2">
-            <div className="grid gap-2">
-              <Label htmlFor="fname">First Name</Label>
-              <Input
-                id="fname"
-                type="text"
-                placeholder="John"
-                {...register("first_name", {
-                  required: "First name is required",
-                })}
-                onChange={() => setErr("")}
-              />
-              {errors?.first_name && (
-                <p className="text-red-400 text-sm">
-                  {errors.first_name.message as string}
-                </p>
-              )}
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="lname">Last Name</Label>
-              <Input
-                id="lname"
-                type="text"
-                placeholder="Doe"
-                {...register("last_name", {
-                  required: "Last name is required",
-                })}
-                onChange={() => setErr("")}
-              />
-              {errors?.last_name && (
-                <p className="text-red-400 text-sm">
-                  {errors.last_name.message as string}
-                </p>
-              )}
-            </div>
-          </div>
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
             <Input

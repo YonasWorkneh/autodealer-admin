@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Search,
   Grid3X3,
@@ -23,66 +23,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import { useCars } from "@/hooks/cars";
+import { formatPrice } from "@/lib/utils";
 
-const cars = [
-  {
-    id: 1,
-    name: "Volkswagen ID6",
-    style: "Volkswagen",
-    type: "Auto",
-    color: "Orange",
-    price: "285,892",
-    image: "/id6-orange.png",
-  },
-  {
-    id: 2,
-    name: "Suzuki Dzire",
-    style: "Dzire",
-    type: "Petrol",
-    color: "Dark Blue",
-    price: "358,174",
-    image: "/dzire.webp",
-  },
-  {
-    id: 3,
-    name: "Toyota V8",
-    style: "V8",
-    type: "Petrol",
-    color: "Blue Black",
-    price: "358,174",
-    image: "/v8.png",
-  },
-  {
-    id: 4,
-    name: "BYD-Song",
-    style: "Song",
-    type: "Auto",
-    color: "Brown",
-    price: "285,892",
-    image: "/byd.png",
-  },
-  {
-    id: 5,
-    name: "Toyota Invincible",
-    style: "Invincible",
-    type: "Auto",
-    color: "Brown",
-    price: "425,000",
-    image: "/invincible.png",
-  },
-  {
-    id: 6,
-    name: "Jetour-T1",
-    style: "T1",
-    type: "Auto",
-    color: "Green",
-    price: "195,500",
-    image: "/jetour.png",
-  },
-];
+const filters = ["All", "Live", "Pending Review", "Suspended"];
 
 export default function Page() {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [active, setActive] = useState("all");
+  const { data: cars } = useCars();
+
+  useEffect(() => {}, [active]);
 
   return (
     <div className="flex h-screen bg-background">
@@ -113,61 +63,87 @@ export default function Page() {
 
         {/* Dashboard Content */}
         <div className="flex-1 p-4 md:p-6">
-          {/* Cars Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {cars.map((car) => (
-              <Card
-                key={car.id}
-                className="overflow-hidden hover:shadow-lg transition-shadow relative"
+          {/* filter header */}
+          <div className="flex bg-gray-100 gap-4 p-3 py-2 rounded-full w-fit my-10">
+            {filters.map((filter) => (
+              <Button
+                className={`hover:bg-zinc-900 rounded-full cursor-pointer px-8 hover:text-white ${
+                  filter.toLowerCase() === active
+                    ? ""
+                    : "bg-gray-100 text-black shadow-none"
+                }`}
+                onClick={() => setActive(filter)}
               >
-                <DropdownMenu>
-                  <DropdownMenuTrigger
-                    asChild
-                    className="absolute top-2 right-2 z-50 cursor-pointer"
-                  >
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 cursor-pointer"
-                    >
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>View Details</DropdownMenuItem>
-                    <DropdownMenuItem>Export</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <div className="relative flex justify-center">
-                  <img
-                    src={car.image || "/placeholder.svg"}
-                    alt={car.name}
-                    className="w-2/3 md:w-1/2 h-auto object-cover"
-                  />
-                </div>
-                <CardContent className="p-3 md:p-4">
-                  <h3 className="font-semibold text-base md:text-lg mb-2 md:mb-3">
-                    {car.name}
-                  </h3>
-                  <div className="flex flex-col gap-1 md:flex-row md:justify-between text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">
-                    <span>
-                      Style:{" "}
-                      <span className="text-foreground">{car.style}</span>
-                    </span>
-                    <span>
-                      Type: <span className="text-foreground">{car.type}</span>
-                    </span>
-                    <span>
-                      Color:{" "}
-                      <span className="text-foreground">{car.color}</span>
-                    </span>
-                  </div>
-                  <div className="text-xl md:text-2xl font-bold">
-                    $ {car.price}
-                  </div>
-                </CardContent>
-              </Card>
+                {filter}
+              </Button>
             ))}
+          </div>
+          {/* Cars Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
+            {cars?.map((car) => {
+              const image =
+                car.images.find((image) => image.is_featured) || car.images[0];
+              return (
+                <Card
+                  key={car.id}
+                  className="overflow-hidden hover:shadow-lg transition-shadow relative pt-0"
+                >
+                  <DropdownMenu>
+                    <DropdownMenuTrigger
+                      asChild
+                      className="absolute top-2 right-2 z-50 cursor-pointer bg-white"
+                    >
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 cursor-pointer"
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>View Details</DropdownMenuItem>
+                      <DropdownMenuItem>Export</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <div className="relative flex justify-center">
+                    <img
+                      src={image.image_url || "/placeholder.svg"}
+                      alt={image.caption || ""}
+                      className="w-full md:w-full max-h-[250px] object-cover"
+                    />
+                  </div>
+                  <CardContent className="p-3 md:p-4 pt-0">
+                    <h3 className="font-semibold text-base md:text-lg mb-2 md:mb-3 capitalize">
+                      {car.make + " " + car.model}
+                    </h3>
+                    <div className="flex flex-col gap-1 md:flex-row md:justify-between text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">
+                      <span>
+                        Style:{" "}
+                        <span className="text-foreground capitalize">
+                          {car.model}
+                        </span>
+                      </span>
+                      <span>
+                        Type:{" "}
+                        <span className="text-foreground capitalize">
+                          {car.body_type}
+                        </span>
+                      </span>
+                      <span>
+                        Color:{" "}
+                        <span className="text-foreground capitalize">
+                          {car.exterior_color}
+                        </span>
+                      </span>
+                    </div>
+                    <div className="text-xl md:text-2xl font-bold">
+                      {formatPrice(car.price)}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       </div>
