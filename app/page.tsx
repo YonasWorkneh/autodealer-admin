@@ -30,6 +30,7 @@ import {
   YAxis,
 } from "recharts";
 import { usePopularCars } from "@/hooks/cars";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatPrice } from "@/lib/utils";
 
 export default function Page() {
@@ -83,7 +84,7 @@ export default function Page() {
     { segment: "Hyundai", value: 20, color: "#222" },
   ];
 
-  const { data: popularCars } = usePopularCars();
+  const { data: popularCars, isLoading: popularCarsLoading } = usePopularCars();
 
   return (
     <div className="p-4 sm:p-6">
@@ -230,6 +231,31 @@ export default function Page() {
                   <span>Price</span>
                 </div>
 
+                {popularCarsLoading && (
+                  <>
+                    {Array.from({ length: 5 }).map((_, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center space-x-3 py-2"
+                      >
+                        <span className="w-4 text-xs sm:text-sm">
+                          <Skeleton className="h-3 w-3" />
+                        </span>
+                        <Skeleton className="w-16 sm:w-20 h-12 rounded-sm" />
+                        <div className="flex-1 space-y-1">
+                          <Skeleton className="h-3 w-40 sm:w-48" />
+                          <Skeleton className="h-2 w-24 sm:w-28" />
+                        </div>
+                        <span className="hidden sm:inline w-10">
+                          <Skeleton className="h-3 w-full" />
+                        </span>
+                        <span className="w-14 sm:w-20">
+                          <Skeleton className="h-3 w-full" />
+                        </span>
+                      </div>
+                    ))}
+                  </>
+                )}
                 {popularCars?.map((car, index) => {
                   const image =
                     car.images.find((image) => image.is_featured) ||
