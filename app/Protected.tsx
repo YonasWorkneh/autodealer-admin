@@ -1,7 +1,6 @@
 "use client";
 
-import React, { ReactElement, useEffect, useState } from "react";
-import Loading from "./loading";
+import React, { ReactElement, useEffect } from "react";
 import { useUserStore } from "@/store/user";
 import { useRouter } from "next/navigation";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -15,15 +14,19 @@ export default function Protected({
   children: ReactElement;
   isLogged: boolean;
 }) {
-  const [isMounted, setIsMounted] = useState(false);
   const { setUser } = useUserStore();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLogged) router.push("/signin");
+    // Redirect to signin if not logged in
+    if (!isLogged) {
+      router.push("/signin");
+      return;
+    }
+
+    // Refresh user credentials in the background
     const refreshUserCredentials = async () => {
       try {
-        if (!isLogged) return;
         const res = await fetch("/api/me");
         const data = await res.json();
 
@@ -33,12 +36,16 @@ export default function Protected({
         setUser(data.user);
       } catch (err: any) {
         console.error(err.message);
+        // Optionally redirect to signin on error
+        // router.push("/signin");
       }
     };
+
+    // Execute in background without blocking render
     refreshUserCredentials();
-    setTimeout(() => setIsMounted(true), 2000);
-  }, []);
-  if (!isMounted) return <Loading />;
+  }, [isLogged, router, setUser]);
+
+  // Render immediately without waiting
   return (
     <div>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

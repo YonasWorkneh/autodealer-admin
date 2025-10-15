@@ -155,3 +155,40 @@ export async function getPopularCars() {
     throw err;
   }
 }
+
+export async function approveCar(id: number) {
+  const credential = await getCredentials();
+  try {
+    const res = await fetch(`${BASE_URL}/inventory/cars/${id}/approve/`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${credential.access}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) throw new Error("Error approving car.");
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function rejectCar(id: number, reason?: string) {
+  const credential = await getCredentials();
+  try {
+    const res = await fetch(`${BASE_URL}/inventory/cars/${id}/reject/`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${credential.access}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ reason }),
+    });
+    if (!res.ok) throw new Error("Error rejecting car.");
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    throw err;
+  }
+}

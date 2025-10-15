@@ -23,6 +23,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCars } from "@/hooks/cars";
 import { formatPrice } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -30,6 +31,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 const filters = ["All", "Live", "Pending Review", "Suspended"];
 
 export default function Page() {
+  const router = useRouter();
   const [active, setActive] = useState("all");
   const { data: cars, isLoading } = useCars();
 
@@ -38,7 +40,7 @@ export default function Page() {
   return (
     <div className="flex h-screen bg-background">
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-y-auto">
+      <div className="flex-1 flex flex-col">
         {/* Header */}
         <div className="border-b border-border p-4 md:p-6">
           <div>
@@ -49,15 +51,6 @@ export default function Page() {
               <p className="text-muted-foreground text-sm md:text-base">
                 Manage your car listings &mdash; Add, edit and delete cars.
               </p>
-              <Link
-                href={"/listing/new"}
-                className="group bg-zinc-800 hover:bg-zinc-900 text-white py-2 text-sm w-full md:w-fit cursor-pointer flex justify-center md:justify-start gap-2 items-center px-3 rounded-full"
-              >
-                <span>Add New</span>
-                <span className="group-hover:translate-x-1 transition-all">
-                  →
-                </span>
-              </Link>
             </div>
           </div>
         </div>
@@ -131,7 +124,8 @@ export default function Page() {
                 return (
                   <Card
                     key={car.id}
-                    className="overflow-hidden hover:shadow-lg transition-shadow relative pt-0"
+                    className="overflow-hidden hover:shadow-lg transition-shadow relative pt-0 cursor-pointer"
+                    onClick={() => router.push(`/listing/${car.id}`)}
                   >
                     <DropdownMenu>
                       <DropdownMenuTrigger
@@ -142,13 +136,23 @@ export default function Page() {
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 cursor-pointer"
+                          onClick={(e) => e.stopPropagation()}
                         >
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>View Details</DropdownMenuItem>
-                        <DropdownMenuItem>Export</DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/listing/${car.id}`);
+                          }}
+                        >
+                          View Details
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                          Export
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                     <div className="relative flex justify-center">

@@ -59,14 +59,6 @@ export default function Page() {
       icon: Car,
       comparison: "vs last week",
     },
-    {
-      title: "Total Profit",
-      value: "600,543,000",
-      change: "+8.04%",
-      positive: true,
-      icon: DollarSign,
-      comparison: "vs last week",
-    },
   ];
 
   const salesData = [
@@ -257,6 +249,7 @@ export default function Page() {
                   </>
                 )}
                 {popularCars?.map((car, index) => {
+                  if (index > 4) return null;
                   const image =
                     car.images.find((image) => image.is_featured) ||
                     car.images[0];
@@ -297,7 +290,7 @@ export default function Page() {
           </Card>
 
           {/* Latest Inventory */}
-          <Card className="h-full">
+          <Card className="h-fit">
             <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <CardTitle>Latest Inventory</CardTitle>
               <Link
@@ -315,7 +308,7 @@ export default function Page() {
                 <img
                   src="/id6-orange.png"
                   alt="Volkwagen ID6 Electric"
-                  className="w-full max-h-[200px] sm:max-h-[225px] object-cover rounded-lg"
+                  className="w-full max-h-[200px] sm:max-h-[350px] object-cover rounded-lg"
                 />
                 <div className="absolute bottom-2 left-2 bg-black rounded-full p-2">
                   <CarFront className="w-4 h-4 text-white" />

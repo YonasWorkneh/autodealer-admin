@@ -11,6 +11,8 @@ import {
   carFavorites,
   removeCarFavorite,
   getPopularCars,
+  approveCar,
+  rejectCar,
 } from "@/lib/carApi";
 import type { FetchedCar } from "@/app/types/Car";
 
@@ -141,5 +143,32 @@ export function usePopularCars() {
   return useQuery({
     queryKey: ["popular-cars"],
     queryFn: getPopularCars,
+  });
+}
+
+export function useApproveCar(onSuccess?: () => void, onError?: () => void) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => approveCar(id),
+    onSuccess: () => {
+      onSuccess?.();
+      queryClient.invalidateQueries({ queryKey: ["cars"] });
+      queryClient.invalidateQueries({ queryKey: ["car"] });
+    },
+    onError: () => onError?.(),
+  });
+}
+
+export function useRejectCar(onSuccess?: () => void, onError?: () => void) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: number; reason?: string }) =>
+      rejectCar(id, reason),
+    onSuccess: () => {
+      onSuccess?.();
+      queryClient.invalidateQueries({ queryKey: ["cars"] });
+      queryClient.invalidateQueries({ queryKey: ["car"] });
+    },
+    onError: () => onError?.(),
   });
 }
