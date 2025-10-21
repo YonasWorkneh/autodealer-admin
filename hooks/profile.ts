@@ -16,16 +16,16 @@ export function useProfile() {
 // Upgrade user profile
 export function useUpgradeProfile() {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
+  const { showToast } = useToast();
 
   return useMutation({
     mutationFn: upgradeProfile,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      toast({
-        title: "✅ Success",
-        description: "Your profile upgrade have been saved.",
-      });
+      showToast(
+        "success",
+        "✅ Success - Your profile upgrade have been saved."
+      );
     },
   });
 }

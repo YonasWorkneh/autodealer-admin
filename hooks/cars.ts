@@ -146,29 +146,35 @@ export function usePopularCars() {
   });
 }
 
-export function useApproveCar(onSuccess?: () => void, onError?: () => void) {
+export function useApproveCar(
+  onSuccess?: (data: any) => void,
+  onError?: (error: Error) => void
+) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: number) => approveCar(id),
-    onSuccess: () => {
-      onSuccess?.();
+    onSuccess: (data) => {
+      onSuccess?.(data);
       queryClient.invalidateQueries({ queryKey: ["cars"] });
       queryClient.invalidateQueries({ queryKey: ["car"] });
     },
-    onError: () => onError?.(),
+    onError: (error: Error) => onError?.(error),
   });
 }
 
-export function useRejectCar(onSuccess?: () => void, onError?: () => void) {
+export function useRejectCar(
+  onSuccess?: (data: any) => void,
+  onError?: (error: Error) => void
+) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, reason }: { id: number; reason?: string }) =>
       rejectCar(id, reason),
-    onSuccess: () => {
-      onSuccess?.();
+    onSuccess: (data) => {
+      onSuccess?.(data);
       queryClient.invalidateQueries({ queryKey: ["cars"] });
       queryClient.invalidateQueries({ queryKey: ["car"] });
     },
-    onError: () => onError?.(),
+    onError: (error: Error) => onError?.(error),
   });
 }

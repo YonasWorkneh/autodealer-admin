@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ReactElement, useEffect } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import { useUserStore } from "@/store/user";
 import { useRouter } from "next/navigation";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -16,9 +16,11 @@ export default function Protected({
 }) {
   const { setUser } = useUserStore();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     // Redirect to signin if not logged in
+    setMounted(true);
     if (!isLogged) {
       router.push("/signin");
       return;
@@ -46,9 +48,9 @@ export default function Protected({
   }, [isLogged, router, setUser]);
 
   // Render immediately without waiting
-  return (
+  return mounted ? (
     <div>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </div>
-  );
+  ) : null;
 }

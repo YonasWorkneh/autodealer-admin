@@ -13,12 +13,24 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useUserStore } from "@/store/user";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathName = usePathname();
+  const router = useRouter();
+  const { clearUser } = useUserStore();
+
+  const logout = async () => {
+    try {
+      await fetch("/api/logout", { method: "POST" });
+    } catch (e) {}
+    clearUser();
+    router.push("/signin");
+  };
 
   const links = [
     { label: "Dashboard", href: "/", icon: LayoutDashboard },
@@ -67,7 +79,10 @@ export default function Sidebar() {
           >
             <Settings className="size-5" />
           </Link>
-          <button className="text-white hover:bg-[#fff] hover:text-black cursor-pointer size-10 rounded-full grid place-items-center">
+          <button
+            onClick={logout}
+            className="text-white hover:bg-[#fff] hover:text-black cursor-pointer size-10 rounded-full grid place-items-center"
+          >
             <LogOut className="size-5" />
           </button>
         </div>
@@ -147,7 +162,10 @@ export default function Sidebar() {
               >
                 <Settings className="h-5 w-5" /> Settings
               </Link>
-              <button className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+              <button
+                onClick={logout}
+                className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10"
+              >
                 <LogOut className="h-5 w-5" /> Logout
               </button>
             </div>

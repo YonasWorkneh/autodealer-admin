@@ -20,6 +20,7 @@ import {
   Clock,
   ChevronLeft,
   ChevronRight,
+  Loader2,
 } from "lucide-react";
 import React, { useState } from "react";
 import {
@@ -39,7 +40,7 @@ import Image from "next/image";
 export default function CarDetailsPage() {
   const params = useParams();
   const router = useRouter();
-  const { toast } = useToast();
+  const { showToast } = useToast();
   const carId = params.id as string;
   const { data: car, isLoading, error } = useCar(carId);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
@@ -60,37 +61,41 @@ export default function CarDetailsPage() {
   }, [car]);
 
   const approveMutation = useApproveCar(
-    () => {
-      toast({
-        title: "✅ Car Approved",
-        description: "The car listing has been approved successfully.",
-      });
+    (data) => {
+      showToast(
+        "success",
+        `The car ${car?.make} ${car?.model} has been approved and is now live.`
+      );
       setShowApproveDialog(false);
     },
-    () => {
-      toast({
-        title: "❌ Error",
-        description: "Failed to approve the car. Please try again.",
-        variant: "destructive",
-      });
+    (error) => {
+      showToast(
+        "error",
+        `${error.message || "Failed to approve car. Please try again."}`
+      );
     }
   );
 
   const rejectMutation = useRejectCar(
-    () => {
-      toast({
-        title: "✅ Car Rejected",
-        description: "The car listing has been rejected.",
-      });
+    (data) => {
+      const isPending = car?.verification_status === "pending";
+      showToast(
+        "success",
+        `The car ${car?.make} ${car?.model} has been ${
+          isPending ? "rejected" : "removed from live listings"
+        }. ${rejectReason ? "Reason provided to seller." : ""}`
+      );
       setShowRejectDialog(false);
       setRejectReason("");
     },
-    () => {
-      toast({
-        title: "❌ Error",
-        description: "Failed to reject the car. Please try again.",
-        variant: "destructive",
-      });
+    (error) => {
+      const isPending = car?.verification_status === "pending";
+      showToast(
+        "error",
+        `Failed to ${isPending ? "reject" : "remove"} car. ${
+          error.message || "Please try again."
+        }`
+      );
     }
   );
 
@@ -245,18 +250,66 @@ export default function CarDetailsPage() {
                         variant="default"
                         className="bg-green-600 hover:bg-green-700"
                         onClick={() => setShowApproveDialog(true)}
-                        disabled={approveMutation.isPending}
+                        disabled={
+                          approveMutation.isPending || rejectMutation.isPending
+                        }
                       >
-                        <Check className="mr-2 h-4 w-4" />
-                        Approve
+                        {approveMutation.isPending ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <Check className="mr-2 h-4 w-4" />
+                        )}
+                        {approveMutation.isPending ? "Approving..." : "Approve"}
                       </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={() => setShowRejectDialog(true)}
+                        disabled={
+                          approveMutation.isPending || rejectMutation.isPending
+                        }
+                      >
+                        {rejectMutation.isPending ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <X className="mr-2 h-4 w-4" />
+                        )}
+                        {rejectMutation.isPending ? "Rejecting..." : "Reject"}
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Reject Button for Approved Cars */}
+            {(car.verification_status === "verified" ||
+              car.status === "live") && (
+              <Card className="bg-green-50 border-green-200">
+                <CardContent className="p-4">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-2">
+                      <Check className="h-5 w-5 text-green-600" />
+                      <div>
+                        <h3 className="font-semibold text-green-900">
+                          Car Approved & Live
+                        </h3>
+                        <p className="text-sm text-green-700">
+                          This car is currently live and visible to users
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
                       <Button
                         variant="destructive"
                         onClick={() => setShowRejectDialog(true)}
                         disabled={rejectMutation.isPending}
                       >
-                        <X className="mr-2 h-4 w-4" />
-                        Reject
+                        {rejectMutation.isPending ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <X className="mr-2 h-4 w-4" />
+                        )}
+                        {rejectMutation.isPending ? "Rejecting..." : "Reject"}
                       </Button>
                     </div>
                   </div>
@@ -533,17 +586,38 @@ export default function CarDetailsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Approve Car Listing</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to approve this car listing? This will make
-              it visible to all users.
+              Are you sure you want to approve this car listing for{" "}
+              <strong>
+                {car?.make} {car?.model}
+              </strong>
+              ?
+              <br />
+              <br />
+              This will:
+              <ul className="list-disc list-inside mt-2 space-y-1">
+                <li>Mark the listing as verified</li>
+                <li>Make it visible to all users</li>
+                <li>Allow buyers to contact the seller</li>
+              </ul>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={approveMutation.isPending}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleApprove}
               className="bg-green-600 hover:bg-green-700"
+              disabled={approveMutation.isPending}
             >
-              {approveMutation.isPending ? "Approving..." : "Approve"}
+              {approveMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Approving...
+                </>
+              ) : (
+                "Approve Listing"
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -553,27 +627,94 @@ export default function CarDetailsPage() {
       <AlertDialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Reject Car Listing</AlertDialogTitle>
+            <AlertDialogTitle>
+              {car?.verification_status === "pending"
+                ? "Reject Car Listing"
+                : "Remove Car from Live Listings"}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Please provide a reason for rejecting this car listing. This will
-              be sent to the seller.
+              {car?.verification_status === "pending" ? (
+                <>
+                  You are about to reject the listing for{" "}
+                  <strong>
+                    {car?.make} {car?.model}
+                  </strong>
+                  .
+                  <br />
+                  <br />
+                  This will:
+                  <ul className="list-disc list-inside mt-2 space-y-1">
+                    <li>Mark the listing as rejected</li>
+                    <li>Hide it from public view</li>
+                    <li>Notify the seller with your reason (optional)</li>
+                  </ul>
+                </>
+              ) : (
+                <>
+                  You are about to remove the listing for{" "}
+                  <strong>
+                    {car?.make} {car?.model}
+                  </strong>{" "}
+                  from live listings.
+                  <br />
+                  <br />
+                  This will:
+                  <ul className="list-disc list-inside mt-2 space-y-1">
+                    <li>Mark the listing as rejected/suspended</li>
+                    <li>Remove it from public view</li>
+                    <li>Notify the seller with your reason (optional)</li>
+                    <li>
+                      Users will no longer be able to see or contact about this
+                      car
+                    </li>
+                  </ul>
+                </>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="my-4">
+            <label
+              htmlFor="reject-reason"
+              className="text-sm font-medium mb-2 block"
+            >
+              {car?.verification_status === "pending"
+                ? "Rejection Reason (Optional)"
+                : "Removal Reason (Optional)"}
+            </label>
             <Textarea
-              placeholder="Enter rejection reason (optional)..."
+              id="reject-reason"
+              placeholder={
+                car?.verification_status === "pending"
+                  ? "Enter a reason for rejection that will help the seller understand what needs to be improved..."
+                  : "Enter a reason for removing this listing from live view..."
+              }
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               rows={4}
+              className="resize-none"
             />
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={rejectMutation.isPending}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleReject}
               className="bg-red-600 hover:bg-red-700"
+              disabled={rejectMutation.isPending}
             >
-              {rejectMutation.isPending ? "Rejecting..." : "Reject"}
+              {rejectMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {car?.verification_status === "pending"
+                    ? "Rejecting..."
+                    : "Removing..."}
+                </>
+              ) : car?.verification_status === "pending" ? (
+                "Reject Listing"
+              ) : (
+                "Remove from Live"
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

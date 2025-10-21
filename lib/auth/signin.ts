@@ -20,22 +20,8 @@ export const signin = async (data: SignInParams) => {
     if (!user?.access)
       throw new Error("Error trying to log you in. Please try again.");
     const cookiess = await cookies();
-    cookiess.set({
-      name: "access",
-      value: user?.access,
-      httpOnly: true, // 🔑 makes it HttpOnly
-      secure: true, // only over HTTPS
-      sameSite: "strict", // prevent CSRF
-      path: "/", // send on all requests
-    });
-    cookiess.set({
-      name: "refresh",
-      value: user?.refresh,
-      httpOnly: true, // 🔑 makes it HttpOnly
-      secure: true, // only over HTTPS
-      sameSite: "strict", // prevent CSRF
-      path: "/", // send on all requests
-    });
+    cookiess.set("access", user?.access);
+    cookiess.set("refresh", user?.refresh);
 
     return user;
   } catch (err: any) {

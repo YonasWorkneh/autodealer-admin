@@ -34,6 +34,7 @@ export default function Page() {
   const router = useRouter();
   const [active, setActive] = useState("all");
   const { data: cars, isLoading } = useCars();
+  console.log(cars);
 
   useEffect(() => {}, [active]);
 

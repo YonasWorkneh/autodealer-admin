@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "react-hot-toast";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import { cookies } from "next/headers";
@@ -19,8 +19,6 @@ export default async function RootLayout({
 }>) {
   const cookieStore = await cookies();
   const isLogged = !!cookieStore.get("access")?.value;
-
-  console.log("authenticated", isLogged);
 
   return (
     <html lang="en">
@@ -46,6 +44,12 @@ html {
               </main>
             </>
           </Protected>
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              duration: 4000,
+            }}
+          />
         </div>
       </body>
     </html>

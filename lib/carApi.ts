@@ -22,7 +22,12 @@ async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
 }
 
 export async function fetchCars(): Promise<FetchedCar[]> {
-  return fetcher<FetchedCar[]>("/inventory/cars/");
+  const credential = await getCredentials();
+  return fetcher<FetchedCar[]>("/inventory/cars/", {
+    headers: {
+      Authorization: `Bearer ${credential.access}`,
+    },
+  });
 }
 
 export async function fetchCarById(id: string): Promise<FetchedCar> {
@@ -158,37 +163,70 @@ export async function getPopularCars() {
 
 export async function approveCar(id: number) {
   const credential = await getCredentials();
+  const formData = new FormData();
+  formData.append("verification_status", "verified");
   try {
-    const res = await fetch(`${BASE_URL}/inventory/cars/${id}/approve/`, {
-      method: "POST",
+    const res = await fetch(`${BASE_URL}/inventory/cars/${id}/verify/`, {
+      method: "PATCH",
       headers: {
         Authorization: `Bearer ${credential.access}`,
-        "Content-Type": "application/json",
       },
+      body: formData,
     });
-    if (!res.ok) throw new Error("Error approving car.");
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      const errorMessage =
+        errorData.detail ||
+        errorData.message ||
+        `Failed to approve car (${res.status})`;
+      throw new Error(errorMessage);
+    }
+
     const data = await res.json();
     return data;
-  } catch (err) {
-    throw err;
+  } catch (err: any) {
+    console.log("error message", err.message);
+    if (err.message) {
+      throw err;
+    }
+    throw new Error(
+      "Network error. Please check your connection and try again."
+    );
   }
 }
 
 export async function rejectCar(id: number, reason?: string) {
   const credential = await getCredentials();
+  const formData = new FormData();
+  formData.append("verification_status", "rejected");
+  formData.append("reason", reason || "");
   try {
-    const res = await fetch(`${BASE_URL}/inventory/cars/${id}/reject/`, {
-      method: "POST",
+    const res = await fetch(`${BASE_URL}/inventory/cars/${id}/verify/`, {
+      method: "PATCH",
       headers: {
         Authorization: `Bearer ${credential.access}`,
-        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ reason }),
+      body: formData,
     });
-    if (!res.ok) throw new Error("Error rejecting car.");
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      const errorMessage =
+        errorData.detail ||
+        errorData.message ||
+        `Failed to reject car (${res.status})`;
+      throw new Error(errorMessage);
+    }
+
     const data = await res.json();
     return data;
-  } catch (err) {
-    throw err;
+  } catch (err: any) {
+    if (err.message) {
+      throw new Error(err.message);
+    }
+    throw new Error(
+      "Network error. Please check your connection and try again."
+    );
   }
 }
