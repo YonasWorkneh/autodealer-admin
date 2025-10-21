@@ -10,6 +10,8 @@ import {
   Menu,
   X,
   TrendingUp,
+  BarChart3,
+  Eye,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -38,6 +40,8 @@ export default function Sidebar() {
     { label: "Cars", href: "/listing", icon: CarFront },
     { label: "Users", href: "/users", icon: Users },
     { label: "Sales", href: "/sales", icon: TrendingUp },
+    { label: "Analytics", href: "/analytics", icon: BarChart3 },
+    { label: "Views", href: "/car-views", icon: Eye },
     { label: "Enterprise", href: "/enterprise", icon: PackageCheck },
   ];
 

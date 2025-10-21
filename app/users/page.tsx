@@ -12,133 +12,98 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-const volunteers = [
-  {
-    id: 1,
-    name: "Beza Tesfaye",
-    email: "beza.tesfaye@example.et",
-    phone: "+251 91 123 4567",
-    role: "Admin",
-    location: "Addis Ababa, Ethiopia",
-    initial: "B",
-    status: "Active",
-    enrolled: "July 3, 2018",
-    lastActive: "2 hours ago",
-    totalListings: 15,
-    verifiedListings: 12,
-  },
-  {
-    id: 2,
-    name: "Yonatan",
-    email: "yonatan@example.et",
-    phone: "+251 92 234 5678",
-    role: "Dealer",
-    location: "Bahir Dar, Ethiopia",
-    initial: "Y",
-    status: "Active",
-    enrolled: "July 3, 2018",
-    lastActive: "1 day ago",
-    totalListings: 8,
-    verifiedListings: 6,
-  },
-  {
-    id: 3,
-    name: "Wube",
-    email: "wube@example.et",
-    phone: "+251 93 345 6789",
-    role: "Broker",
-    location: "Hawassa, Ethiopia",
-    initial: "W",
-    status: "Active",
-    enrolled: "July 3, 2018",
-    lastActive: "3 hours ago",
-    totalListings: 22,
-    verifiedListings: 18,
-  },
-  {
-    id: 4,
-    name: "Bisrat Yohannes",
-    email: "bisrat.yohannes@example.et",
-    phone: "+251 94 456 7890",
-    role: "Dealer",
-    location: "Mekelle, Ethiopia",
-    initial: "B",
-    status: "Active",
-    enrolled: "July 3, 2018",
-    lastActive: "5 hours ago",
-    totalListings: 11,
-    verifiedListings: 9,
-  },
-  {
-    id: 5,
-    name: "Mekdes",
-    email: "mekdes@example.et",
-    phone: "+251 95 567 8901",
-    role: "User",
-    location: "Dire Dawa, Ethiopia",
-    initial: "M",
-    status: "Active",
-    enrolled: "July 3, 2018",
-    lastActive: "1 hour ago",
-    totalListings: 3,
-    verifiedListings: 2,
-  },
-  {
-    id: 6,
-    name: "Ahadu Sefefe",
-    email: "ahadu.sefefe@example.et",
-    phone: "+251 96 678 9012",
-    role: "Broker",
-    location: "Gondar, Ethiopia",
-    initial: "A",
-    status: "Active",
-    enrolled: "July 3, 2018",
-    lastActive: "4 hours ago",
-    totalListings: 19,
-    verifiedListings: 16,
-  },
-  {
-    id: 7,
-    name: "Lidya Sefefe",
-    email: "lidya.sefefe@example.et",
-    phone: "+251 97 789 0123",
-    role: "Dealer",
-    location: "Jimma, Ethiopia",
-    initial: "L",
-    status: "Active",
-    enrolled: "July 3, 2018",
-    lastActive: "6 hours ago",
-    totalListings: 7,
-    verifiedListings: 5,
-  },
-];
+import { useUserProfiles } from "@/hooks/userProfiles";
+import type { UserProfile } from "@/app/types/UserProfile";
 
 export default function Page() {
   const router = useRouter();
-  const [selectedVolunteers, setSelectedVolunteers] = useState<number[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const { data: userProfiles, isLoading, error } = useUserProfiles();
+
+  // Filter users who are neither brokers nor dealers
+  const regularUsers =
+    userProfiles?.filter(
+      (user) => !user.broker_profile && !user.dealer_profile
+    ) || [];
+
+  // Filter users based on search query
+  const filteredUsers = regularUsers.filter((user) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      user.first_name.toLowerCase().includes(query) ||
+      user.last_name.toLowerCase().includes(query) ||
+      user.contact.toLowerCase().includes(query) ||
+      user.role.toLowerCase().includes(query)
+    );
+  });
 
   const handleSelectAll = (checked: boolean) => {
-    setSelectedVolunteers(checked ? volunteers.map((v) => v.id) : []);
+    setSelectedUsers(checked ? filteredUsers.map((u) => u.id) : []);
   };
 
-  const handleSelectVolunteer = (id: number, checked: boolean) => {
-    setSelectedVolunteers((prev) =>
-      checked ? [...prev, id] : prev.filter((vid) => vid !== id)
+  const handleSelectUser = (id: number, checked: boolean) => {
+    setSelectedUsers((prev) =>
+      checked ? [...prev, id] : prev.filter((uid) => uid !== id)
     );
   };
 
-  const isAllSelected = selectedVolunteers.length === volunteers.length;
+  const isAllSelected =
+    selectedUsers.length === filteredUsers.length && filteredUsers.length > 0;
   const isIndeterminate =
-    selectedVolunteers.length > 0 &&
-    selectedVolunteers.length < volunteers.length;
+    selectedUsers.length > 0 && selectedUsers.length < filteredUsers.length;
+
+  if (isLoading) {
+    return (
+      <div className="p-4 sm:p-8">
+        <div className="mb-6 sm:mb-8">
+          <Skeleton className="h-8 w-48 mb-2" />
+          <Skeleton className="h-4 w-96" />
+        </div>
+        <div className="space-y-4">
+          {Array.from({ length: 5 }).map((_, idx) => (
+            <Card key={idx}>
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <Skeleton className="w-8 h-8 rounded-full" />
+                  <div className="flex-1">
+                    <Skeleton className="h-6 w-48 mb-2" />
+                    <Skeleton className="h-4 w-32" />
+                  </div>
+                  <Skeleton className="h-8 w-8" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 sm:p-8">
+        <Card className="p-6">
+          <CardContent className="text-center">
+            <h2 className="text-xl font-bold mb-2">Error Loading Users</h2>
+            <p className="text-muted-foreground mb-4">
+              There was an error loading the user data. Please try again.
+            </p>
+            <Button onClick={() => window.location.reload()}>Retry</Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 sm:p-8">
@@ -183,13 +148,13 @@ export default function Page() {
               <span className="text-sm font-medium">Role</span>
             </div>
             <div className="col-span-2">
-              <span className="text-sm font-medium">Phone</span>
+              <span className="text-sm font-medium">Contact</span>
             </div>
             <div className="col-span-2">
               <span className="text-sm font-medium">Status</span>
             </div>
             <div className="col-span-1">
-              <span className="text-sm font-medium">Listings</span>
+              <span className="text-sm font-medium">Points</span>
             </div>
             <div className="col-span-1"></div>
           </div>
@@ -197,150 +162,171 @@ export default function Page() {
 
         {/* Rows */}
         <div className="divide-y divide-border">
-          {volunteers.map((volunteer) => (
-            <div
-              key={volunteer.id}
-              className="px-4 sm:px-6 py-4 hover:bg-muted/30 transition-colors"
-            >
-              {/* Desktop Grid */}
-              <div className="hidden lg:grid grid-cols-12 gap-4 items-center">
-                <div className="col-span-1">
-                  <Checkbox
-                    checked={selectedVolunteers.includes(volunteer.id)}
-                    onCheckedChange={(checked) =>
-                      handleSelectVolunteer(volunteer.id, checked as boolean)
-                    }
-                  />
-                </div>
-                <div className="col-span-3 flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                    <span className="text-sm font-medium">
-                      {volunteer.initial}
-                    </span>
-                  </div>
-                  <div>
-                    <div className="font-medium">{volunteer.name}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {volunteer.email}
-                    </div>
-                  </div>
-                </div>
-                <div className="col-span-2">
-                  <Badge
-                    variant={
-                      volunteer.role === "Admin" ? "default" : "secondary"
-                    }
-                    className="capitalize"
-                  >
-                    {volunteer.role}
-                  </Badge>
-                </div>
-                <div className="col-span-2">
-                  <span className="text-sm">{volunteer.phone}</span>
-                </div>
-                <div className="col-span-2">
-                  <Badge className="bg-green-700 text-white rounded-full lowercase">
-                    {volunteer.status}
-                  </Badge>
-                </div>
-                <div className="col-span-1">
-                  <span className="text-sm font-medium">
-                    {volunteer.totalListings}
-                  </span>
-                </div>
-                <div className="col-span-1 flex justify-end">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Edit</DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => router.push(`/users/${volunteer.id}`)}
-                      >
-                        View Details
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive">
-                        Remove
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </div>
-
-              {/* Mobile/Tablet Card */}
-              <div className="flex flex-col gap-3 lg:hidden">
-                <div className="flex items-center gap-3">
-                  <Checkbox
-                    checked={selectedVolunteers.includes(volunteer.id)}
-                    onCheckedChange={(checked) =>
-                      handleSelectVolunteer(volunteer.id, checked as boolean)
-                    }
-                  />
-                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                    <span className="text-sm font-medium">
-                      {volunteer.initial}
-                    </span>
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-medium">{volunteer.name}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {volunteer.email}
-                    </div>
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Edit</DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => router.push(`/users/${volunteer.id}`)}
-                      >
-                        View Details
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive">
-                        Remove
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">Role:</span>
-                    <Badge
-                      variant={
-                        volunteer.role === "Admin" ? "default" : "secondary"
+          {filteredUsers.length > 0 ? (
+            filteredUsers.map((user) => (
+              <div
+                key={user.id}
+                className="px-4 sm:px-6 py-4 hover:bg-muted/30 transition-colors"
+              >
+                {/* Desktop Grid */}
+                <div className="hidden lg:grid grid-cols-12 gap-4 items-center">
+                  <div className="col-span-1">
+                    <Checkbox
+                      checked={selectedUsers.includes(user.id)}
+                      onCheckedChange={(checked) =>
+                        handleSelectUser(user.id, checked as boolean)
                       }
-                      className="ml-2 capitalize"
+                    />
+                  </div>
+                  <div className="col-span-3 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                      <span className="text-sm font-medium">
+                        {user.first_name.charAt(0)}
+                      </span>
+                    </div>
+                    <div>
+                      <div className="font-medium">
+                        {user.first_name} {user.last_name}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        User ID: #{user.user}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-span-2">
+                    <Badge
+                      variant={user.role === "admin" ? "default" : "secondary"}
+                      className="capitalize"
                     >
-                      {volunteer.role}
+                      {user.role}
                     </Badge>
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">Phone:</span>
-                    <span className="ml-2">{volunteer.phone}</span>
+                  <div className="col-span-2">
+                    <span className="text-sm">{user.contact}</span>
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">Status:</span>
-                    <Badge className="ml-2 bg-green-700 text-white rounded-full lowercase">
-                      {volunteer.status}
+                  <div className="col-span-2">
+                    <Badge className="bg-green-700 text-white rounded-full lowercase">
+                      Active
                     </Badge>
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">Listings:</span>
-                    <span className="ml-2 font-medium">
-                      {volunteer.totalListings}
+                  <div className="col-span-1">
+                    <span className="text-sm font-medium">
+                      {user.buyer_profile?.loyalty_points || 0}
                     </span>
+                  </div>
+                  <div className="col-span-1 flex justify-end">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => router.push(`/users/${user.id}`)}
+                        >
+                          View Details
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive">
+                          Remove
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </div>
+
+                {/* Mobile/Tablet Card */}
+                <div className="flex flex-col gap-3 lg:hidden">
+                  <div className="flex items-center gap-3">
+                    <Checkbox
+                      checked={selectedUsers.includes(user.id)}
+                      onCheckedChange={(checked) =>
+                        handleSelectUser(user.id, checked as boolean)
+                      }
+                    />
+                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                      <span className="text-sm font-medium">
+                        {user.first_name.charAt(0)}
+                      </span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-medium">
+                        {user.first_name} {user.last_name}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        User ID: #{user.user}
+                      </div>
+                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => router.push(`/users/${user.id}`)}
+                        >
+                          View Details
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive">
+                          Remove
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <span className="text-muted-foreground">Role:</span>
+                      <Badge
+                        variant={
+                          user.role === "admin" ? "default" : "secondary"
+                        }
+                        className="ml-2 capitalize"
+                      >
+                        {user.role}
+                      </Badge>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Contact:</span>
+                      <span className="ml-2">{user.contact}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Status:</span>
+                      <Badge className="ml-2 bg-green-700 text-white rounded-full lowercase">
+                        Active
+                      </Badge>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Points:</span>
+                      <span className="ml-2 font-medium">
+                        {user.buyer_profile?.loyalty_points || 0}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
+            ))
+          ) : (
+            <div className="px-4 sm:px-6 py-8 text-center">
+              <h3 className="text-lg font-semibold mb-2">No Users Found</h3>
+              <p className="text-muted-foreground">
+                {searchQuery
+                  ? "No users match your search criteria."
+                  : "No regular users found (excluding brokers and dealers)."}
+              </p>
             </div>
-          ))}
+          )}
         </div>
 
         {/* Pagination */}
