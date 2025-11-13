@@ -12,6 +12,7 @@ import {
   TrendingUp,
   BarChart3,
   Eye,
+  Tag,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -38,6 +39,7 @@ export default function Sidebar() {
   const links = [
     { label: "Dashboard", href: "/", icon: LayoutDashboard },
     { label: "Cars", href: "/listing", icon: CarFront },
+    { label: "Makes", href: "/makes", icon: Tag },
     { label: "Users", href: "/users", icon: Users },
     { label: "Sales", href: "/sales", icon: TrendingUp },
     { label: "Analytics", href: "/analytics", icon: BarChart3 },
