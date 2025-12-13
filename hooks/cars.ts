@@ -13,6 +13,12 @@ import {
   getPopularCars,
   approveCar,
   rejectCar,
+  createMake,
+  createModel,
+  updateMake,
+  deleteMake,
+  updateModel,
+  deleteModel,
 } from "@/lib/carApi";
 import type { FetchedCar } from "@/app/types/Car";
 
@@ -43,6 +49,102 @@ export function useModels(makeId?: number) {
     queryKey: ["models", makeId],
     queryFn: () => fetchModels(makeId),
     enabled: makeId !== undefined,
+  });
+}
+
+export function useCreateMake(
+  onSuccess?: (data: any) => void,
+  onError?: (error: Error) => void
+) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (name: string) => createMake(name),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["makes"] });
+      onSuccess?.(data);
+    },
+    onError: (error: Error) => onError?.(error),
+  });
+}
+
+export function useCreateModel(
+  onSuccess?: (data: any) => void,
+  onError?: (error: Error) => void
+) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ name, make_id }: { name: string; make_id: number }) =>
+      createModel({ name, make_id }),
+    onSuccess: (data) => {
+      onSuccess?.(data);
+      queryClient.invalidateQueries({ queryKey: ["models"] });
+      queryClient.invalidateQueries({ queryKey: ["makes"] });
+    },
+    onError: (error: Error) => onError?.(error),
+  });
+}
+
+export function useUpdateMake(
+  onSuccess?: (data: any) => void,
+  onError?: (error: Error) => void
+) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, name }: { id: number; name: string }) =>
+      updateMake({ id, name }),
+    onSuccess: (data) => {
+      onSuccess?.(data);
+      queryClient.invalidateQueries({ queryKey: ["makes"] });
+    },
+    onError: (error: Error) => onError?.(error),
+  });
+}
+
+export function useDeleteMake(
+  onSuccess?: () => void,
+  onError?: (error: Error) => void
+) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => deleteMake(id),
+    onSuccess: () => {
+      onSuccess?.();
+      queryClient.invalidateQueries({ queryKey: ["makes"] });
+    },
+    onError: (error: Error) => onError?.(error),
+  });
+}
+
+export function useUpdateModel(
+  onSuccess?: (data: any) => void,
+  onError?: (error: Error) => void
+) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { id: number; name?: string; make_id?: number }) =>
+      updateModel(payload),
+    onSuccess: (data) => {
+      onSuccess?.(data);
+      queryClient.invalidateQueries({ queryKey: ["models"] });
+      queryClient.invalidateQueries({ queryKey: ["makes"] });
+    },
+    onError: (error: Error) => onError?.(error),
+  });
+}
+
+export function useDeleteModel(
+  onSuccess?: () => void,
+  onError?: (error: Error) => void
+) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => deleteModel(id),
+    onSuccess: () => {
+      onSuccess?.();
+      queryClient.invalidateQueries({ queryKey: ["models"] });
+      queryClient.invalidateQueries({ queryKey: ["makes"] });
+    },
+    onError: (error: Error) => onError?.(error),
   });
 }
 

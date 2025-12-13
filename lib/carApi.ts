@@ -50,6 +50,72 @@ export async function fetchModels(makeId?: number): Promise<Model[]> {
   return fetcher<Model[]>(url);
 }
 
+export async function createMake(name: string) {
+  try {
+    const credential = await getCredentials();
+    const res = await fetch(`${BASE_URL}/inventory/makes/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${credential.access}`,
+      },
+      body: JSON.stringify({ name }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      const message =
+        errorData.detail ||
+        errorData.message ||
+        `Failed to create make (${res.status})`;
+      throw new Error(message);
+    }
+
+    return res.json();
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Unexpected error creating make.");
+  }
+}
+
+export async function createModel({
+  name,
+  make_id,
+}: {
+  name: string;
+  make_id: number;
+}) {
+  try {
+    const credential = await getCredentials();
+    const res = await fetch(`${BASE_URL}/inventory/models/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${credential.access}`,
+      },
+      body: JSON.stringify({ name, make_id }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      const message =
+        errorData.detail ||
+        errorData.message ||
+        `Failed to create model (${res.status})`;
+      throw new Error(message);
+    }
+
+    return res.json();
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Unexpected error creating model.");
+  }
+}
+
 export async function postCar(formData: FormData): Promise<Car> {
   const credential = await getCredentials();
 
@@ -228,5 +294,133 @@ export async function rejectCar(id: number, reason?: string) {
     throw new Error(
       "Network error. Please check your connection and try again."
     );
+  }
+}
+
+export async function updateMake({ id, name }: { id: number; name: string }) {
+  try {
+    const credential = await getCredentials();
+    const res = await fetch(`${BASE_URL}/inventory/makes/${id}/`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${credential.access}`,
+      },
+      body: JSON.stringify({ name }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      const message =
+        errorData.detail ||
+        errorData.message ||
+        `Failed to update make (${res.status})`;
+      throw new Error(message);
+    }
+
+    return res.json();
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Unexpected error updating make.");
+  }
+}
+
+export async function deleteMake(id: number) {
+  try {
+    const credential = await getCredentials();
+    const res = await fetch(`${BASE_URL}/inventory/makes/${id}/`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${credential.access}`,
+      },
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      const message =
+        errorData.detail ||
+        errorData.message ||
+        `Failed to delete make (${res.status})`;
+      throw new Error(message);
+    }
+
+    return { success: true, id };
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Unexpected error deleting make.");
+  }
+}
+
+export async function updateModel({
+  id,
+  name,
+  make_id,
+}: {
+  id: number;
+  name?: string;
+  make_id?: number;
+}) {
+  try {
+    const credential = await getCredentials();
+    const payload: Record<string, unknown> = {};
+    if (name !== undefined) payload.name = name;
+    if (make_id !== undefined) payload.make_id = make_id;
+
+    const res = await fetch(`${BASE_URL}/inventory/models/${id}/`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${credential.access}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      const message =
+        errorData.detail ||
+        errorData.message ||
+        `Failed to update model (${res.status})`;
+      throw new Error(message);
+    }
+
+    return res.json();
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Unexpected error updating model.");
+  }
+}
+
+export async function deleteModel(id: number) {
+  try {
+    const credential = await getCredentials();
+    const res = await fetch(`${BASE_URL}/inventory/models/${id}/`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${credential.access}`,
+      },
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      const message =
+        errorData.detail ||
+        errorData.message ||
+        `Failed to delete model (${res.status})`;
+      throw new Error(message);
+    }
+
+    return { success: true, id };
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Unexpected error deleting model.");
   }
 }
