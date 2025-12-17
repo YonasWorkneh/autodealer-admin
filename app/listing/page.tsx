@@ -58,21 +58,7 @@ export default function Page() {
 
         {/* Dashboard Content */}
         <div className="flex-1 p-4 md:p-6">
-          {/* filter header */}
-          <div className="flex bg-gray-100 gap-4 p-3 py-2 rounded-full w-fit my-10">
-            {filters.map((filter) => (
-              <Button
-                className={`hover:bg-zinc-900 rounded-full cursor-pointer px-8 hover:text-white ${
-                  filter.toLowerCase() === active
-                    ? ""
-                    : "bg-gray-100 text-black shadow-none"
-                }`}
-                onClick={() => setActive(filter)}
-              >
-                {filter}
-              </Button>
-            ))}
-          </div>
+         
           {/* Cars Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
             {isLoading && (

@@ -29,15 +29,25 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { usePopularCars } from "@/hooks/cars";
+import { usePopularCars, useCars } from "@/hooks/cars";
+import { useUserProfiles } from "@/hooks/userProfiles";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatPrice } from "@/lib/utils";
 
 export default function Page() {
+  const { data: popularCars, isLoading: popularCarsLoading } = usePopularCars();
+  const { data: cars } = useCars();
+  const { data: userProfiles } = useUserProfiles();
+
+  // Filter cars for auctions
+  const auctionCars = cars?.filter(
+    (car) => car.sale_type?.toLowerCase() === "auction"
+  );
+
   const metrics = [
     {
       title: "Total Cars",
-      value: "5056",
+      value: cars?.length || 0,
       change: "+8.04%",
       positive: true,
       icon: CarFront,
@@ -45,15 +55,15 @@ export default function Page() {
     },
     {
       title: "Total Users",
-      value: "128",
+      value: userProfiles?.length || 0,
       change: "-3.06%",
       positive: false,
       icon: Users,
       comparison: "vs last week",
     },
     {
-      title: "Total Sold Cars",
-      value: "84",
+      title: "Total Auctions",
+      value: auctionCars?.length || 0,
       change: "+8.04%",
       positive: true,
       icon: Car,
@@ -70,13 +80,23 @@ export default function Page() {
     { month: "Jun", sales: 67, revenue: 1850000 },
   ];
 
-  const customerData = [
-    { segment: "Volkswagen", value: 35, color: "silver" },
-    { segment: "BYD", value: 45, color: "black" },
-    { segment: "Hyundai", value: 20, color: "#222" },
-  ];
+  // Process popular cars to get top 3 makes
+  const popularMakes = popularCars?.reduce((acc, car) => {
+    const make = car.make;
+    acc[make] = (acc[make] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
 
-  const { data: popularCars, isLoading: popularCarsLoading } = usePopularCars();
+  const customerData = Object.entries(popularMakes || {})
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 3)
+    .map(([make, count], index) => ({
+      segment: make,
+      value: count,
+      color: ["black", "#222", "#444"][index] || "silver",
+    }));
+
+
 
   return (
     <div className="p-4 sm:p-6">
