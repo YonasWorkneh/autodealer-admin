@@ -144,8 +144,8 @@ export default function Page() {
                     </DropdownMenu>
                     <div className="relative flex justify-center">
                       <img
-                        src={image.image_url || "/placeholder.svg"}
-                        alt={image.caption || ""}
+                        src={image?.image_url || "/placeholder.svg"}
+                        alt={image?.caption || ""}
                         className="w-full md:w-full max-h-[250px] object-cover"
                       />
                     </div>
