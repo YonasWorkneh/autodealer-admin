@@ -2,6 +2,7 @@ import type { Car, FetchedCar } from "@/app/types/Car"; // move your interfaces 
 import { Favorite } from "@/app/types/Favorite";
 import type { Make } from "@/app/types/Make";
 import type { Model } from "@/app/types/Model";
+import type { CarView } from "@/app/types/CarView";
 import { getCredentials } from "./credential";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL as string;
@@ -423,4 +424,13 @@ export async function deleteModel(id: number) {
     }
     throw new Error("Unexpected error deleting model.");
   }
+}
+
+export async function fetchCarViews(carId: number): Promise<CarView[]> {
+  const credential = await getCredentials();
+  return fetcher<CarView[]>(`/analytics/view_viewers?car_id=${carId}`, {
+    headers: {
+      Authorization: `Bearer ${credential.access}`,
+    },
+  });
 }

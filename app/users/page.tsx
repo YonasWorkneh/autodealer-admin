@@ -129,9 +129,9 @@ export default function Page() {
       </div>
 
       {/* Table */}
-      <div className="border border-border rounded-lg overflow-hidden">
+      <div className="border border-primary/10 rounded-lg overflow-hidden">
         {/* Desktop Header */}
-        <div className="hidden lg:block bg-muted/50 border-b border-border px-6 py-4">
+        <div className="hidden lg:block bg-primary/5 border-b border-primary/10 px-6 py-4">
           <div className="grid grid-cols-12 gap-4 items-center">
             <div className="col-span-1">
               <Checkbox
@@ -142,31 +142,35 @@ export default function Page() {
               />
             </div>
             <div className="col-span-3">
-              <span className="text-sm font-medium">Name</span>
+              <span className="text-sm font-medium text-primary/80">Name</span>
             </div>
             <div className="col-span-2">
-              <span className="text-sm font-medium">Role</span>
+              <span className="text-sm font-medium text-primary/80">Role</span>
             </div>
             <div className="col-span-2">
-              <span className="text-sm font-medium">Contact</span>
+              <span className="text-sm font-medium text-primary/80">Contact</span>
             </div>
             <div className="col-span-2">
-              <span className="text-sm font-medium">Status</span>
+              <span className="text-sm font-medium text-primary/80">Status</span>
             </div>
             <div className="col-span-1">
-              <span className="text-sm font-medium">Points</span>
+              <span className="text-sm font-medium text-primary/80">Points</span>
             </div>
             <div className="col-span-1"></div>
           </div>
         </div>
 
         {/* Rows */}
-        <div className="divide-y divide-border">
+        <div className="divide-y divide-primary/5">
           {filteredUsers.length > 0 ? (
             filteredUsers.map((user) => (
               <div
                 key={user.id}
-                className="px-4 sm:px-6 py-4 hover:bg-muted/30 transition-colors"
+                className={`px-4 sm:px-6 py-4 transition-colors ${
+                  selectedUsers.includes(user.id)
+                    ? "bg-primary/5 hover:bg-primary/10"
+                    : "hover:bg-primary/5"
+                }`}
               >
                 {/* Desktop Grid */}
                 <div className="hidden lg:grid grid-cols-12 gap-4 items-center">
@@ -179,8 +183,8 @@ export default function Page() {
                     />
                   </div>
                   <div className="col-span-3 flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                      <span className="text-sm font-medium">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
+                      <span className="text-sm font-medium text-primary">
                         {user.first_name.charAt(0)}
                       </span>
                     </div>
@@ -205,7 +209,7 @@ export default function Page() {
                     <span className="text-sm">{user.contact}</span>
                   </div>
                   <div className="col-span-2">
-                    <Badge className="bg-green-700 text-white rounded-full lowercase">
+                    <Badge className="bg-primary text-primary-foreground rounded-full lowercase">
                       Active
                     </Badge>
                   </div>
@@ -249,8 +253,8 @@ export default function Page() {
                         handleSelectUser(user.id, checked as boolean)
                       }
                     />
-                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                      <span className="text-sm font-medium">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
+                      <span className="text-sm font-medium text-primary">
                         {user.first_name.charAt(0)}
                       </span>
                     </div>
@@ -303,7 +307,7 @@ export default function Page() {
                     </div>
                     <div>
                       <span className="text-muted-foreground">Status:</span>
-                      <Badge className="ml-2 bg-green-700 text-white rounded-full lowercase">
+                      <Badge className="ml-2 bg-primary text-primary-foreground rounded-full lowercase">
                         Active
                       </Badge>
                     </div>
@@ -342,13 +346,13 @@ export default function Page() {
             </Button>
 
             <div className="flex items-center gap-2">
-              <Button size="sm" className="bg-primary text-white">
+              <Button size="sm" className="bg-primary text-primary-foreground">
                 1
               </Button>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="hover:bg-primary/5 hover:border-primary/30">
                 2
               </Button>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="hover:bg-primary/5 hover:border-primary/30">
                 3
               </Button>
             </div>

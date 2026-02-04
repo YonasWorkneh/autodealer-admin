@@ -146,8 +146,8 @@ export default function AnalyticsPage() {
         ].map((tab) => (
           <Button
             key={tab.key}
-            className={`hover:bg-zinc-900 rounded-full cursor-pointer px-8 hover:text-white ${
-              activeTab === tab.key ? "" : "bg-gray-100 text-black shadow-none"
+            className={`hover:bg-primary/90 rounded-full cursor-pointer px-8 hover:text-primary-foreground ${
+              activeTab === tab.key ? "" : "bg-gray-100 text-primary shadow-none"
             }`}
             onClick={() => setActiveTab(tab.key as any)}
           >

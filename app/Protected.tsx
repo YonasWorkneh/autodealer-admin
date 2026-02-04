@@ -2,10 +2,14 @@
 
 import React, { ReactElement, useEffect, useState } from "react";
 import { useUserStore } from "@/store/user";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Sidebar from "@/components/Sidebar";
+import Header from "@/components/Header";
 
 const queryClient = new QueryClient();
+
+const authRoutes = ["/signin", "/signup", "/forgot-password", "/reset"];
 
 export default function Protected({
   children,
@@ -16,11 +20,20 @@ export default function Protected({
 }) {
   const { setUser } = useUserStore();
   const router = useRouter();
+  const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
 
+  const isAuthRoute = authRoutes.some((route) => pathname?.startsWith(route));
+
   useEffect(() => {
-    // Redirect to signin if not logged in
     setMounted(true);
+    
+    // Allow auth routes without redirecting
+    if (isAuthRoute) {
+      return;
+    }
+
+    // Redirect to signin if not logged in and not on auth route
     if (!isLogged) {
       router.push("/signin");
       return;
@@ -45,12 +58,26 @@ export default function Protected({
 
     // Execute in background without blocking render
     refreshUserCredentials();
-  }, [isLogged, router, setUser]);
+  }, [isLogged, router, setUser, isAuthRoute]);
 
   // Render immediately without waiting
-  return mounted ? (
-    <div>
+  if (!mounted) return null;
+
+  // For auth routes, render children directly without sidebar/header
+  if (isAuthRoute) {
+    return (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </div>
-  ) : null;
+    );
+  }
+
+  // For protected routes, render with sidebar and header
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Sidebar />
+      <main className="flex-1 md:ml-16 max-h-screen p-4 py-0 bg-white pt-20">
+        <Header />
+        <div className="root">{children}</div>
+      </main>
+    </QueryClientProvider>
+  );
 }

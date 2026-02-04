@@ -326,7 +326,7 @@ function CarViewCard({
         )}
 
         {/* View Count Badge */}
-        <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-sm flex items-center gap-1">
+        <div className="absolute top-2 right-2 bg-primary/70 text-primary-foreground px-2 py-1 rounded text-sm flex items-center gap-1">
           <Eye className="h-3 w-3" />
           <span>{view.total_views.toLocaleString()}</span>
         </div>

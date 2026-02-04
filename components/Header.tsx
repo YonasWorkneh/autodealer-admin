@@ -21,13 +21,13 @@ export default function Header() {
     >
       {/* Search */}
       <div className="flex-1 max-w-full sm:max-w-[300px] lg:max-w-[400px]">
-        <div className="text-gray-600 bg-gray-100 rounded-full px-10 py-2 relative border w-full border-transparent focus-within:border-black/10">
+        <div className="text-gray-600 bg-gray-100 rounded-full px-10 py-2 relative border w-full border-transparent focus-within:border-primary/20">
           <Input
             placeholder="Search for anything..."
             className="bg-transparent border-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none"
           />
           <Search
-            className="absolute top-1/2 -translate-y-1/2 left-4 text-black/70"
+            className="absolute top-1/2 -translate-y-1/2 left-4 text-primary/70"
             size={18}
           />
         </div>
@@ -40,7 +40,7 @@ export default function Header() {
           <div className="bg-gray-100 size-9 sm:size-10 rounded-full grid place-items-center">
             <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div className="size-2 bg-black rounded-full absolute top-1 right-1" />
+          <div className="size-2 bg-primary rounded-full absolute top-1 right-1" />
         </Link>
 
         {/* User info */}
@@ -55,7 +55,7 @@ export default function Header() {
             <p className="text-sm whitespace-nowrap">
               Hello, {user.first_name}
             </p>
-            <div className="text-gray-500 bg-white rounded-full px-2 py-1 text-xs sm:text-sm">
+            <div className="text-black bg-primary/10 border border-primary/10 rounded-full px-2 py-1 text-xs sm:text-sm">
               22 May
             </div>
           </div>

@@ -15,7 +15,7 @@ export default function Page() {
         {/* 404 with tire */}
         <div className="relative mt-6 flex items-end justify-center gap-3 select-none">
           <span
-            className="font-black leading-none text-zinc-900"
+            className="font-black leading-none text-primary"
             style={{ fontSize: "clamp(120px, 20vw, 260px)" }}
             aria-hidden="true"
           >
@@ -40,7 +40,7 @@ export default function Page() {
           </div>
 
           <span
-            className="font-black leading-none text-zinc-900"
+            className="font-black leading-none text-primary"
             style={{ fontSize: "clamp(120px, 20vw, 260px)" }}
             aria-hidden="true"
           >
@@ -49,7 +49,7 @@ export default function Page() {
         </div>
 
         {/* Headline */}
-        <h1 className="mt-8 text-center text-3xl font-extrabold tracking-wide text-zinc-800 md:text-4xl">
+        <h1 className="mt-8 text-center text-3xl font-extrabold tracking-wide text-primary md:text-4xl">
           PAGE NOT FOUND!!
         </h1>
         <p className="mt-3 max-w-2xl text-center text-base text-zinc-600 md:text-lg">
@@ -61,7 +61,7 @@ export default function Page() {
         <div className="mt-8">
           <Button
             asChild
-            className="rounded-full bg-zinc-800 px-6 py-5 text-base font-semibold tracking-wide text-white hover:bg-zinc-900"
+            className="rounded-full bg-primary px-6 py-5 text-base font-semibold tracking-wide text-primary-foreground hover:bg-primary/90"
           >
             <Link href="/">BACK TO HOMEPAGE</Link>
           </Button>

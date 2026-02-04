@@ -35,14 +35,7 @@ html {
       <body>
         <div className="root">
           <Protected isLogged={isLogged}>
-            <>
-              {/* sidebar */}
-              <Sidebar />
-              <main className="flex-1 md:ml-16 max-h-screen p-4 py-0 bg-white pt-20">
-                <Header />
-                <div className="root">{children}</div>
-              </main>
-            </>
+            <>{children}</>
           </Protected>
           <Toaster
             position="top-center"

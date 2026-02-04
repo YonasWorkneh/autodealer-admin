@@ -93,7 +93,7 @@ export default function Page() {
                   </p>
                   <Link
                     href={"/listing/new"}
-                    className="group bg-zinc-800 hover:bg-zinc-900 text-white py-2 text-sm w-fit cursor-pointer flex gap-2 items-center px-3 rounded-full"
+                    className="group bg-primary hover:bg-primary/90 text-primary-foreground py-2 text-sm w-fit cursor-pointer flex gap-2 items-center px-3 rounded-full"
                   >
                     <span>Add New</span>
                     <span className="group-hover:translate-x-1 transition-all">

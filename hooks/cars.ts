@@ -19,8 +19,10 @@ import {
   deleteMake,
   updateModel,
   deleteModel,
+  fetchCarViews,
 } from "@/lib/carApi";
 import type { FetchedCar } from "@/app/types/Car";
+import type { CarView } from "@/app/types/CarView";
 
 export function useCars() {
   return useQuery<FetchedCar[]>({
@@ -278,5 +280,13 @@ export function useRejectCar(
       queryClient.invalidateQueries({ queryKey: ["car"] });
     },
     onError: (error: Error) => onError?.(error),
+  });
+}
+
+export function useCarViews(carId: number) {
+  return useQuery<CarView[]>({
+    queryKey: ["car-views", carId],
+    queryFn: () => fetchCarViews(carId),
+    staleTime: 2 * 60 * 1000, // cache for 2 minutes
   });
 }

@@ -93,7 +93,11 @@ export default function Page() {
     .map(([make, count], index) => ({
       segment: make,
       value: count,
-      color: ["black", "#222", "#444"][index] || "silver",
+      color: index === 0 
+        ? "#522084" 
+        : index === 1 
+        ? "#6B3FA3" 
+        : "#8459C2",
     }));
 
 
@@ -148,18 +152,18 @@ export default function Page() {
             <CardContent>
               <ChartContainer
                 config={{
-                  sales: { label: "Sales", color: "var(--chart-1)" },
-                  revenue: { label: "Revenue", color: "var(--chart-2)" },
+                  sales: { label: "Sales", color: "var(--primary)" },
+                  revenue: { label: "Revenue", color: "var(--primary)" },
                 }}
                 className="h-[250px] sm:h-[300px]"
               >
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={salesData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#522084" strokeOpacity={0.1} />
+                    <XAxis dataKey="month" stroke="#522084" strokeOpacity={0.6} />
+                    <YAxis stroke="#522084" strokeOpacity={0.6} />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="sales" fill="black" />
+                    <Bar dataKey="sales" fill="#522084" />
                   </BarChart>
                 </ResponsiveContainer>
               </ChartContainer>
@@ -175,9 +179,9 @@ export default function Page() {
             <CardContent>
               <ChartContainer
                 config={{
-                  new: { label: "New Customers", color: "black" },
-                  returning: { label: "Returning", color: "#222" },
-                  referrals: { label: "Referrals", color: "#000" },
+                  new: { label: "New Customers", color: "#522084" },
+                  returning: { label: "Returning", color: "#6B3FA3" },
+                  referrals: { label: "Referrals", color: "#8459C2" },
                 }}
                 className="h-[250px] sm:h-[300px]"
               >
@@ -315,7 +319,7 @@ export default function Page() {
               <CardTitle>Latest Inventory</CardTitle>
               <Link
                 href={"/listing"}
-                className="group bg-zinc-800 hover:bg-zinc-900 text-white py-2 text-xs sm:text-sm w-fit cursor-pointer flex gap-2 items-center px-3 rounded-full"
+                className="group bg-primary hover:bg-primary/90 text-primary-foreground py-2 text-xs sm:text-sm w-fit cursor-pointer flex gap-2 items-center px-3 rounded-full"
               >
                 <span>View more</span>
                 <span className="group-hover:translate-x-1 transition-all">
@@ -330,7 +334,7 @@ export default function Page() {
                   alt="Volkwagen ID6 Electric"
                   className="w-full max-h-[200px] sm:max-h-[350px] object-cover rounded-lg"
                 />
-                <div className="absolute bottom-2 left-2 bg-black rounded-full p-2">
+                <div className="absolute bottom-2 left-2 bg-primary rounded-full p-2">
                   <CarFront className="w-4 h-4 text-white" />
                 </div>
               </div>
@@ -350,7 +354,7 @@ export default function Page() {
                     <Badge
                       key={idx}
                       variant="secondary"
-                      className="bg-black text-white rounded-full text-xs sm:text-sm"
+                      className="bg-primary text-primary-foreground rounded-full text-xs sm:text-sm"
                     >
                       {tag}
                     </Badge>

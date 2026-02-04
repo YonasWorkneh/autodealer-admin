@@ -1,7 +1,8 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useCar, useApproveCar, useRejectCar } from "@/hooks/cars";
+import { useCar, useApproveCar, useRejectCar, useCarViews } from "@/hooks/cars";
+import { useUserProfile } from "@/hooks/userProfiles";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +22,15 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  User,
+  Building2,
+  Phone,
+  MapPin,
+  ShieldCheck,
+  CreditCard,
+  UserCircle,
+  Eye,
+  Mail,
 } from "lucide-react";
 import React, { useState } from "react";
 import {
@@ -36,13 +46,118 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import type { CarView } from "@/app/types/CarView";
+
+// Component to display a single view row with user information
+function ViewRow({ view }: { view: CarView }) {
+  const { data: userProfile, isLoading: isLoadingProfile } = useUserProfile(
+    view.user_id || null
+  );
+
+  const fullName = `${view.first_name || ""} ${view.last_name || ""}`.trim();
+  const displayName =
+    fullName || view.user__email?.split("@")[0] || "Unknown User";
+  const initials = fullName
+    ? `${view.first_name?.[0] || ""}${view.last_name?.[0] || ""}`.toUpperCase()
+    : view.user__email?.[0]?.toUpperCase() || "?";
+
+  // Use role from user profile if available, otherwise show N/A
+  const viewerType = userProfile?.role || null;
+
+  return (
+    <TableRow>
+      <TableCell>
+        <div className="flex items-center gap-2">
+          <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-medium">
+            {initials}
+          </div>
+          <div>
+            <p className="font-medium">{displayName}</p>
+            {isLoadingProfile ? (
+              <Skeleton className="h-3 w-16 mt-1" />
+            ) : viewerType ? (
+              <p className="text-xs text-muted-foreground capitalize">
+                {viewerType}
+              </p>
+            ) : null}
+          </div>
+        </div>
+      </TableCell>
+      <TableCell>
+        {view.contact && !view.contact.includes("@") ? (
+          <a
+            href={`tel:${view.contact}`}
+            className="flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+          >
+            <Phone className="h-3 w-3" />
+            {view.contact}
+          </a>
+        ) : (
+          <span className="text-muted-foreground">N/A</span>
+        )}
+      </TableCell>
+      <TableCell>
+        {view.user__email ? (
+          <a
+            href={`mailto:${view.user__email}`}
+            className="flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+          >
+            <Mail className="h-3 w-3" />
+            {view.user__email}
+          </a>
+        ) : (
+          <span className="text-muted-foreground">N/A</span>
+        )}
+      </TableCell>
+      <TableCell>
+        {isLoadingProfile ? (
+          <Skeleton className="h-5 w-20" />
+        ) : viewerType ? (
+          <Badge
+            variant={
+              viewerType === "dealer" ||
+              viewerType === "broker" ||
+              viewerType === "buyer"
+                ? "default"
+                : "secondary"
+            }
+            className="capitalize"
+          >
+            {viewerType}
+          </Badge>
+        ) : (
+          <span className="text-muted-foreground">N/A</span>
+        )}
+      </TableCell>
+      <TableCell>
+        <div className="flex items-center gap-1 text-muted-foreground">
+          <Clock className="h-3 w-3" />
+          {new Date(view.viewed_at).toLocaleString()}
+        </div>
+      </TableCell>
+    </TableRow>
+  );
+}
 
 export default function CarDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const { showToast } = useToast();
-  const carId = params.id as string;
-  const { data: car, isLoading, error } = useCar(carId);
+  const carId = Number(params.id);
+  const { data: car, isLoading, error } = useCar(carId.toString());
+  const profileId = car?.dealer || car?.broker || null;
+  const { data: profile, isLoading: isLoadingProfile } = useUserProfile(
+    profileId
+  );
+  const { data: carViews, isLoading: isLoadingViews } = useCarViews(carId);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [showApproveDialog, setShowApproveDialog] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
@@ -215,6 +330,7 @@ export default function CarDetailsPage() {
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2 capitalize">
                   {car.make} {car.model} {car.year}
+                  
                 </h1>
                 <div className="flex items-center gap-2">
                   {getStatusBadge(car.verification_status)}
@@ -345,7 +461,7 @@ export default function CarDetailsPage() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white hover:text-white cursor-pointer rounded-full h-10 w-10"
+                              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-primary/50 hover:bg-primary/70 text-primary-foreground hover:text-primary-foreground cursor-pointer rounded-full h-10 w-10"
                               onClick={prevImage}
                             >
                               <ChevronLeft className="h-5 w-5" />
@@ -353,7 +469,7 @@ export default function CarDetailsPage() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white hover:text-white cursor-pointer rounded-full h-10 w-10"
+                              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary/50 hover:bg-primary/70 text-primary-foreground hover:text-primary-foreground cursor-pointer rounded-full h-10 w-10"
                               onClick={nextImage}
                             >
                               <ChevronRight className="h-5 w-5" />
@@ -362,7 +478,7 @@ export default function CarDetailsPage() {
                         )}
 
                         {/* Image Counter */}
-                        <div className="absolute bottom-4 right-4 bg-black/70 text-white px-2 py-1 rounded text-sm flex items-center gap-1">
+                        <div className="absolute bottom-4 right-4 bg-primary/70 text-primary-foreground px-2 py-1 rounded text-sm flex items-center gap-1">
                           <Image
                             src={"/image-count.svg"}
                             alt={`Image ${currentImageIndex + 1}`}
@@ -529,6 +645,254 @@ export default function CarDetailsPage() {
                 </CardContent>
               </Card>
             )}
+
+            {/* Dealer/Broker Information */}
+            {(car.dealer || car.broker) && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    {car.dealer ? (
+                      <Building2 className="h-5 w-5" />
+                    ) : (
+                      <UserCircle className="h-5 w-5" />
+                    )}
+                    {car.dealer ? "Dealer Information" : "Broker Information"}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {isLoadingProfile ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-4">
+                        <Skeleton className="h-16 w-16 rounded-full" />
+                        <div className="space-y-2 flex-1">
+                          <Skeleton className="h-4 w-48" />
+                          <Skeleton className="h-4 w-32" />
+                        </div>
+                      </div>
+                    </div>
+                  ) : profile ? (
+                    <div className="space-y-4">
+                      <div className="flex items-start gap-4">
+                        <div className="relative">
+                          <Image
+                            src={
+                              profile.image_url ||
+                              profile.image ||
+                              "/placeholder-user.jpg"
+                            }
+                            alt={`${profile.first_name} ${profile.last_name}`}
+                            width={64}
+                            height={64}
+                            className="rounded-full object-cover border-2 border-border"
+                          />
+                          {(profile.dealer_profile?.is_verified ||
+                            profile.broker_profile?.is_verified) && (
+                            <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-1">
+                              <ShieldCheck className="h-4 w-4 text-white" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="text-lg font-semibold">
+                              {profile.first_name} {profile.last_name}
+                            </h3>
+                            {(profile.dealer_profile?.is_verified ||
+                              profile.broker_profile?.is_verified) && (
+                              <Badge
+                                variant="default"
+                                className="bg-green-600 text-white"
+                              >
+                                <ShieldCheck className="h-3 w-3 mr-1" />
+                                Verified
+                              </Badge>
+                            )}
+                          </div>
+                          {profile.dealer_profile?.company_name && (
+                            <p className="text-muted-foreground flex items-center gap-1 mb-2">
+                              <Building2 className="h-4 w-4" />
+                              {profile.dealer_profile.company_name}
+                            </p>
+                          )}
+                          {(profile.dealer_profile?.role ||
+                            profile.broker_profile?.role) && (
+                            <p className="text-muted-foreground flex items-center gap-1 mb-2">
+                              <UserCircle className="h-4 w-4" />
+                              {profile.dealer_profile?.role ||
+                                profile.broker_profile?.role}
+                            </p>
+                          )}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+                            {profile.contact && (
+                              <div className="flex items-center gap-2 text-sm">
+                                <Phone className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-muted-foreground">
+                                  Contact:
+                                </span>
+                                <span className="font-medium">
+                                  {profile.contact}
+                                </span>
+                              </div>
+                            )}
+                            {profile.address && (
+                              <div className="flex items-start gap-2 text-sm">
+                                <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                                <div>
+                                  <span className="text-muted-foreground">
+                                    Address:
+                                  </span>
+                                  <span className="font-medium ml-1">
+                                    {profile.address}
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+                            {profile.dealer_profile?.license_number && (
+                              <div className="flex items-center gap-2 text-sm">
+                                <ShieldCheck className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-muted-foreground">
+                                  License Number:
+                                </span>
+                                <span className="font-medium">
+                                  {profile.dealer_profile.license_number}
+                                </span>
+                              </div>
+                            )}
+                            {profile.broker_profile?.national_id && (
+                              <div className="flex items-center gap-2 text-sm">
+                                <ShieldCheck className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-muted-foreground">
+                                  National ID:
+                                </span>
+                                <span className="font-medium">
+                                  {profile.broker_profile.national_id}
+                                </span>
+                              </div>
+                            )}
+                            {profile.dealer_profile?.tax_id && (
+                              <div className="flex items-center gap-2 text-sm">
+                                <Building2 className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-muted-foreground">
+                                  Tax ID:
+                                </span>
+                                <span className="font-medium">
+                                  {profile.dealer_profile.tax_id}
+                                </span>
+                              </div>
+                            )}
+                            {(profile.dealer_profile?.telebirr_account ||
+                              profile.broker_profile?.telebirr_account) && (
+                              <div className="flex items-center gap-2 text-sm">
+                                <CreditCard className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-muted-foreground">
+                                  Telebirr Account:
+                                </span>
+                                <span className="font-medium">
+                                  {profile.dealer_profile?.telebirr_account ||
+                                    profile.broker_profile?.telebirr_account}
+                                </span>
+                              </div>
+                            )}
+                            {profile.role && (
+                              <div className="flex items-center gap-2 text-sm">
+                                <UserCircle className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-muted-foreground">
+                                  User Role:
+                                </span>
+                                <span className="font-medium capitalize">
+                                  {profile.role}
+                                </span>
+                              </div>
+                            )}
+                            {profile.created_at && (
+                              <div className="flex items-center gap-2 text-sm">
+                                <Calendar className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-muted-foreground">
+                                  Profile Created:
+                                </span>
+                                <span className="font-medium">
+                                  {new Date(
+                                    profile.created_at
+                                  ).toLocaleDateString()}
+                                </span>
+                              </div>
+                            )}
+                            {profile.updated_at && (
+                              <div className="flex items-center gap-2 text-sm">
+                                <Clock className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-muted-foreground">
+                                  Last Updated:
+                                </span>
+                                <span className="font-medium">
+                                  {new Date(
+                                    profile.updated_at
+                                  ).toLocaleDateString()}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-4 text-muted-foreground">
+                      <User className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p>
+                        {car.dealer
+                          ? "Dealer information not available"
+                          : "Broker information not available"}
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Car Views */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Eye className="h-5 w-5" />
+                  Car Views ({carViews?.length || 0})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoadingViews ? (
+                  <div className="space-y-2">
+                    <Skeleton className="h-12 w-full" />
+                    <Skeleton className="h-12 w-full" />
+                    <Skeleton className="h-12 w-full" />
+                  </div>
+                ) : carViews && carViews.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Viewer</TableHead>
+                          <TableHead>Contact</TableHead>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Viewer Role</TableHead>
+                          <TableHead>Viewed At</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {carViews.map((view, index) => (
+                          <ViewRow
+                            key={`${view.user_id}-${view.viewed_at}-${index}`}
+                            view={view}
+                          />
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Eye className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p>No views yet</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
             {/* Additional Details */}
             <Card>

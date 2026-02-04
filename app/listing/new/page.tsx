@@ -695,7 +695,7 @@ export default function PlaceAddForm() {
       <div>
         <div className="w-full bg-transparent rounded-lg p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-semibold text-black/70 uppercase text-center">
+            <h1 className="text-3xl font-semibold text-primary/80 uppercase text-center">
               {c_id ? "Edit Car Details" : "Car Details Form"}
             </h1>
           </div>
@@ -774,7 +774,7 @@ export default function PlaceAddForm() {
                       }}
                     >
                       <SelectTrigger
-                        className={`w-full h-12 border-black/10 rounded-md py-8 ${
+                        className={`w-full h-12 border-primary/10 rounded-md py-8 ${
                           errors.make ? "border-red-500" : ""
                         }`}
                       >
@@ -819,7 +819,7 @@ export default function PlaceAddForm() {
                       disabled={!watchedMake || watchedMake === 0}
                     >
                       <SelectTrigger
-                        className={`w-full h-12 border-black/10 rounded-md py-8 ${
+                        className={`w-full h-12 border-primary/10 rounded-md py-8 ${
                           errors.model ? "border-red-500" : ""
                         }`}
                       >
@@ -866,7 +866,7 @@ export default function PlaceAddForm() {
                         onValueChange={field.onChange}
                       >
                         <SelectTrigger
-                          className={`w-full h-12 border-black/10 rounded-md py-8 ${
+                          className={`w-full h-12 border-primary/10 rounded-md py-8 ${
                             errors.year ? "border-red-500" : ""
                           }`}
                         >
@@ -901,7 +901,7 @@ export default function PlaceAddForm() {
                         id="mileage"
                         type="number"
                         placeholder="50000"
-                        className={`h-12 border-black/10 rounded-md py-8 ${
+                        className={`h-12 border-primary/10 rounded-md py-8 ${
                           errors.mileage ? "border-red-500" : ""
                         }`}
                       />
@@ -930,7 +930,7 @@ export default function PlaceAddForm() {
                         onValueChange={field.onChange}
                       >
                         <SelectTrigger
-                          className={`w-full h-12 border-black/10 rounded-md py-8 ${
+                          className={`w-full h-12 border-primary/10 rounded-md py-8 ${
                             errors.engine ? "border-red-500" : ""
                           }`}
                         >
@@ -965,7 +965,7 @@ export default function PlaceAddForm() {
                         onValueChange={field.onChange}
                       >
                         <SelectTrigger
-                          className={`w-full h-12 border-black/10 rounded-md py-8 ${
+                          className={`w-full h-12 border-primary/10 rounded-md py-8 ${
                             errors.gearbox ? "border-red-500" : ""
                           }`}
                         >
@@ -1003,7 +1003,7 @@ export default function PlaceAddForm() {
                         onValueChange={field.onChange}
                       >
                         <SelectTrigger
-                          className={`w-full h-12 border-black/10 rounded-md py-8 ${
+                          className={`w-full h-12 border-primary/10 rounded-md py-8 ${
                             errors.fuelType ? "border-red-500" : ""
                           }`}
                         >
@@ -1038,7 +1038,7 @@ export default function PlaceAddForm() {
                         onValueChange={field.onChange}
                       >
                         <SelectTrigger
-                          className={`w-full h-12 border-black/10 rounded-md py-8 ${
+                          className={`w-full h-12 border-primary/10 rounded-md py-8 ${
                             errors.bodyType ? "border-red-500" : ""
                           }`}
                         >
@@ -1080,7 +1080,7 @@ export default function PlaceAddForm() {
                         id="bodyColor"
                         type="text"
                         placeholder="Grey"
-                        className={`h-12 border-black/10 rounded-md py-8 ${
+                        className={`h-12 border-primary/10 rounded-md py-8 ${
                           errors.bodyColor ? "border-red-500" : ""
                         }`}
                       />
@@ -1108,7 +1108,7 @@ export default function PlaceAddForm() {
                         id="interiorColor"
                         type="text"
                         placeholder="White"
-                        className={`h-12 border-black/10 rounded-md py-8 ${
+                        className={`h-12 border-primary/10 rounded-md py-8 ${
                           errors.interiorColor ? "border-red-500" : ""
                         }`}
                       />
@@ -1136,7 +1136,7 @@ export default function PlaceAddForm() {
                         id="price"
                         type="number"
                         placeholder="Enter price"
-                        className={`h-12 border-black/10 rounded-md py-8 ${
+                        className={`h-12 border-primary/10 rounded-md py-8 ${
                           errors.price ? "border-red-500" : ""
                         }`}
                       />
@@ -1161,7 +1161,7 @@ export default function PlaceAddForm() {
                         onValueChange={field.onChange}
                       >
                         <SelectTrigger
-                          className={`w-full h-12 border-black/10 rounded-md py-8 ${
+                          className={`w-full h-12 border-primary/10 rounded-md py-8 ${
                             errors.salesType ? "border-red-500" : ""
                           }`}
                         >
@@ -1229,7 +1229,7 @@ export default function PlaceAddForm() {
                       <button
                         type="button"
                         onClick={() => removeImage(idx)}
-                        className="absolute top-1 right-1 bg-black/60 text-white rounded-full size-[20px] text-xs cursor-pointer hover:bg-black/70"
+                        className="absolute top-1 right-1 bg-primary/60 text-primary-foreground rounded-full size-[20px] text-xs cursor-pointer hover:bg-primary/70"
                       >
                         ✕
                       </button>
@@ -1278,7 +1278,7 @@ export default function PlaceAddForm() {
                       {...field}
                       id="description"
                       placeholder="Write a short description about your car..."
-                      className={`min-h-[120px] border-black/10 rounded-md ${
+                      className={`min-h-[120px] border-primary/10 rounded-md ${
                         errors.description ? "border-red-500" : ""
                       }`}
                     />

@@ -31,7 +31,7 @@ export default function AccountSettingsPage() {
       <div className="max-w-4xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-black mb-2">
+          <h1 className="text-3xl font-bold text-primary mb-2">
             Account Settings
           </h1>
           <p className="text-muted-foreground">
@@ -104,7 +104,7 @@ export default function AccountSettingsPage() {
                 {/* Upload button */}
                 <label
                   htmlFor="avatar-upload"
-                  className="cursor-pointer absolute bottom-0 left-[calc(50%-18px)] bg-black hover:bg-gray-800 text-white p-2 rounded-full"
+                  className="cursor-pointer absolute bottom-0 left-[calc(50%-18px)] bg-primary hover:bg-primary/90 text-primary-foreground p-2 rounded-full"
                 >
                   <Camera className="h-4 w-4" />
                 </label>
@@ -121,7 +121,9 @@ export default function AccountSettingsPage() {
             <div className="mt-12 pt-8 border-t border-gray-200">
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive">Delete Account</Button>
+                  <Button variant="destructive" className="bg-red-100 text-red-700 hover:bg-red-200 border border-red-200/50 shadow-sm">
+                    Delete Account
+                  </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
@@ -135,7 +137,7 @@ export default function AccountSettingsPage() {
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction className="bg-red-500 hover:bg-red-600">
+                    <AlertDialogAction className="bg-red-200 text-red-800 hover:bg-red-300 border border-red-300/50 shadow-sm">
                       Yes, delete
                     </AlertDialogAction>
                   </AlertDialogFooter>
@@ -150,7 +152,7 @@ export default function AccountSettingsPage() {
             {/* Action Buttons */}
             <div className="flex gap-4 justify-end mt-10">
               <Button variant="outline">Cancel</Button>
-              <Button className="bg-black hover:bg-gray-800 text-white">
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
                 Save
               </Button>
             </div>

@@ -197,7 +197,7 @@ export default function MakesPage() {
             placeholder="Search car make..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 pr-4 py-3 w-full rounded-full border border-input bg-background focus:outline-none focus:ring-0 focus:border-zinc-900"
+            className="pl-12 pr-4 py-3 w-full rounded-full border border-input bg-background focus:outline-none focus:ring-0 focus:border-primary"
           />
         </div>
         <div className="flex gap-2">
@@ -702,7 +702,7 @@ function MakeDialog({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter make name"
-              className="w-full rounded-md border border-input bg-background px-3 py-2 focus:outline-none focus:ring-0 focus:border-zinc-900"
+              className="w-full rounded-md border border-input bg-background px-3 py-2 focus:outline-none focus:ring-0 focus:border-primary"
             />
           </div>
           <div className="flex justify-end gap-2">
@@ -792,7 +792,7 @@ function ModelDialog({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter model name"
-              className="w-full rounded-md border border-input bg-background px-3 py-2 focus:outline-none focus:ring-0 focus:border-zinc-900"
+              className="w-full rounded-md border border-input bg-background px-3 py-2 focus:outline-none focus:ring-0 focus:border-primary"
             />
           </div>
           <div className="flex justify-end gap-2">
