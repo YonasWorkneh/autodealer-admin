@@ -29,3 +29,7 @@ async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
 export async function fetchUserProfiles(): Promise<UserProfile[]> {
   return fetcher<UserProfile[]>("/users/profiles");
 }
+
+export async function fetchUserProfileById(id: number): Promise<UserProfile> {
+  return fetcher<UserProfile>(`/users/profiles/${id}`);
+}

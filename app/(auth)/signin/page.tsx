@@ -48,11 +48,11 @@ export default function SignIn() {
   };
 
   return (
-    <Card className="w-[380px] sm:w-[450px]">
+    <Card className="w-[380px] sm:w-[450px] border-primary/10 shadow-lg">
       <CardHeader>
         <Link
           href={"/"}
-          className="flex items-center justify-center gap-2 mb-3 border-b pb-4"
+          className="flex items-center justify-center gap-2 mb-3 border-b border-primary/20 pb-4"
         >
           <div className="w-8 h-8 rounded-full flex items-center justify-center">
             <Image
@@ -63,9 +63,9 @@ export default function SignIn() {
               className="w-full h-full"
             />
           </div>
-          <h1>AUTO&mdash;DEALER</h1>
+          <h1 className="text-primary font-semibold">AUTO&mdash;DEALER</h1>
         </Link>
-        <CardTitle className="text-lg md:text-xl">Sign In</CardTitle>
+        <CardTitle className="text-lg md:text-xl text-primary">Sign In</CardTitle>
         <CardDescription className="text-xs md:text-sm">
           Enter your email below to login to your account
         </CardDescription>
@@ -73,13 +73,14 @@ export default function SignIn() {
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-foreground">Email</Label>
             <Input
               id="email"
               type="email"
               placeholder="m@example.com"
               {...register("email", { required: "Email is required" })}
               onChange={() => setErr("")}
+              className="focus-visible:ring-primary focus-visible:border-primary"
             />
             {errors?.email && (
               <p className="text-red-400 text-sm">
@@ -90,10 +91,10 @@ export default function SignIn() {
 
           <div className="grid gap-2">
             <div className="flex items-center">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-foreground">Password</Label>
               <Link
                 href="/forgot-password"
-                className="ml-auto inline-block text-sm underline"
+                className="ml-auto inline-block text-sm text-primary underline decoration-primary/60 hover:decoration-primary transition-colors"
               >
                 Forgot your password?
               </Link>
@@ -106,9 +107,10 @@ export default function SignIn() {
                 autoComplete="password"
                 {...register("password", { required: "Password is required" })}
                 onChange={() => setErr("")}
+                className="focus-visible:ring-primary focus-visible:border-primary"
               />
               <span
-                className="absolute right-5 top-[8px]"
+                className="absolute right-5 top-[8px] cursor-pointer text-muted-foreground hover:text-primary transition-colors"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -181,10 +183,13 @@ export default function SignIn() {
       </CardContent>
       <CardFooter>
         <div className="flex justify-center w-full py-4">
-          <p className="text-center text-xs text-neutral-500">
+          <p className="text-center text-xs text-muted-foreground">
             Don't have an account ?
-            <Link href="/signup" className="underline">
-              <span className="dark:text-white/70 cursor-pointer"> Signup</span>
+            <Link 
+              href="/signup" 
+              className="text-primary underline decoration-primary/60 hover:decoration-primary transition-colors ml-1"
+            >
+              <span className="cursor-pointer font-medium">Signup</span>
             </Link>
           </p>
         </div>
