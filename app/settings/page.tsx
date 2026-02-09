@@ -103,6 +103,7 @@ export default function AccountSettingsPage() {
       toast({
         title: "Success",
         description: "Profile updated successfully.",
+        variant: "success"
       });
 
       // Update local store and refetch profile to ensure consistency

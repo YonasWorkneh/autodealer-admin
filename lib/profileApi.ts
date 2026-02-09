@@ -57,7 +57,7 @@ export const updateProfile = async (data: any) => {
   const credential = await getCredentials();
   const { profile, id } = data;
   try {
-    const res = await fetch(`${API_URL}/users/profilesss/${id}`, {
+    const res = await fetch(`${API_URL}/users/profiles/${id}`, {
       headers: {
         Authorization: `Bearer ${credential.access}`,
       },
