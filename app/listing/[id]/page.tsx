@@ -124,8 +124,8 @@ function ViewRow({ view }: { view: CarView }) {
           <Badge
             variant={
               viewerType === "dealer" ||
-              viewerType === "broker" ||
-              viewerType === "buyer"
+                viewerType === "broker" ||
+                viewerType === "buyer"
                 ? "default"
                 : "secondary"
             }
@@ -196,8 +196,7 @@ export default function CarDetailsPage() {
       const isPending = car?.verification_status === "pending";
       showToast(
         "success",
-        `The car ${car?.make} ${car?.model} has been ${
-          isPending ? "rejected" : "removed from live listings"
+        `The car ${car?.make} ${car?.model} has been ${isPending ? "rejected" : "removed from live listings"
         }. ${rejectReason ? "Reason provided to seller." : ""}`
       );
       setShowRejectDialog(false);
@@ -207,8 +206,7 @@ export default function CarDetailsPage() {
       const isPending = car?.verification_status === "pending";
       showToast(
         "error",
-        `Failed to ${isPending ? "reject" : "remove"} car. ${
-          error.message || "Please try again."
+        `Failed to ${isPending ? "reject" : "remove"} car. ${error.message || "Please try again."
         }`
       );
     }
@@ -330,7 +328,7 @@ export default function CarDetailsPage() {
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2 capitalize">
                   {car.make} {car.model} {car.year}
-                  
+
                 </h1>
                 <div className="flex items-center gap-2">
                   {getStatusBadge(car.verification_status)}
@@ -383,6 +381,7 @@ export default function CarDetailsPage() {
                         disabled={
                           approveMutation.isPending || rejectMutation.isPending
                         }
+                        className="!text-white"
                       >
                         {rejectMutation.isPending ? (
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -400,38 +399,38 @@ export default function CarDetailsPage() {
             {/* Reject Button for Approved Cars */}
             {(car.verification_status === "verified" ||
               car.status === "live") && (
-              <Card className="bg-green-50 border-green-200">
-                <CardContent className="p-4">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-2">
-                      <Check className="h-5 w-5 text-green-600" />
-                      <div>
-                        <h3 className="font-semibold text-green-900">
-                          Car Approved & Live
-                        </h3>
-                        <p className="text-sm text-green-700">
-                          This car is currently live and visible to users
-                        </p>
+                <Card className="bg-green-50 border-green-200">
+                  <CardContent className="p-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                      <div className="flex items-center gap-2">
+                        <Check className="h-5 w-5 text-green-600" />
+                        <div>
+                          <h3 className="font-semibold text-green-900">
+                            Car Approved & Live
+                          </h3>
+                          <p className="text-sm text-green-700">
+                            This car is currently live and visible to users
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="destructive"
+                          onClick={() => setShowRejectDialog(true)}
+                          disabled={rejectMutation.isPending}
+                        >
+                          {rejectMutation.isPending ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            <X className="mr-2 h-4 w-4" />
+                          )}
+                          {rejectMutation.isPending ? "Rejecting..." : "Reject"}
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="destructive"
-                        onClick={() => setShowRejectDialog(true)}
-                        disabled={rejectMutation.isPending}
-                      >
-                        {rejectMutation.isPending ? (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : (
-                          <X className="mr-2 h-4 w-4" />
-                        )}
-                        {rejectMutation.isPending ? "Rejecting..." : "Reject"}
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                  </CardContent>
+                </Card>
+              )}
 
             {/* Images */}
             <Card>
@@ -505,11 +504,10 @@ export default function CarDetailsPage() {
                       {car.images.slice(0, 4).map((image, index) => (
                         <div
                           key={image.id}
-                          className={`relative overflow-hidden rounded-lg cursor-pointer transition-all duration-200 ${
-                            index === currentImageIndex
+                          className={`relative overflow-hidden rounded-lg cursor-pointer transition-all duration-200 ${index === currentImageIndex
                               ? "ring-2 ring-blue-500 scale-105"
                               : "hover:scale-105 opacity-70 hover:opacity-100"
-                          }`}
+                            }`}
                           onClick={() => selectImage(index)}
                         >
                           <Image
@@ -687,10 +685,10 @@ export default function CarDetailsPage() {
                           />
                           {(profile.dealer_profile?.is_verified ||
                             profile.broker_profile?.is_verified) && (
-                            <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-1">
-                              <ShieldCheck className="h-4 w-4 text-white" />
-                            </div>
-                          )}
+                              <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-1">
+                                <ShieldCheck className="h-4 w-4 text-white" />
+                              </div>
+                            )}
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
@@ -699,14 +697,14 @@ export default function CarDetailsPage() {
                             </h3>
                             {(profile.dealer_profile?.is_verified ||
                               profile.broker_profile?.is_verified) && (
-                              <Badge
-                                variant="default"
-                                className="bg-green-600 text-white"
-                              >
-                                <ShieldCheck className="h-3 w-3 mr-1" />
-                                Verified
-                              </Badge>
-                            )}
+                                <Badge
+                                  variant="default"
+                                  className="bg-green-600 text-white"
+                                >
+                                  <ShieldCheck className="h-3 w-3 mr-1" />
+                                  Verified
+                                </Badge>
+                              )}
                           </div>
                           {profile.dealer_profile?.company_name && (
                             <p className="text-muted-foreground flex items-center gap-1 mb-2">
@@ -716,12 +714,12 @@ export default function CarDetailsPage() {
                           )}
                           {(profile.dealer_profile?.role ||
                             profile.broker_profile?.role) && (
-                            <p className="text-muted-foreground flex items-center gap-1 mb-2">
-                              <UserCircle className="h-4 w-4" />
-                              {profile.dealer_profile?.role ||
-                                profile.broker_profile?.role}
-                            </p>
-                          )}
+                              <p className="text-muted-foreground flex items-center gap-1 mb-2">
+                                <UserCircle className="h-4 w-4" />
+                                {profile.dealer_profile?.role ||
+                                  profile.broker_profile?.role}
+                              </p>
+                            )}
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
                             {profile.contact && (
                               <div className="flex items-center gap-2 text-sm">
@@ -782,17 +780,17 @@ export default function CarDetailsPage() {
                             )}
                             {(profile.dealer_profile?.telebirr_account ||
                               profile.broker_profile?.telebirr_account) && (
-                              <div className="flex items-center gap-2 text-sm">
-                                <CreditCard className="h-4 w-4 text-muted-foreground" />
-                                <span className="text-muted-foreground">
-                                  Telebirr Account:
-                                </span>
-                                <span className="font-medium">
-                                  {profile.dealer_profile?.telebirr_account ||
-                                    profile.broker_profile?.telebirr_account}
-                                </span>
-                              </div>
-                            )}
+                                <div className="flex items-center gap-2 text-sm">
+                                  <CreditCard className="h-4 w-4 text-muted-foreground" />
+                                  <span className="text-muted-foreground">
+                                    Telebirr Account:
+                                  </span>
+                                  <span className="font-medium">
+                                    {profile.dealer_profile?.telebirr_account ||
+                                      profile.broker_profile?.telebirr_account}
+                                  </span>
+                                </div>
+                              )}
                             {profile.role && (
                               <div className="flex items-center gap-2 text-sm">
                                 <UserCircle className="h-4 w-4 text-muted-foreground" />
