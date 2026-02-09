@@ -23,19 +23,19 @@ export async function GET() {
     cookieStore.set({
       name: "access",
       value: data?.access,
-      secure: true, 
-      sameSite: "strict", 
-      path: "/", 
+      secure: true,
+      sameSite: "strict",
+      path: "/",
       maxAge: 60 * 15, // 15 minutes
     });
     cookieStore.set({
       name: "refresh",
       value: data?.refresh,
 
-      secure: true, 
-      sameSite: "strict", 
+      secure: true,
+      sameSite: "strict",
       path: "/",
-      maxAge: 60 * 60 * 24 * 30, 
+      maxAge: 60 * 60 * 24 * 30,
     });
     const res = await fetch(`${api}/auth/user/`, {
       headers: { Authorization: `Bearer ${data?.access}` },
@@ -48,7 +48,7 @@ export async function GET() {
         message: "succesfully refreshed tokens.",
         user,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (err: any) {
     console.error(err.message);

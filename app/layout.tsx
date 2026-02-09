@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
-import { Toaster } from "react-hot-toast";
+import { Toaster } from "@/components/ui/toaster";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import { cookies } from "next/headers";
 import Protected from "./Protected";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "E-Car-ADMIN",
@@ -33,17 +34,14 @@ html {
         <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
       </head>
       <body>
-        <div className="root">
-          <Protected isLogged={isLogged}>
-            <>{children}</>
-          </Protected>
-          <Toaster
-            position="top-center"
-            toastOptions={{
-              duration: 4000,
-            }}
-          />
-        </div>
+        <Providers>
+          <div className="root">
+            <Protected isLogged={isLogged}>
+              <>{children}</>
+            </Protected>
+            <Toaster />
+          </div>
+        </Providers>
       </body>
     </html>
   );

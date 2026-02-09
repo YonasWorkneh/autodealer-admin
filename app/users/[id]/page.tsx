@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,162 +18,85 @@ import {
   User,
   Shield,
   Activity,
+  MoreVertical,
 } from "lucide-react";
-import { useState } from "react";
-
-// Mock data - in real app, this would come from API
-const users = [
-  {
-    id: 1,
-    name: "Beza Tesfaye",
-    email: "beza.tesfaye@example.et",
-    phone: "+251 91 123 4567",
-    role: "Admin",
-    location: "Addis Ababa, Ethiopia",
-    initial: "B",
-    status: "Active",
-    enrolled: "July 3, 2018",
-    lastActive: "2 hours ago",
-    totalListings: 15,
-    verifiedListings: 12,
-    bio: "Experienced automotive professional with over 5 years in the industry. Specializes in luxury vehicles and has built a strong reputation for quality service.",
-    joinDate: "July 3, 2018",
-    lastLogin: "2 hours ago",
-    totalSales: 45,
-    averageRating: 4.8,
-    responseTime: "Within 1 hour",
-  },
-  {
-    id: 2,
-    name: "Yonatan",
-    email: "yonatan@example.et",
-    phone: "+251 92 234 5678",
-    role: "Dealer",
-    location: "Bahir Dar, Ethiopia",
-    initial: "Y",
-    status: "Active",
-    enrolled: "July 3, 2018",
-    lastActive: "1 day ago",
-    totalListings: 8,
-    verifiedListings: 6,
-    bio: "Passionate car dealer with expertise in both new and used vehicles. Committed to providing excellent customer service and fair pricing.",
-    joinDate: "July 3, 2018",
-    lastLogin: "1 day ago",
-    totalSales: 23,
-    averageRating: 4.6,
-    responseTime: "Within 2 hours",
-  },
-  {
-    id: 3,
-    name: "Wube",
-    email: "wube@example.et",
-    phone: "+251 93 345 6789",
-    role: "Broker",
-    location: "Hawassa, Ethiopia",
-    initial: "W",
-    status: "Active",
-    enrolled: "July 3, 2018",
-    lastActive: "3 hours ago",
-    totalListings: 22,
-    verifiedListings: 18,
-    bio: "Professional automotive broker connecting buyers and sellers. Known for quick transactions and transparent communication.",
-    joinDate: "July 3, 2018",
-    lastLogin: "3 hours ago",
-    totalSales: 67,
-    averageRating: 4.9,
-    responseTime: "Within 30 minutes",
-  },
-  {
-    id: 4,
-    name: "Bisrat Yohannes",
-    email: "bisrat.yohannes@example.et",
-    phone: "+251 94 456 7890",
-    role: "Dealer",
-    location: "Mekelle, Ethiopia",
-    initial: "B",
-    status: "Active",
-    enrolled: "July 3, 2018",
-    lastActive: "5 hours ago",
-    totalListings: 11,
-    verifiedListings: 9,
-    bio: "Local dealer with deep knowledge of the Ethiopian automotive market. Specializes in reliable, family-friendly vehicles.",
-    joinDate: "July 3, 2018",
-    lastLogin: "5 hours ago",
-    totalSales: 34,
-    averageRating: 4.7,
-    responseTime: "Within 1 hour",
-  },
-  {
-    id: 5,
-    name: "Mekdes",
-    email: "mekdes@example.et",
-    phone: "+251 95 567 8901",
-    role: "User",
-    location: "Dire Dawa, Ethiopia",
-    initial: "M",
-    status: "Active",
-    enrolled: "July 3, 2018",
-    lastActive: "1 hour ago",
-    totalListings: 3,
-    verifiedListings: 2,
-    bio: "New to the platform but enthusiastic about finding the perfect vehicle. Looking for reliable and affordable options.",
-    joinDate: "July 3, 2018",
-    lastLogin: "1 hour ago",
-    totalSales: 0,
-    averageRating: 0,
-    responseTime: "Within 4 hours",
-  },
-  {
-    id: 6,
-    name: "Ahadu Sefefe",
-    email: "ahadu.sefefe@example.et",
-    phone: "+251 96 678 9012",
-    role: "Broker",
-    location: "Gondar, Ethiopia",
-    initial: "A",
-    status: "Active",
-    enrolled: "July 3, 2018",
-    lastActive: "4 hours ago",
-    totalListings: 19,
-    verifiedListings: 16,
-    bio: "Experienced broker with a focus on commercial vehicles and fleet management. Known for handling complex transactions efficiently.",
-    joinDate: "July 3, 2018",
-    lastLogin: "4 hours ago",
-    totalSales: 89,
-    averageRating: 4.8,
-    responseTime: "Within 1 hour",
-  },
-  {
-    id: 7,
-    name: "Lidya Sefefe",
-    email: "lidya.sefefe@example.et",
-    phone: "+251 97 789 0123",
-    role: "Dealer",
-    location: "Jimma, Ethiopia",
-    initial: "L",
-    status: "Active",
-    enrolled: "July 3, 2018",
-    lastActive: "6 hours ago",
-    totalListings: 7,
-    verifiedListings: 5,
-    bio: "Local dealer specializing in budget-friendly vehicles. Committed to making car ownership accessible to everyone in the community.",
-    joinDate: "July 3, 2018",
-    lastLogin: "6 hours ago",
-    totalSales: 18,
-    averageRating: 4.5,
-    responseTime: "Within 2 hours",
-  },
-];
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getProfileById } from "@/lib/profileApi";
+import { UserProfile } from "@/app/types/Profile";
+import { formatDistanceToNow } from "date-fns";
+import { useToast } from "@/components/ui/use-toast";
+import { getCredentials } from "@/lib/credential";
 
 export default function UserDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const userId = params.id as string;
-  const [isLoading] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [actionLoading, setActionLoading] = useState(false);
 
-  // Find user by ID
-  const user = users.find((u) => u.id === parseInt(userId));
+  const { data: user, isLoading, error } = useQuery<UserProfile>({
+    queryKey: ["user", userId],
+    queryFn: () => getProfileById(parseInt(userId)),
+    enabled: !!userId,
+  });
 
+  const handleUserAction = async (action: "approve" | "reactivate" | "reject" | "suspend") => {
+    // Check if user has broker_profile
+    if (!user?.broker_profile) {
+      toast({
+        title: "Error",
+        description: "Actions can only be performed on brokers.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      const credential = await getCredentials();
+      const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+      const response = await fetch(`${API_URL}/brokers/admin/${userId}/${action}/`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${credential.access}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        const message = errorData?.detail || errorData?.message || `Failed to ${action} user`;
+        throw new Error(message);
+      }
+
+      toast({
+        title: "Success",
+        description: `User ${action}d successfully.`,
+        variant: "success",
+      });
+
+      // Refetch user data
+      queryClient.invalidateQueries({ queryKey: ["user", userId] });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || `Failed to ${action} user.`,
+        variant: "destructive",
+      });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  console.log("user", user);
   if (isLoading) {
     return (
       <div className="flex bg-background max-w-7xl mx-auto">
@@ -190,7 +114,7 @@ export default function UserDetailsPage() {
     );
   }
 
-  if (!user) {
+  if (error || !user) {
     return (
       <div className="flex bg-background max-w-7xl mx-auto items-center justify-center min-h-screen">
         <Card className="p-6">
@@ -213,12 +137,13 @@ export default function UserDetailsPage() {
       string,
       { label: string; variant: "default" | "secondary" | "destructive" }
     > = {
-      Admin: { label: "Admin", variant: "default" },
-      Dealer: { label: "Dealer", variant: "secondary" },
-      Broker: { label: "Broker", variant: "secondary" },
-      User: { label: "User", variant: "secondary" },
+      admin: { label: "Admin", variant: "default" },
+      dealer: { label: "Dealer", variant: "secondary" },
+      broker: { label: "Broker", variant: "secondary" },
+      buyer: { label: "User", variant: "secondary" },
     };
-    const roleInfo = roleMap[role] || roleMap["User"];
+    // Default to secondary if role is not in map
+    const roleInfo = roleMap[role.toLowerCase()] || { label: role, variant: "secondary" };
     return (
       <Badge variant={roleInfo.variant} className="capitalize">
         {roleInfo.label}
@@ -226,10 +151,12 @@ export default function UserDetailsPage() {
     );
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string | boolean) => {
+    // Handling boolean or string status if API differs
+    const statusText = status === true ? "Active" : status === false ? "Inactive" : status;
     return (
       <Badge className="bg-green-700 text-white rounded-full lowercase">
-        {status}
+        {statusText || "Active"}
       </Badge>
     );
   };
@@ -248,22 +175,49 @@ export default function UserDetailsPage() {
           </Button>
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-                <span className="text-2xl font-medium">{user.initial}</span>
+              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+                {user.image ? (
+                  <img src={user.image} alt={user.first_name} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-2xl font-medium">{user.first_name?.[0]}</span>
+                )}
               </div>
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                  {user.name}
+                  {user.first_name} {user.last_name}
                 </h1>
                 <div className="flex items-center gap-2">
                   {getRoleBadge(user.role)}
-                  {getStatusBadge(user.status)}
+                  {getStatusBadge("Active")}
                 </div>
               </div>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline">Edit User</Button>
-              <Button variant="destructive">Suspend</Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="cursor-pointer" disabled={actionLoading}>
+                    <MoreVertical className="h-4 w-4 mr-2" />
+                    Actions
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => handleUserAction("approve")}>
+                    Approve
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleUserAction("reactivate")}>
+                    Reactivate
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleUserAction("reject")}>
+                    Reject
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleUserAction("suspend")}
+                    className="text-destructive"
+                  >
+                    Suspend
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
@@ -281,21 +235,21 @@ export default function UserDetailsPage() {
                   <Mail className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">Email</p>
-                    <p className="font-semibold">{user.email}</p>
+                    <p className="font-semibold">{user.email || "N/A"}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <Phone className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">Phone</p>
-                    <p className="font-semibold">{user.phone}</p>
+                    <p className="font-semibold">{user.contact || "N/A"}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <MapPin className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">Location</p>
-                    <p className="font-semibold">{user.location}</p>
+                    <p className="font-semibold">{user.address || "N/A"}</p>
                   </div>
                 </div>
               </div>
@@ -313,14 +267,18 @@ export default function UserDetailsPage() {
                   <Calendar className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">Joined</p>
-                    <p className="font-semibold">{user.joinDate}</p>
+                    <p className="font-semibold">
+                      {user.created_at ? new Date(user.created_at).toLocaleDateString() : "N/A"}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <Clock className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">Last Active</p>
-                    <p className="font-semibold">{user.lastActive}</p>
+                    <p className="font-semibold">
+                      {user.updated_at ? formatDistanceToNow(new Date(user.updated_at), { addSuffix: true }) : "N/A"}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -329,7 +287,7 @@ export default function UserDetailsPage() {
                     <p className="text-sm text-muted-foreground">
                       Total Listings
                     </p>
-                    <p className="font-semibold">{user.totalListings}</p>
+                    <p className="font-semibold">0</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -338,95 +296,7 @@ export default function UserDetailsPage() {
                     <p className="text-sm text-muted-foreground">
                       Verified Listings
                     </p>
-                    <p className="font-semibold">{user.verifiedListings}</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Performance Metrics */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Performance Metrics</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                <div className="flex items-center gap-3">
-                  <Activity className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total Sales</p>
-                    <p className="font-semibold">{user.totalSales}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <User className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Average Rating
-                    </p>
-                    <p className="font-semibold">
-                      {user.averageRating > 0
-                        ? `${user.averageRating}/5.0`
-                        : "N/A"}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Shield className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Response Time
-                    </p>
-                    <p className="font-semibold">{user.responseTime}</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Bio */}
-          {user.bio && (
-            <Card>
-              <CardHeader>
-                <CardTitle>About</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">{user.bio}</p>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Recent Activity */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">User logged in</p>
-                    <p className="text-xs text-muted-foreground">
-                      {user.lastActive}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">Listed new vehicle</p>
-                    <p className="text-xs text-muted-foreground">2 days ago</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
-                  <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">
-                      Updated profile information
-                    </p>
-                    <p className="text-xs text-muted-foreground">1 week ago</p>
+                    <p className="font-semibold">0</p>
                   </div>
                 </div>
               </div>

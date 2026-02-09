@@ -6,11 +6,21 @@ import { Bell, Search } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUserStore } from "@/store/user";
+import { useNotifications } from "@/hooks/use-notifications";
+import { Notification } from "@/app/types/notification";
+
+import { useProfile } from "@/hooks/useProfile";
 
 export default function Header() {
   const pathName = usePathname();
   const isAuthPage = pathName.includes("signin") || pathName.includes("signup");
   const { user } = useUserStore();
+  const { notifications } = useNotifications();
+  const { profile } = useProfile();
+
+  const unreadNotifications =
+    notifications?.filter((notification: Notification) => !notification.is_read) ??
+    [];
 
   if (isAuthPage) return null;
 
@@ -36,17 +46,19 @@ export default function Header() {
       {/* Right section */}
       <div className="flex items-center gap-4 sm:gap-6">
         {/* Notifications */}
-        <Link href={"/"} className="relative">
+        <Link href={"/notifications"} className="relative">
           <div className="bg-gray-100 size-9 sm:size-10 rounded-full grid place-items-center">
             <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div className="size-2 bg-primary rounded-full absolute top-1 right-1" />
+          {unreadNotifications.length > 0 && (
+            <div className="size-2 bg-primary rounded-full absolute top-1 right-1" />
+          )}
         </Link>
 
         {/* User info */}
         <div className="flex items-center gap-3 sm:gap-6 bg-gray-100 rounded-full px-2 sm:px-4 py-1">
           <img
-            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8cmFuZG9tJTIwcGVyc29ufGVufDB8fDB8fHww"
+            src={profile?.image || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8cmFuZG9tJTIwcGVyc29ufGVufDB8fDB8fHww"}
             alt="user-img"
             className="size-8 sm:size-10 rounded-full object-cover"
           />

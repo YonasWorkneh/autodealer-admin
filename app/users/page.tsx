@@ -27,6 +27,8 @@ export default function Page() {
   const router = useRouter();
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const { data: userProfiles, isLoading, error } = useUserProfiles();
 
   // Filter users who are neither brokers nor dealers
@@ -47,8 +49,20 @@ export default function Page() {
     );
   });
 
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+
+  // Reset to page 1 when search query changes
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    setCurrentPage(1);
+  };
+
   const handleSelectAll = (checked: boolean) => {
-    setSelectedUsers(checked ? filteredUsers.map((u) => u.id) : []);
+    setSelectedUsers(checked ? paginatedUsers.map((u) => u.id) : []);
   };
 
   const handleSelectUser = (id: number, checked: boolean) => {
@@ -57,10 +71,53 @@ export default function Page() {
     );
   };
 
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      setSelectedUsers([]); // Clear selections when changing pages
+    }
+  };
+
   const isAllSelected =
-    selectedUsers.length === filteredUsers.length && filteredUsers.length > 0;
+    selectedUsers.length === paginatedUsers.length && paginatedUsers.length > 0;
   const isIndeterminate =
-    selectedUsers.length > 0 && selectedUsers.length < filteredUsers.length;
+    selectedUsers.length > 0 && selectedUsers.length < paginatedUsers.length;
+
+  // Generate page numbers to display
+  const getPageNumbers = () => {
+    const pages: (number | string)[] = [];
+    const maxVisible = 5;
+
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push('...');
+        pages.push(currentPage - 1);
+        pages.push(currentPage);
+        pages.push(currentPage + 1);
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+
+    return pages;
+  };
 
   if (isLoading) {
     return (
@@ -122,7 +179,7 @@ export default function Page() {
           <Input
             placeholder="Search user..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className="pl-12 h-12 sm:h-14 rounded-full"
           />
         </div>
@@ -162,15 +219,15 @@ export default function Page() {
 
         {/* Rows */}
         <div className="divide-y divide-primary/5">
-          {filteredUsers.length > 0 ? (
-            filteredUsers.map((user) => (
+          {paginatedUsers.length > 0 ? (
+            paginatedUsers.map((user) => (
               <div
                 key={user.id}
-                className={`px-4 sm:px-6 py-4 transition-colors ${
-                  selectedUsers.includes(user.id)
-                    ? "bg-primary/5 hover:bg-primary/10"
-                    : "hover:bg-primary/5"
-                }`}
+                className={`px-4 sm:px-6 py-4 transition-colors cursor-pointer ${selectedUsers.includes(user.id)
+                  ? "bg-primary/5 hover:bg-primary/10"
+                  : "hover:bg-primary/5"
+                  }`}
+                onClick={() => router.push(`/users/${user.id}`)}
               >
                 {/* Desktop Grid */}
                 <div className="hidden lg:grid grid-cols-12 gap-4 items-center">
@@ -219,28 +276,6 @@ export default function Page() {
                     </span>
                   </div>
                   <div className="col-span-1 flex justify-end">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0"
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => router.push(`/users/${user.id}`)}
-                        >
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">
-                          Remove
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
                   </div>
                 </div>
 
@@ -334,39 +369,57 @@ export default function Page() {
         </div>
 
         {/* Pagination */}
-        <div className="p-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Previous
-            </Button>
+        {filteredUsers.length > 0 && (
+          <div className="p-4 border-t border-primary/10">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-sm text-muted-foreground">
+                Showing {startIndex + 1} to {Math.min(endIndex, filteredUsers.length)} of {filteredUsers.length} users
+              </div>
 
-            <div className="flex items-center gap-2">
-              <Button size="sm" className="bg-primary text-primary-foreground">
-                1
-              </Button>
-              <Button variant="outline" size="sm" className="hover:bg-primary/5 hover:border-primary/30">
-                2
-              </Button>
-              <Button variant="outline" size="sm" className="hover:bg-primary/5 hover:border-primary/30">
-                3
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </Button>
+
+                <div className="flex items-center gap-1">
+                  {getPageNumbers().map((page, index) => (
+                    page === '...' ? (
+                      <span key={`ellipsis-${index}`} className="px-2 text-muted-foreground">...</span>
+                    ) : (
+                      <Button
+                        key={page}
+                        size="sm"
+                        variant={currentPage === page ? "default" : "outline"}
+                        className={currentPage === page ? "bg-primary text-primary-foreground" : "hover:bg-primary/5 hover:border-primary/30"}
+                        onClick={() => handlePageChange(page as number)}
+                      >
+                        {page}
+                      </Button>
+                    )
+                  ))}
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              Next
-              <ChevronRight className="h-4 w-4" />
-            </Button>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
