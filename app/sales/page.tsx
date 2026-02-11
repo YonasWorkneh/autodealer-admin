@@ -17,13 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Card, CardContent } from "@/components/ui/card";
 import { useSales } from "@/hooks/sales";
 import { formatPrice } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -158,25 +152,9 @@ export default function SalesPage() {
         </Card>
       </div>
 
-      {/* Search */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="relative w-full sm:w-96">
-          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <Input
-            placeholder="Search sales by buyer name, email, or price..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 h-12 sm:h-14 rounded-full"
-          />
-        </div>
-        <Button className="flex items-center gap-2">
-          <Download className="h-4 w-4" />
-          Export
-        </Button>
-      </div>
-
       {/* Sales List */}
       <div className="space-y-4">
+        <h2 className="text-2xl font-semibold mb-4">Sales List</h2>
         {filteredSales && filteredSales.length > 0 ? (
           filteredSales.map((sale) => (
             <Card key={sale.id} className="hover:shadow-lg transition-shadow">
@@ -237,27 +215,6 @@ export default function SalesPage() {
                     >
                       Completed
                     </Badge>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0"
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Eye className="mr-2 h-4 w-4" />
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Download className="mr-2 h-4 w-4" />
-                          Export Receipt
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
                   </div>
                 </div>
               </CardContent>
@@ -277,43 +234,6 @@ export default function SalesPage() {
           </Card>
         )}
       </div>
-
-      {/* Pagination */}
-      {filteredSales && filteredSales.length > 0 && (
-        <div className="mt-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Previous
-            </Button>
-
-            <div className="flex items-center gap-2">
-              <Button size="sm" className="bg-primary text-white">
-                1
-              </Button>
-              <Button variant="outline" size="sm">
-                2
-              </Button>
-              <Button variant="outline" size="sm">
-                3
-              </Button>
-            </div>
-
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              Next
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

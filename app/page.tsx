@@ -33,6 +33,7 @@ import { usePopularCars, useCars } from "@/hooks/cars";
 import { useUserProfiles } from "@/hooks/userProfiles";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatPrice } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const { data: popularCars, isLoading: popularCarsLoading } = usePopularCars();
@@ -41,33 +42,33 @@ export default function Page() {
 
   // Filter cars for auctions
   const auctionCars = cars?.filter(
-    (car) => car.sale_type?.toLowerCase() === "auction"
+    (car) => car.sale_type?.toLowerCase() === "auction",
   );
 
   const metrics = [
     {
       title: "Total Cars",
       value: cars?.length || 0,
-      change: "+8.04%",
+      change: "",
       positive: true,
       icon: CarFront,
-      comparison: "vs last week",
+      comparison: "",
     },
     {
       title: "Total Users",
       value: userProfiles?.length || 0,
-      change: "-3.06%",
+      change: "",
       positive: false,
       icon: Users,
-      comparison: "vs last week",
+      comparison: "",
     },
     {
       title: "Total Auctions",
       value: auctionCars?.length || 0,
-      change: "+8.04%",
+      change: "",
       positive: true,
       icon: Car,
-      comparison: "vs last week",
+      comparison: "",
     },
   ];
 
@@ -81,11 +82,14 @@ export default function Page() {
   ];
 
   // Process popular cars to get top 3 makes
-  const popularMakes = popularCars?.reduce((acc, car) => {
-    const make = car.make;
-    acc[make] = (acc[make] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const popularMakes = popularCars?.reduce(
+    (acc, car) => {
+      const make = car.make;
+      acc[make] = (acc[make] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   const customerData = Object.entries(popularMakes || {})
     .sort(([, a], [, b]) => b - a)
@@ -93,14 +97,14 @@ export default function Page() {
     .map(([make, count], index) => ({
       segment: make,
       value: count,
-      color: index === 0 
-        ? "#522084" 
-        : index === 1 
-        ? "#6B3FA3" 
-        : "#8459C2",
+      color: index === 0 ? "#522084" : index === 1 ? "#6B3FA3" : "#8459C2",
     }));
+  const latestCar = cars?.sort(
+    (a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+  )?.[0];
 
-
+  const router = useRouter();
 
   return (
     <div className="p-4 sm:p-6">
@@ -159,8 +163,16 @@ export default function Page() {
               >
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={salesData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#522084" strokeOpacity={0.1} />
-                    <XAxis dataKey="month" stroke="#522084" strokeOpacity={0.6} />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#522084"
+                      strokeOpacity={0.1}
+                    />
+                    <XAxis
+                      dataKey="month"
+                      stroke="#522084"
+                      strokeOpacity={0.6}
+                    />
                     <YAxis stroke="#522084" strokeOpacity={0.6} />
                     <ChartTooltip content={<ChartTooltipContent />} />
                     <Bar dataKey="sales" fill="#522084" />
@@ -312,57 +324,109 @@ export default function Page() {
               </div>
             </div>
           </Card>
-
           {/* Latest Inventory */}
-          <Card className="h-fit">
-            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <CardTitle>Latest Inventory</CardTitle>
-              <Link
-                href={"/listing"}
-                className="group bg-primary hover:bg-primary/90 text-primary-foreground py-2 text-xs sm:text-sm w-fit cursor-pointer flex gap-2 items-center px-3 rounded-full"
-              >
-                <span>View more</span>
-                <span className="group-hover:translate-x-1 transition-all">
-                  →
-                </span>
-              </Link>
-            </CardHeader>
-            <CardContent>
-              <div className="relative mb-4">
-                <img
-                  src="/id6-orange.png"
-                  alt="Volkwagen ID6 Electric"
-                  className="w-full max-h-[200px] sm:max-h-[350px] object-cover rounded-lg"
-                />
-                <div className="absolute bottom-2 left-2 bg-primary rounded-full p-2">
-                  <CarFront className="w-4 h-4 text-white" />
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-                <div>
-                  <p className="text-xs sm:text-sm text-black/70">Model</p>
-                  <h3 className="font-semibold">Volkswagen ID6</h3>
-                </div>
-                <div className="text-left sm:text-right">
-                  <p className="text-xs sm:text-sm text-black/70">Price</p>
-                  <p className="font-semibold">5,000,000</p>
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {["Volkswagen", "Smart AC", "Diesel", "Electric", "5"].map(
-                  (tag, idx) => (
-                    <Badge
-                      key={idx}
-                      variant="secondary"
-                      className="bg-primary text-primary-foreground rounded-full text-xs sm:text-sm"
+
+          {latestCar && (
+            <Card className="h-full">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>Latest Inventory</CardTitle>
+                <Link
+                  href={"/listing"}
+                  className="group bg-primary hover:bg-primary-hover text-primary-foreground py-2 text-sm w-fit cursor-pointer flex gap-2 items-center px-3 rounded-full"
+                >
+                  <span>View more</span>
+                  <span className="group-hover:translate-x-1 transition-all">
+                    →
+                  </span>
+                </Link>
+              </CardHeader>
+              <CardContent>
+                {latestCar ? (
+                  <>
+                    <div
+                      className="relative mb-4 cursor-pointer"
+                      onClick={() => router.push(`/listing/${latestCar.id}`)}
                     >
-                      {tag}
-                    </Badge>
-                  )
+                      <img
+                        src={
+                          latestCar.images && latestCar.images.length > 0
+                            ? typeof latestCar.images[0] === "string"
+                              ? latestCar.images[0]
+                              : latestCar.images[0].image_url
+                            : "/placeholder.svg"
+                        }
+                        alt={`${latestCar.year} ${latestCar.make} ${latestCar.model}`}
+                        className="w-3/4 max-h-[225px] object-cover rounded-lg"
+                      />
+                      <div className="absolute bottom-2 left-2 bg-primary rounded-full p-2">
+                        <CarFront className="w-4 h-4 text-primary-foreground" />
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Model</p>
+                        <h3 className="font-semibold">
+                          {latestCar.year} {latestCar.make} {latestCar.model}
+                        </h3>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-muted-foreground">Price</p>
+                        <p className="font-semibold">
+                          $
+                          {parseFloat(
+                            typeof latestCar.price === "string"
+                              ? latestCar.price
+                              : String(latestCar.price),
+                          ).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge
+                        variant="secondary"
+                        className="bg-black text-white rounded-full"
+                      >
+                        {latestCar.make}
+                      </Badge>
+                      <Badge
+                        variant="secondary"
+                        className="bg-primary text-primary-foreground rounded-full capitalize"
+                      >
+                        {latestCar.body_type}
+                      </Badge>
+                      <Badge
+                        variant="secondary"
+                        className="bg-primary text-primary-foreground rounded-full capitalize"
+                      >
+                        {latestCar.fuel_type}
+                      </Badge>
+                      <Badge
+                        variant="secondary"
+                        className="bg-black text-white rounded-full uppercase"
+                      >
+                        {latestCar.drivetrain}
+                      </Badge>
+                      <Badge
+                        variant="secondary"
+                        className="bg-primary text-primary-foreground rounded-full capitalize"
+                      >
+                        {latestCar.condition}
+                      </Badge>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground mb-4">
+                      No cars in inventory yet
+                    </p>
+                    <Link href="/listing/new">
+                      <Button>Add Your First Car</Button>
+                    </Link>
+                  </div>
                 )}
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

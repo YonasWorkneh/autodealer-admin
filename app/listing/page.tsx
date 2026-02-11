@@ -27,14 +27,27 @@ import { useRouter } from "next/navigation";
 import { useCars } from "@/hooks/cars";
 import { formatPrice } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const filters = ["All", "Live", "Pending Review", "Suspended"];
 
 export default function Page() {
   const router = useRouter();
-  const [active, setActive] = useState("all");
+  const [active, setActive] = useState("fixed-price");
   const { data: cars, isLoading } = useCars();
-  console.log(cars);
+  const fixedPriceCars = cars?.filter((car) => car.sale_type === "fixed_price");
+  const auctionCars = cars?.filter((car) => car.sale_type === "auction");
+  const filteredCars = active === "fixed-price" ? fixedPriceCars : auctionCars;
+  const tabs = [
+    {
+      label: "Fixed Price",
+      value: "fixed-price",
+    },
+    {
+      label: "Auction",
+      value: "auction",
+    },
+  ];
 
   useEffect(() => {}, [active]);
 
@@ -58,9 +71,24 @@ export default function Page() {
 
         {/* Dashboard Content */}
         <div className="flex-1 p-4 md:p-6">
-         
+          {/* tabs */}
+          <div className="flex gap-2">
+            {tabs.map((tab) => {
+              return (
+                <Button
+                  key={tab.value}
+                  className={`cursor-pointer ${active === tab.value ? "bg-primary text-primary-foreground" : "bg-gray-100/50 text-gray-500"}`}
+                  onClick={() =>
+                    setActive(tab.value as "fixed-price" | "auction")
+                  }
+                >
+                  {tab.label}
+                </Button>
+              );
+            })}
+          </div>
           {/* Cars Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10 mt-4">
             {isLoading && (
               <>
                 {Array.from({ length: 6 }).map((_, idx) => (
@@ -81,7 +109,7 @@ export default function Page() {
                 ))}
               </>
             )}
-            {!isLoading && cars && cars.length === 0 && (
+            {!isLoading && filteredCars && filteredCars.length === 0 && (
               <div className="col-span-1 sm:col-span-2 lg:col-span-3">
                 <Card className="p-6 flex flex-col items-center justify-center text-center gap-3">
                   <div className="text-lg md:text-xl font-semibold">
@@ -104,7 +132,7 @@ export default function Page() {
               </div>
             )}
             {!isLoading &&
-              cars?.map((car) => {
+              filteredCars?.map((car) => {
                 const image =
                   car.images.find((image) => image.is_featured) ||
                   car.images[0];

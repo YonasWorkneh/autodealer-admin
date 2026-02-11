@@ -5,8 +5,10 @@ import {
   createSale,
   updateSale,
   deleteSale,
+  fetchLeadsByCarId,
 } from "@/lib/salesApi";
 import type { Sale } from "@/app/types/Sale";
+import type { Lead } from "@/app/types/Lead";
 
 export function useSales() {
   return useQuery<Sale[]>({
@@ -67,5 +69,14 @@ export function useDeleteSale(
       queryClient.invalidateQueries({ queryKey: ["sales"] });
     },
     onError: (error: Error) => onError?.(error),
+  });
+}
+
+export function useLeadsByCarId(carId: number | null) {
+  return useQuery<Lead[]>({
+    queryKey: ["leads", carId],
+    queryFn: () => fetchLeadsByCarId(carId as number),
+    enabled: !!carId,
+    staleTime: 2 * 60 * 1000,
   });
 }

@@ -7,10 +7,10 @@ import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import { cookies } from "next/headers";
 import Protected from "./Protected";
-import { Providers } from "./providers";
+import Providers  from "./Providers";
 
 export const metadata: Metadata = {
-  title: "E-Car-ADMIN",
+  title: "ET-Car-Admin",
 };
 
 export default async function RootLayout({

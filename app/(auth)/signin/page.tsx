@@ -63,9 +63,11 @@ export default function SignIn() {
               className="w-full h-full"
             />
           </div>
-          <h1 className="text-primary font-semibold">AUTO&mdash;DEALER</h1>
+          <h1 className="text-primary font-semibold">ET&mdash;CAR</h1>
         </Link>
-        <CardTitle className="text-lg md:text-xl text-primary">Sign In</CardTitle>
+        <CardTitle className="text-lg md:text-xl text-primary">
+          Sign In
+        </CardTitle>
         <CardDescription className="text-xs md:text-sm">
           Enter your email below to login to your account
         </CardDescription>
@@ -73,14 +75,15 @@ export default function SignIn() {
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="email" className="text-foreground">Email</Label>
+            <Label htmlFor="email" className="text-foreground">
+              Email
+            </Label>
             <Input
               id="email"
               type="email"
               placeholder="m@example.com"
               {...register("email", { required: "Email is required" })}
               onChange={() => setErr("")}
-              className="focus-visible:ring-primary focus-visible:border-primary"
             />
             {errors?.email && (
               <p className="text-red-400 text-sm">
@@ -91,7 +94,9 @@ export default function SignIn() {
 
           <div className="grid gap-2">
             <div className="flex items-center">
-              <Label htmlFor="password" className="text-foreground">Password</Label>
+              <Label htmlFor="password" className="text-foreground">
+                Password
+              </Label>
               <Link
                 href="/forgot-password"
                 className="ml-auto inline-block text-sm text-primary underline decoration-primary/60 hover:decoration-primary transition-colors"
@@ -107,7 +112,6 @@ export default function SignIn() {
                 autoComplete="password"
                 {...register("password", { required: "Password is required" })}
                 onChange={() => setErr("")}
-                className="focus-visible:ring-primary focus-visible:border-primary"
               />
               <span
                 className="absolute right-5 top-[8px] cursor-pointer text-muted-foreground hover:text-primary transition-colors"
@@ -145,7 +149,7 @@ export default function SignIn() {
           <div
             className={cn(
               "w-full gap-2 flex items-center",
-              "justify-between flex-col"
+              "justify-between flex-col",
             )}
           >
             <Button
@@ -181,19 +185,6 @@ export default function SignIn() {
           </div>
         </form>
       </CardContent>
-      <CardFooter>
-        <div className="flex justify-center w-full py-4">
-          <p className="text-center text-xs text-muted-foreground">
-            Don't have an account ?
-            <Link 
-              href="/signup" 
-              className="text-primary underline decoration-primary/60 hover:decoration-primary transition-colors ml-1"
-            >
-              <span className="cursor-pointer font-medium">Signup</span>
-            </Link>
-          </p>
-        </div>
-      </CardFooter>
     </Card>
   );
 }

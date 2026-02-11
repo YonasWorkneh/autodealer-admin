@@ -13,6 +13,8 @@ import {
   BarChart3,
   Eye,
   Tag,
+  Headset,
+  ShieldCheck,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -42,6 +44,7 @@ export default function Sidebar() {
     { label: "Makes", href: "/makes", icon: Tag },
     { label: "Users", href: "/users", icon: Users },
     { label: "Sales", href: "/sales", icon: TrendingUp },
+    { label: "Brokers", href: "/brokers", icon: ShieldCheck },
   ];
 
   const isAuthPage = pathName.includes("signin") || pathName.includes("signup");
@@ -68,11 +71,16 @@ export default function Sidebar() {
               <Link
                 href={link.href}
                 key={link.href}
-                className={`hover:bg-[#fff] hover:text-primary cursor-pointer size-10 rounded-full grid place-items-center ${
-                  active ? " bg-white text-primary" : "text-primary-foreground bg-transparent"
+                className={`group relative hover:bg-[#fff] hover:text-primary cursor-pointer size-10 rounded-full grid place-items-center transition-colors ${
+                  active
+                    ? " bg-white text-primary"
+                    : "text-primary-foreground bg-transparent"
                 }`}
               >
                 <link.icon className="h-6 w-6" />
+                <span className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50">
+                  {link.label}
+                </span>
               </Link>
             );
           })}
@@ -80,15 +88,21 @@ export default function Sidebar() {
         <div className="flex gap-10 flex-col text-white absolute bottom-10">
           <Link
             href={"/settings"}
-            className="text-primary-foreground hover:bg-[#fff] hover:text-primary cursor-pointer size-10 rounded-full grid place-items-center"
+            className="group relative text-primary-foreground hover:bg-white hover:text-primary cursor-pointer size-10 rounded-full grid place-items-center transition-colors"
           >
             <Settings className="size-5" />
+            <span className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50">
+              Settings
+            </span>
           </Link>
           <button
             onClick={logout}
-            className="text-primary-foreground hover:bg-[#fff] hover:text-primary cursor-pointer size-10 rounded-full grid place-items-center"
+            className="group relative text-primary-foreground hover:bg-white hover:text-primary cursor-pointer size-10 rounded-full grid place-items-center transition-colors"
           >
             <LogOut className="size-5" />
+            <span className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 text-white text-xs font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50">
+              Logout
+            </span>
           </button>
         </div>
       </aside>

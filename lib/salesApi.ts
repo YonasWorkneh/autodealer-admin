@@ -1,4 +1,5 @@
 import type { Sale } from "@/app/types/Sale";
+import type { Lead } from "@/app/types/Lead";
 import { getCredentials } from "./credential";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL as string;
@@ -72,4 +73,8 @@ export async function deleteSale(
   }
 
   return { success: true, id };
+}
+
+export async function fetchLeadsByCarId(carId: number): Promise<Lead[]> {
+  return fetcher<Lead[]>(`/sales/leads?car_id=${carId}`);
 }

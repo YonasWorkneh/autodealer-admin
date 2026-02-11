@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Camera, Info, User, Eye, EyeOff, Loader2 } from "lucide-react";
 import {
@@ -23,6 +24,7 @@ import { updateProfile } from "@/lib/profileApi";
 import { changePassword } from "@/lib/auth/changePassword";
 import { useToast } from "@/components/ui/use-toast";
 import { useProfile } from "@/hooks/useProfile";
+import { signup } from "@/lib/auth/signup";
 
 export default function AccountSettingsPage() {
   const { user, setUser } = useUserStore();
@@ -52,6 +54,15 @@ export default function AccountSettingsPage() {
   const [loading, setLoading] = useState({
     profile: false,
     password: false,
+    admin: false,
+  });
+
+  const [adminForm, setAdminForm] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    password1: "",
+    password2: "",
   });
 
   useEffect(() => {
@@ -103,13 +114,12 @@ export default function AccountSettingsPage() {
       toast({
         title: "Success",
         description: "Profile updated successfully.",
-        variant: "success"
+        variant: "success",
       });
 
       // Update local store and refetch profile to ensure consistency
       setUser(updatedUser);
       refetchProfile();
-
     } catch (error: any) {
       toast({
         title: "Error",
@@ -148,17 +158,88 @@ export default function AccountSettingsPage() {
       });
       toast({
         title: "Success",
+        variant: "success",
         description: "Password changed successfully.",
       });
       setPasswordForm({ newPassword: "", confirmPassword: "" });
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Failed to change password. Please check your current password requirements.",
+        description:
+          error.message ||
+          "Failed to change password. Please check your current password requirements.",
         variant: "destructive",
       });
     } finally {
       setLoading((prev) => ({ ...prev, password: false }));
+    }
+  };
+
+  const handleAdminSignup = async () => {
+    if (
+      !adminForm.email ||
+      !adminForm.first_name ||
+      !adminForm.last_name ||
+      !adminForm.password1 ||
+      !adminForm.password2
+    ) {
+      toast({
+        title: "Error",
+        description: "All fields are required to create a new admin.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (adminForm.password1 !== adminForm.password2) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (adminForm.password1.length < 8) {
+      toast({
+        title: "Error",
+        description: "Password must be at least 8 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading((prev) => ({ ...prev, admin: true }));
+    try {
+      await signup({
+        email: adminForm.email,
+        password1: adminForm.password1,
+        password2: adminForm.password2,
+        first_name: adminForm.first_name,
+        last_name: adminForm.last_name,
+      });
+
+      toast({
+        title: "Success",
+        description: "New admin account created successfully.",
+        variant: "success",
+      });
+
+      setAdminForm({
+        first_name: "",
+        last_name: "",
+        email: "",
+        password1: "",
+        password2: "",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create admin account.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading((prev) => ({ ...prev, admin: false }));
     }
   };
 
@@ -179,198 +260,316 @@ export default function AccountSettingsPage() {
             Account Settings
           </h1>
           <p className="text-muted-foreground">
-            Edit your personal information and manage account security.
+            Edit your personal information and manage account access.
           </p>
         </div>
 
-        <Card className="border border-gray-200">
+        <Card className="border border-gray-200 shadow-none">
           <CardContent className="p-8">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Form Fields */}
-              <div className="lg:col-span-2 space-y-6">
-                {/* Name */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="first_name">First Name</Label>
-                    <Input
-                      id="first_name"
-                      value={profileForm.first_name}
-                      onChange={handleProfileChange}
-                      className="py-6"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="last_name">Last Name</Label>
-                    <Input
-                      id="last_name"
-                      value={profileForm.last_name}
-                      onChange={handleProfileChange}
-                      className="py-6"
-                    />
-                  </div>
-                </div>
+            <Tabs defaultValue="account" className="w-full">
+              <TabsList className="mb-6">
+                <TabsTrigger value="account">Edit Account</TabsTrigger>
+                <TabsTrigger value="admin">Create New Admin</TabsTrigger>
+              </TabsList>
 
-                {/* Contact and Address */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="contact">Phone Number</Label>
-                    <Input
-                      id="contact"
-                      value={profileForm.contact}
-                      onChange={handleProfileChange}
-                      className="py-6"
-                      placeholder="+251..."
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="address">Address</Label>
-                    <Input
-                      id="address"
-                      value={profileForm.address}
-                      onChange={handleProfileChange}
-                      className="py-6"
-                      placeholder="Addis Ababa, ..."
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-end mt-4">
-                  <Button
-                    onClick={handleProfileUpdate}
-                    disabled={loading.profile}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                  >
-                    {loading.profile && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    Save Profile
-                  </Button>
-                </div>
-
-                <div className="border-t border-gray-200 my-8 pt-8">
-                  <h3 className="text-lg font-semibold mb-4">Change Password</h3>
-
-                  {/* Password */}
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="newPassword">New Password</Label>
-                      <div className="relative">
+              <TabsContent value="account">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  {/* Form Fields */}
+                  <div className="lg:col-span-2 space-y-6">
+                    {/* Name */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="first_name">First Name</Label>
                         <Input
-                          id="newPassword"
-                          type={showPassword.new ? "text" : "password"}
-                          value={passwordForm.newPassword}
-                          onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                          className="py-6 pr-10"
+                          id="first_name"
+                          value={profileForm.first_name}
+                          onChange={handleProfileChange}
+                          className="py-6"
                         />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword({ ...showPassword, new: !showPassword.new })}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                        >
-                          {showPassword.new ? <EyeOff size={18} /> : <Eye size={18} />}
-                        </button>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="last_name">Last Name</Label>
+                        <Input
+                          id="last_name"
+                          value={profileForm.last_name}
+                          onChange={handleProfileChange}
+                          className="py-6"
+                        />
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="confirmPassword">Confirm Password</Label>
-                      <div className="relative">
+                    {/* Contact and Address */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="contact">Phone Number</Label>
                         <Input
-                          id="confirmPassword"
-                          type={showPassword.confirm ? "text" : "password"}
-                          value={passwordForm.confirmPassword}
-                          onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                          className="py-6 pr-10"
+                          id="contact"
+                          value={profileForm.contact}
+                          onChange={handleProfileChange}
+                          className="py-6"
+                          placeholder="+251..."
                         />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword({ ...showPassword, confirm: !showPassword.confirm })}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                        >
-                          {showPassword.confirm ? <EyeOff size={18} /> : <Eye size={18} />}
-                        </button>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="address">Address</Label>
+                        <Input
+                          id="address"
+                          value={profileForm.address}
+                          onChange={handleProfileChange}
+                          className="py-6"
+                          placeholder="Addis Ababa, ..."
+                        />
                       </div>
                     </div>
 
                     <div className="flex justify-end mt-4">
                       <Button
-                        onClick={handlePasswordChange}
-                        disabled={loading.password || !passwordForm.newPassword || !passwordForm.confirmPassword}
+                        onClick={handleProfileUpdate}
+                        disabled={loading.profile}
                         className="bg-primary hover:bg-primary/90 text-primary-foreground"
                       >
-                        {loading.password && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Change Password
+                        {loading.profile && (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        Save Profile
                       </Button>
                     </div>
+
+                    <div className="border-t border-gray-200 my-8 pt-8">
+                      <h3 className="text-lg font-semibold mb-4">
+                        Change Password
+                      </h3>
+
+                      {/* Password */}
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="newPassword">New Password</Label>
+                          <div className="relative">
+                            <Input
+                              id="newPassword"
+                              type={showPassword.new ? "text" : "password"}
+                              value={passwordForm.newPassword}
+                              onChange={(e) =>
+                                setPasswordForm({
+                                  ...passwordForm,
+                                  newPassword: e.target.value,
+                                })
+                              }
+                              className="py-6 pr-10"
+                            />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setShowPassword({
+                                  ...showPassword,
+                                  new: !showPassword.new,
+                                })
+                              }
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                            >
+                              {showPassword.new ? (
+                                <EyeOff size={18} />
+                              ) : (
+                                <Eye size={18} />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="confirmPassword">
+                            Confirm Password
+                          </Label>
+                          <div className="relative">
+                            <Input
+                              id="confirmPassword"
+                              type={showPassword.confirm ? "text" : "password"}
+                              value={passwordForm.confirmPassword}
+                              onChange={(e) =>
+                                setPasswordForm({
+                                  ...passwordForm,
+                                  confirmPassword: e.target.value,
+                                })
+                              }
+                              className="py-6 pr-10"
+                            />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setShowPassword({
+                                  ...showPassword,
+                                  confirm: !showPassword.confirm,
+                                })
+                              }
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                            >
+                              {showPassword.confirm ? (
+                                <EyeOff size={18} />
+                              ) : (
+                                <Eye size={18} />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="flex justify-end mt-4">
+                          <Button
+                            onClick={handlePasswordChange}
+                            disabled={
+                              loading.password ||
+                              !passwordForm.newPassword ||
+                              !passwordForm.confirmPassword
+                            }
+                            className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                          >
+                            {loading.password && (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            )}
+                            Change Password
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Avatar */}
+                  <div className="flex flex-col items-center space-y-4 relative h-fit">
+                    <Avatar className="w-24 h-24">
+                      <AvatarImage
+                        src={
+                          previewImage ||
+                          profile?.image ||
+                          "/placeholder-avatar.png"
+                        }
+                        alt="User avatar"
+                        className="object-cover"
+                      />
+                      <AvatarFallback className="bg-primary/10 text-primary text-xl font-semibold">
+                        {profile?.first_name?.charAt(0)}
+                        {profile?.last_name?.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    {/* Upload button */}
+                    <label
+                      htmlFor="avatar-upload"
+                      className="cursor-pointer absolute bottom-0 left-[calc(50%-18px)] bg-primary hover:bg-primary/90 text-primary-foreground p-2 rounded-full shadow-lg transition-transform hover:scale-105"
+                    >
+                      <Camera className="h-4 w-4" />
+                    </label>
+                    <input
+                      id="avatar-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Click camera icon to change
+                    </p>
                   </div>
                 </div>
-              </div>
+              </TabsContent>
 
-              {/* Avatar */}
-              <div className="flex flex-col items-center space-y-4 relative h-fit">
-                <Avatar className="w-24 h-24">
-                  <AvatarImage
-                    src={previewImage || profile?.image || "/placeholder-avatar.png"}
-                    alt="User avatar"
-                    className="object-cover"
-                  />
-                  <AvatarFallback className="bg-primary/10 text-primary text-xl font-semibold">
-                    {profile?.first_name?.charAt(0)}
-                    {profile?.last_name?.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
+              <TabsContent value="admin">
+                <div className="space-y-4 max-w-2xl">
+                  <p className="text-sm text-muted-foreground">
+                    Create a new admin account with email and password.
+                  </p>
 
-                {/* Upload button */}
-                <label
-                  htmlFor="avatar-upload"
-                  className="cursor-pointer absolute bottom-0 left-[calc(50%-18px)] bg-primary hover:bg-primary/90 text-primary-foreground p-2 rounded-full shadow-lg transition-transform hover:scale-105"
-                >
-                  <Camera className="h-4 w-4" />
-                </label>
-                <input
-                  id="avatar-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-                <p className="text-xs text-muted-foreground mt-2">
-                  Click camera icon to change
-                </p>
-              </div>
-            </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="admin_first_name">First Name</Label>
+                      <Input
+                        id="admin_first_name"
+                        value={adminForm.first_name}
+                        onChange={(e) =>
+                          setAdminForm({
+                            ...adminForm,
+                            first_name: e.target.value,
+                          })
+                        }
+                        className="py-6"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="admin_last_name">Last Name</Label>
+                      <Input
+                        id="admin_last_name"
+                        value={adminForm.last_name}
+                        onChange={(e) =>
+                          setAdminForm({
+                            ...adminForm,
+                            last_name: e.target.value,
+                          })
+                        }
+                        className="py-6"
+                      />
+                    </div>
+                  </div>
 
-            {/* Delete Account Section */}
-            <div className="mt-12 pt-8 border-t border-gray-200">
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive" className="bg-red-100 text-red-700 hover:bg-red-200 border border-red-200/50 shadow-sm">
-                    Delete Account
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you sure you want to delete your account?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action is irreversible. All your data will be
-                      permanently erased.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction className="bg-red-200 text-red-800 hover:bg-red-300 border border-red-300/50 shadow-sm">
-                      Yes, delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-              <div className="flex items-center gap-2 mt-3 text-muted-foreground text-sm">
-                <Info size={16} />
-                <span>All your data will be permanently erased.</span>
-              </div>
-            </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="admin_email">Email</Label>
+                    <Input
+                      id="admin_email"
+                      type="email"
+                      value={adminForm.email}
+                      onChange={(e) =>
+                        setAdminForm({ ...adminForm, email: e.target.value })
+                      }
+                      className="py-6"
+                      placeholder="admin@example.com"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="admin_password1">Password</Label>
+                      <Input
+                        id="admin_password1"
+                        type="password"
+                        value={adminForm.password1}
+                        onChange={(e) =>
+                          setAdminForm({
+                            ...adminForm,
+                            password1: e.target.value,
+                          })
+                        }
+                        className="py-6"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="admin_password2">Confirm Password</Label>
+                      <Input
+                        id="admin_password2"
+                        type="password"
+                        value={adminForm.password2}
+                        onChange={(e) =>
+                          setAdminForm({
+                            ...adminForm,
+                            password2: e.target.value,
+                          })
+                        }
+                        className="py-6"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end mt-4">
+                    <Button
+                      onClick={handleAdminSignup}
+                      disabled={loading.admin}
+                      className="bg-primary/10 text-primary hover:bg-primary/15"
+                    >
+                      {loading.admin && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      Create Admin
+                    </Button>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
       </div>
