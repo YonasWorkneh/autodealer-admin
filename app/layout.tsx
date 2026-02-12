@@ -5,7 +5,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { cookies } from "next/headers";
 import Protected from "./Protected";
-import Providers  from "@/app/Providers";
+import Providers from "./Providers";
 
 export const metadata: Metadata = {
   title: "ET-Car-Admin",
