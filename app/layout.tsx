@@ -3,11 +3,9 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-import Sidebar from "@/components/Sidebar";
-import Header from "@/components/Header";
 import { cookies } from "next/headers";
 import Protected from "./Protected";
-import Providers  from "./Providers";
+import Providers  from "@/app/Providers";
 
 export const metadata: Metadata = {
   title: "ET-Car-Admin",
