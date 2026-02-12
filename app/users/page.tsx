@@ -32,22 +32,19 @@ export default function Page() {
   const { data: userProfiles, isLoading, error } = useUserProfiles();
 
   // Filter users who are neither brokers nor dealers
-  const regularUsers =
-    userProfiles?.filter(
-      (user) => !user.broker_profile && !user.dealer_profile
-    ) || [];
 
   // Filter users based on search query
-  const filteredUsers = regularUsers.filter((user) => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      user.first_name.toLowerCase().includes(query) ||
-      user.last_name.toLowerCase().includes(query) ||
-      user.contact.toLowerCase().includes(query) ||
-      user.role.toLowerCase().includes(query)
-    );
-  });
+  const filteredUsers =
+    userProfiles?.filter((user) => {
+      if (!searchQuery) return true;
+      const query = searchQuery.toLowerCase();
+      return (
+        user.first_name.toLowerCase().includes(query) ||
+        user.last_name.toLowerCase().includes(query) ||
+        user.contact.toLowerCase().includes(query) ||
+        user.role.toLowerCase().includes(query)
+      );
+    }) ?? [];
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
@@ -67,7 +64,7 @@ export default function Page() {
 
   const handleSelectUser = (id: number, checked: boolean) => {
     setSelectedUsers((prev) =>
-      checked ? [...prev, id] : prev.filter((uid) => uid !== id)
+      checked ? [...prev, id] : prev.filter((uid) => uid !== id),
     );
   };
 
@@ -97,21 +94,21 @@ export default function Page() {
         for (let i = 1; i <= 4; i++) {
           pages.push(i);
         }
-        pages.push('...');
+        pages.push("...");
         pages.push(totalPages);
       } else if (currentPage >= totalPages - 2) {
         pages.push(1);
-        pages.push('...');
+        pages.push("...");
         for (let i = totalPages - 3; i <= totalPages; i++) {
           pages.push(i);
         }
       } else {
         pages.push(1);
-        pages.push('...');
+        pages.push("...");
         pages.push(currentPage - 1);
         pages.push(currentPage);
         pages.push(currentPage + 1);
-        pages.push('...');
+        pages.push("...");
         pages.push(totalPages);
       }
     }
@@ -205,13 +202,19 @@ export default function Page() {
               <span className="text-sm font-medium text-primary/80">Role</span>
             </div>
             <div className="col-span-2">
-              <span className="text-sm font-medium text-primary/80">Contact</span>
+              <span className="text-sm font-medium text-primary/80">
+                Contact
+              </span>
             </div>
             <div className="col-span-2">
-              <span className="text-sm font-medium text-primary/80">Status</span>
+              <span className="text-sm font-medium text-primary/80">
+                Status
+              </span>
             </div>
             <div className="col-span-1">
-              <span className="text-sm font-medium text-primary/80">Points</span>
+              <span className="text-sm font-medium text-primary/80">
+                Points
+              </span>
             </div>
             <div className="col-span-1"></div>
           </div>
@@ -223,10 +226,11 @@ export default function Page() {
             paginatedUsers.map((user) => (
               <div
                 key={user.id}
-                className={`px-4 sm:px-6 py-4 transition-colors cursor-pointer ${selectedUsers.includes(user.id)
-                  ? "bg-primary/5 hover:bg-primary/10"
-                  : "hover:bg-primary/5"
-                  }`}
+                className={`px-4 sm:px-6 py-4 transition-colors cursor-pointer ${
+                  selectedUsers.includes(user.id)
+                    ? "bg-primary/5 hover:bg-primary/10"
+                    : "hover:bg-primary/5"
+                }`}
                 onClick={() => router.push(`/users/${user.id}`)}
               >
                 {/* Desktop Grid */}
@@ -275,8 +279,7 @@ export default function Page() {
                       {user.buyer_profile?.loyalty_points || 0}
                     </span>
                   </div>
-                  <div className="col-span-1 flex justify-end">
-                  </div>
+                  <div className="col-span-1 flex justify-end"></div>
                 </div>
 
                 {/* Mobile/Tablet Card */}
@@ -373,7 +376,9 @@ export default function Page() {
           <div className="p-4 border-t border-primary/10">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-sm text-muted-foreground">
-                Showing {startIndex + 1} to {Math.min(endIndex, filteredUsers.length)} of {filteredUsers.length} users
+                Showing {startIndex + 1} to{" "}
+                {Math.min(endIndex, filteredUsers.length)} of{" "}
+                {filteredUsers.length} users
               </div>
 
               <div className="flex items-center gap-2">
@@ -389,21 +394,30 @@ export default function Page() {
                 </Button>
 
                 <div className="flex items-center gap-1">
-                  {getPageNumbers().map((page, index) => (
-                    page === '...' ? (
-                      <span key={`ellipsis-${index}`} className="px-2 text-muted-foreground">...</span>
+                  {getPageNumbers().map((page, index) =>
+                    page === "..." ? (
+                      <span
+                        key={`ellipsis-${index}`}
+                        className="px-2 text-muted-foreground"
+                      >
+                        ...
+                      </span>
                     ) : (
                       <Button
                         key={page}
                         size="sm"
                         variant={currentPage === page ? "default" : "outline"}
-                        className={currentPage === page ? "bg-primary text-primary-foreground" : "hover:bg-primary/5 hover:border-primary/30"}
+                        className={
+                          currentPage === page
+                            ? "bg-primary text-primary-foreground"
+                            : "hover:bg-primary/5 hover:border-primary/30"
+                        }
                         onClick={() => handlePageChange(page as number)}
                       >
                         {page}
                       </Button>
-                    )
-                  ))}
+                    ),
+                  )}
                 </div>
 
                 <Button
