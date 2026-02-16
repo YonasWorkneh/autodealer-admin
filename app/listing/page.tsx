@@ -133,9 +133,7 @@ export default function Page() {
             )}
             {!isLoading &&
               filteredCars?.map((car) => {
-                const image =
-                  car.images.find((image) => image.is_featured) ||
-                  car.images[0];
+                const image = car.featured_image;
                 return (
                   <Card
                     key={car.id}
@@ -172,8 +170,8 @@ export default function Page() {
                     </DropdownMenu>
                     <div className="relative flex justify-center">
                       <img
-                        src={image?.image_url || "/placeholder.svg"}
-                        alt={image?.caption || ""}
+                        src={image || "/placeholder.svg"}
+                        alt={`${car.make} ${car.model}- image`}
                         className="w-full md:w-full max-h-[250px] object-cover"
                       />
                     </div>
@@ -192,12 +190,6 @@ export default function Page() {
                           Type:{" "}
                           <span className="text-foreground capitalize">
                             {car.body_type}
-                          </span>
-                        </span>
-                        <span>
-                          Color:{" "}
-                          <span className="text-foreground capitalize">
-                            {car.exterior_color}
                           </span>
                         </span>
                       </div>

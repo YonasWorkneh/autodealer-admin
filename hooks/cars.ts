@@ -5,7 +5,6 @@ import {
   fetchMakes,
   fetchModels,
   postCar,
-  getMyAds,
   deleteCar,
   makeCarFavorite,
   carFavorites,
@@ -21,7 +20,7 @@ import {
   deleteModel,
   fetchCarViews,
 } from "@/lib/carApi";
-import type { FetchedCar } from "@/app/types/Car";
+import type { FetchedCar, FetchedCarDetail } from "@/app/types/Car";
 import type { CarView } from "@/app/types/CarView";
 
 export function useCars() {
@@ -32,7 +31,7 @@ export function useCars() {
 }
 
 export function useCar(id: string) {
-  return useQuery({
+  return useQuery<FetchedCarDetail>({
     queryKey: ["car", id],
     queryFn: () => fetchCarById(id),
     enabled: !!id, // only run if id exists
@@ -56,7 +55,7 @@ export function useModels(makeId?: number) {
 
 export function useCreateMake(
   onSuccess?: (data: any) => void,
-  onError?: (error: Error) => void
+  onError?: (error: Error) => void,
 ) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -71,7 +70,7 @@ export function useCreateMake(
 
 export function useCreateModel(
   onSuccess?: (data: any) => void,
-  onError?: (error: Error) => void
+  onError?: (error: Error) => void,
 ) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -88,7 +87,7 @@ export function useCreateModel(
 
 export function useUpdateMake(
   onSuccess?: (data: any) => void,
-  onError?: (error: Error) => void
+  onError?: (error: Error) => void,
 ) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -104,7 +103,7 @@ export function useUpdateMake(
 
 export function useDeleteMake(
   onSuccess?: () => void,
-  onError?: (error: Error) => void
+  onError?: (error: Error) => void,
 ) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -119,7 +118,7 @@ export function useDeleteMake(
 
 export function useUpdateModel(
   onSuccess?: (data: any) => void,
-  onError?: (error: Error) => void
+  onError?: (error: Error) => void,
 ) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -136,7 +135,7 @@ export function useUpdateModel(
 
 export function useDeleteModel(
   onSuccess?: () => void,
-  onError?: (error: Error) => void
+  onError?: (error: Error) => void,
 ) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -164,14 +163,6 @@ export function usePostCar(onError?: () => void, onSuccess?: () => void) {
       queryClient.invalidateQueries({ queryKey: ["cars"] });
       queryClient.invalidateQueries({ queryKey: ["my-ads"] });
     },
-  });
-}
-
-export function useMyAds(id: number | undefined) {
-  return useQuery({
-    queryKey: ["my-ads"],
-    queryFn: () => getMyAds(id),
-    enabled: id !== undefined,
   });
 }
 
@@ -215,7 +206,7 @@ export function useUpdateCarViews() {
 
 export function useUpdateFavorite(
   onSuccess?: () => void,
-  onError?: () => void
+  onError?: () => void,
 ) {
   return useMutation({
     mutationFn: (id: number) => makeCarFavorite(id),
@@ -230,7 +221,7 @@ export function useCarFavorites() {
 
 export function useRemoveFavorite(
   onSuccess?: () => void,
-  onError?: () => void
+  onError?: () => void,
 ) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -252,7 +243,7 @@ export function usePopularCars() {
 
 export function useApproveCar(
   onSuccess?: (data: any) => void,
-  onError?: (error: Error) => void
+  onError?: (error: Error) => void,
 ) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -268,7 +259,7 @@ export function useApproveCar(
 
 export function useRejectCar(
   onSuccess?: (data: any) => void,
-  onError?: (error: Error) => void
+  onError?: (error: Error) => void,
 ) {
   const queryClient = useQueryClient();
   return useMutation({

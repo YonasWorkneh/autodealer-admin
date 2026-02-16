@@ -163,6 +163,8 @@ export default function CarDetailsPage() {
     car ? car.id : null,
   );
 
+  console.log("car", car);
+
   const filteredLeads = leads?.filter((lead) => lead?.car?.id === car?.id);
 
   const [showRejectDialog, setShowRejectDialog] = useState(false);
@@ -705,6 +707,33 @@ export default function CarDetailsPage() {
                         {new Date(car.created_at).toLocaleDateString()}
                       </p>
                     </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Seller Information</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Name</p>
+                      <p className="font-semibold capitalize">
+                        {car.seller.name}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">
+                        Seller Type
+                      </p>
+                      <p className="font-semibold capitalize">
+                        {car.seller.type}
+                      </p>
+                    </div>
+                    {/* verified badge */}
+                    {car.seller.is_verified && <Badge>Verified</Badge>}
+                    
                   </div>
                 </CardContent>
               </Card>

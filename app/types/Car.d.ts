@@ -116,6 +116,32 @@ export type CarImage = {
 
 export type FetchedCar = {
   id: number;
+  make: string;
+  model: string;
+  year: number;
+  price: string; // decimal stored as string
+  model_ref: number;
+  make_ref: number;
+  body_type:
+    | "sedan"
+    | "suv"
+    | "truck"
+    | "coupe"
+    | "hatchback"
+    | "convertible"
+    | "wagon"
+    | "van"
+    | "other"
+    | string;
+  sale_type: "fixed_price" | "auction" | string;
+  status: "available" | "sold" | "reserved" | string;
+  featured_image: string;
+  seller: string;
+  created_at: string; // ISO timestamp
+};
+
+export type FetchedCarDetail = {
+  id: number;
   dealer: number | null;
   broker: number | null;
   posted_by: number;
@@ -124,6 +150,13 @@ export type FetchedCar = {
   bids: any[];
 
   verification_status: "pending" | "verified" | "rejected";
+  seller: {
+    id: number;
+    is_verified: boolean;
+    name: string;
+    type: "dealer" | "broker" | "buyer";
+  };
+  seller_average_rating: number | null;
 
   make_ref: number;
   model_ref: number;

@@ -24,7 +24,7 @@ import { updateProfile } from "@/lib/profileApi";
 import { changePassword } from "@/lib/auth/changePassword";
 import { useToast } from "@/components/ui/use-toast";
 import { useProfile } from "@/hooks/useProfile";
-import { signup } from "@/lib/auth/signup";
+import { setAdminRole, signup } from "@/lib/auth/signup";
 
 export default function AccountSettingsPage() {
   const { user, setUser } = useUserStore();
@@ -211,13 +211,17 @@ export default function AccountSettingsPage() {
 
     setLoading((prev) => ({ ...prev, admin: true }));
     try {
-      await signup({
+      const result = await signup({
         email: adminForm.email,
         password1: adminForm.password1,
         password2: adminForm.password2,
         first_name: adminForm.first_name,
         last_name: adminForm.last_name,
       });
+      const user = result?.user;
+      if (user) {
+        await setAdminRole(user.pk);
+      }
 
       toast({
         title: "Success",

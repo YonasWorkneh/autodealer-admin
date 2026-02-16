@@ -1,4 +1,4 @@
-import type { Car, FetchedCar } from "@/app/types/Car"; // move your interfaces to a types file for reusability
+import type { Car, FetchedCar, FetchedCarDetail } from "@/app/types/Car"; // move your interfaces to a types file for reusability
 import { Favorite } from "@/app/types/Favorite";
 import type { Make } from "@/app/types/Make";
 import type { Model } from "@/app/types/Model";
@@ -31,9 +31,9 @@ export async function fetchCars(): Promise<FetchedCar[]> {
   });
 }
 
-export async function fetchCarById(id: string): Promise<FetchedCar> {
+export async function fetchCarById(id: string): Promise<FetchedCarDetail> {
   const credential = await getCredentials();
-  return fetcher<FetchedCar>(`/inventory/cars/${id}`, {
+  return fetcher<FetchedCarDetail>(`/inventory/cars/${id}`, {
     headers: {
       Authorization: `Bearer ${credential.access}`,
     },
@@ -127,17 +127,6 @@ export async function postCar(formData: FormData): Promise<Car> {
       Authorization: `Bearer ${credential.access}`,
     },
   });
-}
-
-export async function getMyAds(id: number | undefined) {
-  if (!id) return [];
-  const credential = await getCredentials();
-  const myAds = await fetcher<FetchedCar[]>("/inventory/cars/", {
-    headers: {
-      Authorization: `Bearer ${credential.access}`,
-    },
-  });
-  return myAds.filter((car) => car.broker === id);
 }
 
 export async function deleteCar(id: number) {
@@ -258,7 +247,7 @@ export async function approveCar(id: number) {
       throw err;
     }
     throw new Error(
-      "Network error. Please check your connection and try again."
+      "Network error. Please check your connection and try again.",
     );
   }
 }
@@ -293,7 +282,7 @@ export async function rejectCar(id: number, reason?: string) {
       throw new Error(err.message);
     }
     throw new Error(
-      "Network error. Please check your connection and try again."
+      "Network error. Please check your connection and try again.",
     );
   }
 }
@@ -429,6 +418,15 @@ export async function deleteModel(id: number) {
 export async function fetchCarViews(carId: number): Promise<CarView[]> {
   const credential = await getCredentials();
   return fetcher<CarView[]>(`/analytics/view_viewers?car_id=${carId}`, {
+    headers: {
+      Authorization: `Bearer ${credential.access}`,
+    },
+  });
+}
+
+export async function getCarInspection(carId: number) {
+  const credential = await getCredentials();
+  return fetcher(`/inventory/car-inspections/${carId}/`, {
     headers: {
       Authorization: `Bearer ${credential.access}`,
     },

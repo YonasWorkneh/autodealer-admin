@@ -286,9 +286,7 @@ export default function Page() {
                 )}
                 {popularCars?.map((car, index) => {
                   if (index > 4) return null;
-                  const image =
-                    car.images.find((image) => image.is_featured) ||
-                    car.images[0];
+                  const image = car.featured_image;
                   return (
                     <div
                       key={index}
@@ -298,8 +296,8 @@ export default function Page() {
                         {index + 1}
                       </span>
                       <Image
-                        src={image.image_url}
-                        alt={image.caption || ""}
+                        src={image}
+                        alt={car.make + " " + car.model + "-image"}
                         width={100}
                         height={100}
                         className="w-16 sm:w-20 h-auto object-contain rounded-sm"
@@ -349,10 +347,10 @@ export default function Page() {
                     >
                       <img
                         src={
-                          latestCar.images && latestCar.images.length > 0
-                            ? typeof latestCar.images[0] === "string"
-                              ? latestCar.images[0]
-                              : latestCar.images[0].image_url
+                          latestCar.featured_image
+                            ? typeof latestCar.featured_image === "string"
+                              ? latestCar.featured_image
+                              : latestCar.featured_image
                             : "/placeholder.svg"
                         }
                         alt={`${latestCar.year} ${latestCar.make} ${latestCar.model}`}
@@ -394,7 +392,7 @@ export default function Page() {
                       >
                         {latestCar.body_type}
                       </Badge>
-                      <Badge
+                      {/* <Badge
                         variant="secondary"
                         className="bg-primary text-primary-foreground rounded-full capitalize"
                       >
@@ -411,7 +409,7 @@ export default function Page() {
                         className="bg-primary text-primary-foreground rounded-full capitalize"
                       >
                         {latestCar.condition}
-                      </Badge>
+                      </Badge> */}
                     </div>
                   </>
                 ) : (
