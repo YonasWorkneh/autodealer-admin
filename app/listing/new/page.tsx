@@ -523,19 +523,26 @@ export default function PlaceAddForm() {
           images: [],
         });
 
-        // Set technical features
+        // Set technical features from features array (backend returns features: string[])
+        const featureSet = Array.isArray((carData as any).features)
+          ? new Set((carData as any).features as string[])
+          : null;
         setTechnicalFeatures((prev) =>
           prev.map((feature) => ({
             ...feature,
-            checked: (carData as any)[feature.field] || false,
+            checked: featureSet
+              ? featureSet.has(feature.field)
+              : Boolean((carData as any)[feature.field]),
           }))
         );
 
-        // Set extras
+        // Set extras from features array
         setExtras((prev) =>
           prev.map((extra) => ({
             ...extra,
-            checked: (carData as any)[extra.field] || false,
+            checked: featureSet
+              ? featureSet.has(extra.field)
+              : Boolean((carData as any)[extra.field]),
           }))
         );
       }, 1000);
@@ -657,14 +664,11 @@ export default function PlaceAddForm() {
         carForm.append(`uploaded_images[${index}].caption`, image.name);
       });
 
-      const selectedTechnical = technicalFeatures.filter((tec) => tec.checked);
-      const selectedExtras = extras.filter((extra) => extra.checked);
-      selectedTechnical.forEach((technical) =>
-        carForm.append(technical.field, String(technical.checked))
-      );
-      selectedExtras.forEach((extra) =>
-        carForm.append(extra.field, String(extra.checked))
-      );
+      const selectedFeatureFields = [
+        ...technicalFeatures.filter((tec) => tec.checked).map((t) => t.field),
+        ...extras.filter((extra) => extra.checked).map((e) => e.field),
+      ];
+      carForm.append("features", JSON.stringify(selectedFeatureFields));
 
       if (c_id) {
         // Update existing car
@@ -832,7 +836,12 @@ export default function PlaceAddForm() {
                           </SelectItem>
                         ) : (
                           models
-                            ?.filter((model) => model.make.id === watchedMake)
+                            ?.filter(
+                              (model) =>
+                                typeof model.make === "number"
+                                  ? model.make === watchedMake
+                                  : model.make?.id === watchedMake
+                            )
                             .map((model) => (
                               <SelectItem
                                 key={model.id}

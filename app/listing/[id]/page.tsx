@@ -32,6 +32,7 @@ import {
   UserCircle,
   Eye,
   Mail,
+  CheckCircle,
 } from "lucide-react";
 import React, { useState } from "react";
 import {
@@ -307,20 +308,13 @@ export default function CarDetailsPage() {
     );
   };
 
-  const carFeatures = [
-    { label: "Bluetooth", value: car.bluetooth },
-    { label: "Heated Seats", value: car.heated_seats },
-    { label: "Navigation", value: car.navigation_system },
-    { label: "Leather Seats", value: car.leather_seats },
-    { label: "Sunroof", value: car.sunroof },
-    { label: "Parking Sensors", value: car.parking_sensors },
-    { label: "Rear Camera", value: car.rear_view_camera },
-    { label: "Keyless Entry", value: car.keyless_entry },
-    { label: "Climate Control", value: car.climate_control },
-    { label: "Power Windows", value: car.power_windows },
-    { label: "Cruise Control", value: car.cruise_control },
-    { label: "Premium Sound", value: car.premium_sound_system },
-  ].filter((feature) => feature.value);
+  // Features come from the backend as an array of strings (e.g. ["bluetooth", "rear_view_camera"])
+  const carFeatures = Array.isArray(car.features) ? car.features : [];
+  const formatFeatureLabel = (key: string) =>
+    key
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
 
   const highestBid = car.bids.reduce((max, bid) => {
     return Math.max(max, parseFloat(bid.amount));
@@ -657,11 +651,11 @@ export default function CarDetailsPage() {
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                         {carFeatures.map((feature) => (
                           <div
-                            key={feature.label}
+                            key={feature}
                             className="flex items-center gap-2 text-sm"
                           >
-                            <Check className="h-4 w-4 text-green-600" />
-                            <span>{feature.label}</span>
+                            <CheckCircle className="h-4 w-4 text-green-600" />
+                            <span>{formatFeatureLabel(feature)}</span>
                           </div>
                         ))}
                       </div>
@@ -733,7 +727,6 @@ export default function CarDetailsPage() {
                     </div>
                     {/* verified badge */}
                     {car.seller.is_verified && <Badge>Verified</Badge>}
-                    
                   </div>
                 </CardContent>
               </Card>

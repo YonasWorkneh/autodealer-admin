@@ -197,55 +197,6 @@ export type FetchedCarDetail = {
   created_at: string; // ISO timestamp
   updated_at: string; // ISO timestamp
 
-  // Features (booleans)
-  bluetooth: boolean;
-  heated_seats: boolean;
-  cd_player: boolean;
-  power_locks: boolean;
-  premium_wheels_rims: boolean;
-  winch: boolean;
-  alarm_anti_theft: boolean;
-  cooled_seats: boolean;
-  keyless_start: boolean;
-  body_kit: boolean;
-  navigation_system: boolean;
-  premium_lights: boolean;
-  cassette_player: boolean;
-  fog_lights: boolean;
-  leather_seats: boolean;
-  roof_rack: boolean;
-  dvd_player: boolean;
-  power_mirrors: boolean;
-  power_sunroof: boolean;
-  aux_audio_in: boolean;
-  brush_guard: boolean;
-  air_conditioning: boolean;
-  performance_tyres: boolean;
-  premium_sound_system: boolean;
-  heat: boolean;
-  vhs_player: boolean;
-  off_road_kit: boolean;
-  am_fm_radio: boolean;
-  moonroof: boolean;
-  racing_seats: boolean;
-  premium_paint: boolean;
-  spoiler: boolean;
-  power_windows: boolean;
-  sunroof: boolean;
-  climate_control: boolean;
-  parking_sensors: boolean;
-  rear_view_camera: boolean;
-  keyless_entry: boolean;
-  off_road_tyres: boolean;
-  satellite_radio: boolean;
-  power_seats: boolean;
-  tiptronic_gears: boolean;
-  dual_exhaust: boolean;
-  power_steering: boolean;
-  cruise_control: boolean;
-  all_wheel_steering: boolean;
-  front_airbags: boolean;
-  side_airbags: boolean;
-  n2o_system: boolean;
-  anti_lock_brakes: boolean;
-};
+  /** Features as array of strings (e.g. ["bluetooth", "heated_seats", "rear_view_camera"]) */
+  features: string[];
+}

@@ -73,7 +73,20 @@ export default function SignIn() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          onKeyDown={(e) => {
+            if (
+              e.key === "Enter" &&
+              (e.target as HTMLElement).tagName !== "TEXTAREA" &&
+              !(e.target as HTMLElement).closest("button")
+            ) {
+              e.preventDefault();
+              (e.currentTarget as HTMLFormElement).requestSubmit();
+            }
+          }}
+          className="grid gap-4"
+        >
           <div className="grid gap-2">
             <Label htmlFor="email" className="text-foreground">
               Email
@@ -153,6 +166,7 @@ export default function SignIn() {
             )}
           >
             <Button
+              type="button"
               variant="outline"
               className={cn("w-full gap-2 cursor-pointer")}
               disabled={loading}
