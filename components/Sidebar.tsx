@@ -15,6 +15,7 @@ import {
   Tag,
   Headset,
   ShieldCheck,
+  Building2,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -45,6 +46,7 @@ export default function Sidebar() {
     { label: "Users", href: "/users", icon: Users },
     { label: "Sales", href: "/sales", icon: TrendingUp },
     { label: "Brokers", href: "/brokers", icon: ShieldCheck },
+    { label: "Enterprises", href: "/enterprises", icon: Building2 },
   ];
 
   const isAuthPage = pathName.includes("signin") || pathName.includes("signup");

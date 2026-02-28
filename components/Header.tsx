@@ -18,6 +18,8 @@ export default function Header() {
   const { notifications } = useNotifications();
   const { profile } = useProfile();
 
+  console.log("profile", profile);
+
   const unreadNotifications =
     notifications?.filter(
       (notification: Notification) => !notification.is_read,

@@ -4,11 +4,10 @@ import type { Make } from "@/app/types/Make";
 import type { Model } from "@/app/types/Model";
 import type { CarView } from "@/app/types/CarView";
 import { getCredentials } from "./credential";
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL as string;
+import { API_URL } from "./config";
 
 async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE_URL}${endpoint}`, {
+  const res = await fetch(`${API_URL}${endpoint}`, {
     ...options,
     headers: {
       ...(options?.headers || {}),
@@ -54,7 +53,7 @@ export async function fetchModels(makeId?: number): Promise<Model[]> {
 export async function createMake(name: string) {
   try {
     const credential = await getCredentials();
-    const res = await fetch(`${BASE_URL}/inventory/makes/`, {
+    const res = await fetch(`${API_URL}/inventory/makes/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -90,7 +89,7 @@ export async function createModel({
 }) {
   try {
     const credential = await getCredentials();
-    const res = await fetch(`${BASE_URL}/inventory/models/`, {
+    const res = await fetch(`${API_URL}/inventory/models/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -131,7 +130,7 @@ export async function postCar(formData: FormData): Promise<Car> {
 
 export async function deleteCar(id: number) {
   const credential = await getCredentials();
-  const res = await fetch(`${BASE_URL}/inventory/cars/${id}/`, {
+  const res = await fetch(`${API_URL}/inventory/cars/${id}/`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${credential.access}`,
@@ -148,7 +147,7 @@ export async function deleteCar(id: number) {
 
 export async function updateCarViews(car_id: number, ip_address: string) {
   const crednetial = await getCredentials();
-  const res = await fetch(`${BASE_URL}/inventory/car-views/`, {
+  const res = await fetch(`${API_URL}/inventory/car-views/`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${crednetial.access}`,
@@ -157,12 +156,13 @@ export async function updateCarViews(car_id: number, ip_address: string) {
     body: JSON.stringify({ ip_address, car_id }),
   });
   const data = await res.json();
+  return data;
 }
 
 export async function makeCarFavorite(id: number) {
   const credential = await getCredentials();
   try {
-    const res = await fetch(`${BASE_URL}/inventory/car-favorites/`, {
+    const res = await fetch(`${API_URL}/inventory/car-favorites/`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${credential.access}`,
@@ -179,7 +179,7 @@ export async function makeCarFavorite(id: number) {
 export async function carFavorites() {
   const credential = await getCredentials();
   try {
-    const res = await fetch(`${BASE_URL}/inventory/car-favorites/`, {
+    const res = await fetch(`${API_URL}/inventory/car-favorites/`, {
       headers: {
         Authorization: `Bearer ${credential.access}`,
       },
@@ -195,7 +195,7 @@ export async function carFavorites() {
 export async function removeCarFavorite(id: number) {
   const credential = await getCredentials();
   try {
-    const res = await fetch(`${BASE_URL}/inventory/car-favorites/${id}/`, {
+    const res = await fetch(`${API_URL}/inventory/car-favorites/${id}/`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${credential.access}`,
@@ -222,7 +222,7 @@ export async function approveCar(id: number) {
   const formData = new FormData();
   formData.append("verification_status", "verified");
   try {
-    const res = await fetch(`${BASE_URL}/inventory/cars/${id}/verify/`, {
+    const res = await fetch(`${API_URL}/inventory/cars/${id}/verify/`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${credential.access}`,
@@ -258,7 +258,7 @@ export async function rejectCar(id: number, reason?: string) {
   formData.append("verification_status", "rejected");
   formData.append("reason", reason || "");
   try {
-    const res = await fetch(`${BASE_URL}/inventory/cars/${id}/verify/`, {
+    const res = await fetch(`${API_URL}/inventory/cars/${id}/verify/`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${credential.access}`,
@@ -290,7 +290,7 @@ export async function rejectCar(id: number, reason?: string) {
 export async function updateMake({ id, name }: { id: number; name: string }) {
   try {
     const credential = await getCredentials();
-    const res = await fetch(`${BASE_URL}/inventory/makes/${id}/`, {
+    const res = await fetch(`${API_URL}/inventory/makes/${id}/`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -320,7 +320,7 @@ export async function updateMake({ id, name }: { id: number; name: string }) {
 export async function deleteMake(id: number) {
   try {
     const credential = await getCredentials();
-    const res = await fetch(`${BASE_URL}/inventory/makes/${id}/`, {
+    const res = await fetch(`${API_URL}/inventory/makes/${id}/`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${credential.access}`,
@@ -360,7 +360,7 @@ export async function updateModel({
     if (name !== undefined) payload.name = name;
     if (make_id !== undefined) payload.make_id = make_id;
 
-    const res = await fetch(`${BASE_URL}/inventory/models/${id}/`, {
+    const res = await fetch(`${API_URL}/inventory/models/${id}/`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -390,7 +390,7 @@ export async function updateModel({
 export async function deleteModel(id: number) {
   try {
     const credential = await getCredentials();
-    const res = await fetch(`${BASE_URL}/inventory/models/${id}/`, {
+    const res = await fetch(`${API_URL}/inventory/models/${id}/`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${credential.access}`,
