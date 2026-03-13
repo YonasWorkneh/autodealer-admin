@@ -1,12 +1,11 @@
 import { getCredentials } from "./credential";
+import { API_URL } from "./config";
 import type { Enterprise } from "@/app/types/Enterprise";
 import type { DealerAction } from "@/app/types/Enterprise";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL as string;
-
 async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const credential = await getCredentials();
-  const res = await fetch(`${BASE_URL}${endpoint}`, {
+  const res = await fetch(`${API_URL}${endpoint}`, {
     ...options,
     headers: {
       Authorization: `Bearer ${credential.access}`,
@@ -47,7 +46,7 @@ export async function dealerAction(
       : undefined;
 
   const res = await fetch(
-    `${BASE_URL}/dealers/admin/dealers/${id}/${action}/`,
+    `${API_URL}/dealers/admin/dealers/${id}/${action}/`,
     {
       method: action === "verify" ? "PATCH" : "POST",
       headers: {

@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL as string;
+import { API_URL } from "@/lib/config";
 
 interface ResetPasswordParams {
   email: string;
@@ -6,7 +6,7 @@ interface ResetPasswordParams {
 
 export const resetPassword = async (data: ResetPasswordParams) => {
   try {
-    const res = await fetch(`${BASE_URL}/auth/password/reset`, {
+    const res = await fetch(`${API_URL}/auth/password/reset`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

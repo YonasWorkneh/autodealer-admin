@@ -1,11 +1,10 @@
 import type { UserProfile } from "@/app/types/UserProfile";
 import { getCredentials } from "./credential";
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL as string;
+import { API_URL } from "./config";
 
 async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const credential = await getCredentials();
-  const res = await fetch(`${BASE_URL}${endpoint}`, {
+  const res = await fetch(`${API_URL}${endpoint}`, {
     ...options,
     headers: {
       Authorization: `Bearer ${credential.access}`,

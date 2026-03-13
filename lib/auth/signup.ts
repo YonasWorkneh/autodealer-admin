@@ -1,4 +1,6 @@
 "use server";
+import { API_URL_SERVER } from "@/lib/config";
+
 interface SignUpParams {
   first_name: string;
   last_name: string;
@@ -18,7 +20,7 @@ interface SignUpResponse {
 
 export const signup = async (data: SignUpParams) => {
   try {
-    const res = await fetch(`${process.env.BASE_API_URL}/auth/registration/`, {
+    const res = await fetch(`${API_URL_SERVER}/auth/registration/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -37,7 +39,7 @@ export const signup = async (data: SignUpParams) => {
 
 export const setAdminRole = async (userId: number) => {
   try {
-    const res = await fetch(`${process.env.BASE_API_URL}/users/me/roles/`, {
+    const res = await fetch(`${API_URL_SERVER}/users/me/roles/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

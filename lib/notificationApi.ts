@@ -1,7 +1,6 @@
 import { NotificationResponse } from "@/app/types/notification";
 import { getCredentials } from "./credential";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { API_URL } from "./config";
 
 export const getNotifications = async () => {
   try {

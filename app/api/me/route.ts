@@ -1,14 +1,13 @@
 // app/api/me/route.ts
 import { cookies, headers } from "next/headers";
-
-const api = process.env.BASE_API_URL;
+import { API_URL_SERVER } from "@/lib/config";
 
 export async function GET() {
   const cookieStore = await cookies();
   const refresh = cookieStore.get("refresh")?.value;
   let outside;
   try {
-    const response = await fetch(`${api}/auth/token/refresh`, {
+    const response = await fetch(`${API_URL_SERVER}/auth/token/refresh`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -37,7 +36,7 @@ export async function GET() {
       path: "/",
       maxAge: 60 * 60 * 24 * 30,
     });
-    const res = await fetch(`${api}/auth/user/`, {
+    const res = await fetch(`${API_URL_SERVER}/auth/user/`, {
       headers: { Authorization: `Bearer ${data?.access}` },
     });
     if (!res.ok) throw new Error("Failed to fetch user.");

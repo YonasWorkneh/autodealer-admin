@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { API_URL } from "@/lib/config";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -61,7 +62,6 @@ export default function UserDetailsPage() {
     setActionLoading(true);
     try {
       const credential = await getCredentials();
-      const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
       const response = await fetch(`${API_URL}/brokers/admin/${userId}/${action}/`, {
         method: "POST",

@@ -1,6 +1,5 @@
 import { getCredentials } from "../credential";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { API_URL } from "../config";
 
 export interface ChangePasswordParams {
   new_password?: string;

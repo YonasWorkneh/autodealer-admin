@@ -2,6 +2,7 @@
 import { jwtDecode } from "jwt-decode";
 
 import { cookies } from "next/headers";
+import { API_URL_SERVER } from "./config";
 
 export const getCredentials = async () => {
   const cookieStore = await cookies();
@@ -17,7 +18,7 @@ export const getCredentials = async () => {
 
 const refreshToken = async (refresh: string | undefined) => {
   if (refresh === undefined) return;
-  const res = await fetch(`${process.env.BASE_API_URL}/auth/token/refresh/`, {
+  const res = await fetch(`${API_URL_SERVER}/auth/token/refresh/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

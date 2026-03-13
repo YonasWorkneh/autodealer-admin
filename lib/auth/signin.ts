@@ -1,5 +1,6 @@
 "use server";
 import { cookies } from "next/headers";
+import { API_URL_SERVER } from "@/lib/config";
 
 interface SignInParams {
   email: string;
@@ -8,7 +9,7 @@ interface SignInParams {
 
 export const signin = async (data: SignInParams) => {
   try {
-    const res = await fetch(`${process.env.BASE_API_URL}/auth/login`, {
+    const res = await fetch(`${API_URL_SERVER}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -33,7 +34,7 @@ export const signin = async (data: SignInParams) => {
 export const getUser = async (id: number) => {
   try {
     const res = await fetch(
-      `${process.env.BASE_API_URL}/users/user-profiles/${id}`
+      `${API_URL_SERVER}/users/user-profiles/${id}`
     );
     if (!res.ok) throw new Error("Something went wrong");
     const user = await res.json();
