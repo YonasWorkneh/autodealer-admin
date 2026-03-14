@@ -39,8 +39,23 @@ export async function fetchCarById(id: string): Promise<FetchedCarDetail> {
   });
 }
 
+/** Backend may return a plain array or paginated { results: [...] }; normalize to Make[] */
+function normalizeMakes(raw: unknown): Make[] {
+  if (Array.isArray(raw)) {
+    return raw.map((m: any) => ({
+      id: Number(m?.id ?? m?.pk ?? 0),
+      name: String(m?.name ?? m?.make_name ?? m?.title ?? ""),
+    })).filter((m) => m.id && m.name);
+  }
+  if (raw && typeof raw === "object" && "results" in raw && Array.isArray((raw as { results: unknown[] }).results)) {
+    return normalizeMakes((raw as { results: unknown[] }).results);
+  }
+  return [];
+}
+
 export async function fetchMakes(): Promise<Make[]> {
-  return fetcher<Make[]>("/inventory/makes/");
+  const raw = await fetcher<unknown>("/inventory/makes/");
+  return normalizeMakes(raw);
 }
 
 export async function fetchModels(makeId?: number): Promise<Model[]> {
@@ -82,10 +97,10 @@ export async function createMake(name: string) {
 
 export async function createModel({
   name,
-  make_id,
+  make,
 }: {
   name: string;
-  make_id: number;
+  make: number;
 }) {
   try {
     const credential = await getCredentials();
@@ -95,7 +110,7 @@ export async function createModel({
         "Content-Type": "application/json",
         Authorization: `Bearer ${credential.access}`,
       },
-      body: JSON.stringify({ name, make_id }),
+      body: JSON.stringify({ name, make }),
     });
 
     if (!res.ok) {
@@ -348,17 +363,17 @@ export async function deleteMake(id: number) {
 export async function updateModel({
   id,
   name,
-  make_id,
+  make,
 }: {
   id: number;
   name?: string;
-  make_id?: number;
+  make?: number;
 }) {
   try {
     const credential = await getCredentials();
     const payload: Record<string, unknown> = {};
     if (name !== undefined) payload.name = name;
-    if (make_id !== undefined) payload.make_id = make_id;
+    if (make !== undefined) payload.make = make;
 
     const res = await fetch(`${API_URL}/inventory/models/${id}/`, {
       method: "PATCH",

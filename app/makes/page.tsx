@@ -78,7 +78,7 @@ export default function MakesPage() {
       setMakeName("");
       setIsMakeDialogOpen(false);
     },
-    (err) => showToast("error", err.message || "Failed to create make.")
+    (err) => showToast("error", err.message || "Failed to create make."),
   );
   const updateMakeMutation = useUpdateMake(
     () => {
@@ -86,14 +86,14 @@ export default function MakesPage() {
       setEditingMake(null);
       setEditingMakeName("");
     },
-    (err) => showToast("error", err.message || "Failed to update make.")
+    (err) => showToast("error", err.message || "Failed to update make."),
   );
   const deleteMakeMutation = useDeleteMake(
     () => {
       showToast("success", "Make deleted successfully.");
       setMakeToDelete(null);
     },
-    (err) => showToast("error", err.message || "Failed to delete make.")
+    (err) => showToast("error", err.message || "Failed to delete make."),
   );
   const createModelMutation = useCreateModel(
     () => {
@@ -102,7 +102,7 @@ export default function MakesPage() {
       setSelectedMakeId("");
       setIsModelDialogOpen(false);
     },
-    (err) => showToast("error", err.message || "Failed to create model.")
+    (err) => showToast("error", err.message || "Failed to create model."),
   );
   const updateModelMutation = useUpdateModel(
     () => {
@@ -111,19 +111,19 @@ export default function MakesPage() {
       setEditingModelName("");
       setEditingModelMakeId("");
     },
-    (err) => showToast("error", err.message || "Failed to update model.")
+    (err) => showToast("error", err.message || "Failed to update model."),
   );
   const deleteModelMutation = useDeleteModel(
     () => {
       showToast("success", "Model deleted successfully.");
       setModelToDelete(null);
     },
-    (err) => showToast("error", err.message || "Failed to delete model.")
+    (err) => showToast("error", err.message || "Failed to delete model."),
   );
 
   const filteredMakes =
     makes?.filter((make) =>
-      make.name.toLowerCase().includes(searchQuery.toLowerCase())
+      make.name.toLowerCase().includes(searchQuery.toLowerCase()),
     ) || [];
 
   if (isLoading) {
@@ -288,7 +288,15 @@ export default function MakesPage() {
         onSubmit={() => {
           const trimmed = makeName.trim();
           if (!trimmed) return;
-          createMakeMutation.mutate(trimmed);
+          createMakeMutation.mutate(trimmed, {
+            onSuccess: () => {
+              showToast("success", "Make created successfully.");
+              setMakeName("");
+              setIsMakeDialogOpen(false);
+            },
+            onError: (err) =>
+              showToast("error", err.message || "Failed to create make."),
+          });
         }}
         isSubmitting={createMakeMutation.isPending}
         title="Create New Make"
@@ -312,7 +320,18 @@ export default function MakesPage() {
           if (!editingMake) return;
           const trimmed = editingMakeName.trim();
           if (!trimmed) return;
-          updateMakeMutation.mutate({ id: editingMake.id, name: trimmed });
+          updateMakeMutation.mutate(
+            { id: editingMake.id, name: trimmed },
+            {
+              onSuccess: () => {
+                showToast("success", "Make updated successfully.");
+                setEditingMake(null);
+                setEditingMakeName("");
+              },
+              onError: (err) =>
+                showToast("error", err.message || "Failed to update make."),
+            },
+          );
         }}
         isSubmitting={updateMakeMutation.isPending}
         title="Edit Make"
@@ -337,10 +356,22 @@ export default function MakesPage() {
         onSubmit={() => {
           const trimmed = modelName.trim();
           if (!trimmed || selectedMakeId === "") return;
-          createModelMutation.mutate({
-            name: trimmed,
-            make_id: selectedMakeId as number,
-          });
+          createModelMutation.mutate(
+            {
+              name: trimmed,
+              make: selectedMakeId as number,
+            },
+            {
+              onSuccess: () => {
+                showToast("success", "Model created successfully.");
+                setModelName("");
+                setSelectedMakeId("");
+                setIsModelDialogOpen(false);
+              },
+              onError: (err) =>
+                showToast("error", err.message || "Failed to create model."),
+            },
+          );
         }}
         isSubmitting={createModelMutation.isPending}
         title="Create New Model"
@@ -374,7 +405,7 @@ export default function MakesPage() {
         makes={makes || []}
         selectedMakeId={
           editingModelMakeId === ""
-            ? editingModel?.make.id ?? ""
+            ? (editingModel?.make.id ?? "")
             : editingModelMakeId
         }
         setSelectedMakeId={setEditingModelMakeId}
@@ -384,14 +415,26 @@ export default function MakesPage() {
           if (!editingModel) return;
           const trimmed = editingModelName.trim();
           if (!trimmed) return;
-          updateModelMutation.mutate({
-            id: editingModel.model.id,
-            name: trimmed,
-            make_id:
-              editingModelMakeId === ""
-                ? editingModel.make.id
-                : (editingModelMakeId as number),
-          });
+          updateModelMutation.mutate(
+            {
+              id: editingModel.model.id,
+              name: trimmed,
+              make:
+                editingModelMakeId === ""
+                  ? editingModel.make.id
+                  : (editingModelMakeId as number),
+            },
+            {
+              onSuccess: () => {
+                showToast("success", "Model updated successfully.");
+                setEditingModel(null);
+                setEditingModelName("");
+                setEditingModelMakeId("");
+              },
+              onError: (err) =>
+                showToast("error", err.message || "Failed to update model."),
+            },
+          );
         }}
         isSubmitting={updateModelMutation.isPending}
         title="Edit Model"
@@ -776,8 +819,8 @@ function ModelDialog({
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Choose a make" />
               </SelectTrigger>
-              <SelectContent>
-                {makes.map((make) => (
+              <SelectContent className="z-50001" position="popper">
+                {(Array.isArray(makes) ? makes : []).map((make) => (
                   <SelectItem key={make.id} value={String(make.id)}>
                     {make.name}
                   </SelectItem>

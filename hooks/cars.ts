@@ -74,8 +74,8 @@ export function useCreateModel(
 ) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ name, make_id }: { name: string; make_id: number }) =>
-      createModel({ name, make_id }),
+    mutationFn: ({ name, make }: { name: string; make: number }) =>
+      createModel({ name, make }),
     onSuccess: (data) => {
       onSuccess?.(data);
       queryClient.invalidateQueries({ queryKey: ["models"] });
@@ -122,7 +122,7 @@ export function useUpdateModel(
 ) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: { id: number; name?: string; make_id?: number }) =>
+    mutationFn: (payload: { id: number; name?: string; make?: number }) =>
       updateModel(payload),
     onSuccess: (data) => {
       onSuccess?.(data);
