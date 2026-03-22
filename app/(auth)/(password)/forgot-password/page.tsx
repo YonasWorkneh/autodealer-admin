@@ -55,16 +55,17 @@ export default function ForgotPasswordForm() {
           href={"/"}
           className="flex items-center justify-center gap-2 mb-3 border-b border-primary/20 pb-4"
         >
-          <div className="w-8 h-8 rounded-full flex items-center justify-center">
+          <Link href={"/"} className="flex items-center gap-2 cursor-pointer">
             <Image
-              src="/wheel.png"
-              alt="wheel"
-              width={100}
-              height={100}
-              className="w-full h-full"
+              src="/logo.svg"
+              alt="hulucars"
+              width={140}
+              height={40}
+              className="h-28 w-auto"
+              priority
             />
-          </div>
-          <h1 className="text-primary font-semibold">AUTO&mdash;DEALER</h1>
+          </Link>
+          <h1 className="text-primary font-semibold">hulucar</h1>
         </Link>
         <CardTitle className="text-lg md:text-xl text-primary">
           Forgot Password?

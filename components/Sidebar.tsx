@@ -56,12 +56,16 @@ export default function Sidebar() {
     <>
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-20 bg-primary flex-col items-center py-6 space-y-6 fixed left-0 top-0 h-full z-20">
-        <Link
-          href={"/"}
-          className="w-8 h-8 rounded-lg flex flex-col items-center justify-center"
-        >
-          <Image src={"/wheel copy.png"} alt="logo" width={100} height={100} />
-          <p className="text-xs text-white mt-2">DEALER</p>
+        {/* logo */}
+        <Link href={"/"} className="flex items-center gap-2 cursor-pointer bg-white rounded-full size-[70px]">
+          <Image
+            src="/logo.svg"
+            alt="hulucars"
+            width={140}
+            height={40}
+            className="h-[50px] w-auto"
+            priority
+          />
         </Link>
         <div className="flex flex-col space-y-10 my-30">
           {links.map((link) => {
@@ -130,15 +134,19 @@ export default function Sidebar() {
             className="fixed top-0 left-0 h-full w-64 bg-primary flex flex-col py-6 px-4 z-[10000]"
           >
             <div className="flex justify-between items-center px-2">
-              <div className="flex items-center space-x-2">
+              <Link
+                href={"/"}
+                className="flex items-center gap-2 cursor-pointer"
+              >
                 <Image
-                  src={"/wheel copy.png"}
-                  alt="logo"
-                  width={40}
+                  src="/logo.svg"
+                  alt="hulucars"
+                  width={140}
                   height={40}
+                  className="h-28 w-auto"
+                  priority
                 />
-                <p className="text-white font-bold">DEALER</p>
-              </div>
+              </Link>
               <button
                 onClick={() => setIsOpen(false)}
                 className="p-2 text-white rounded-md"

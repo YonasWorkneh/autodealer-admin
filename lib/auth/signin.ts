@@ -12,9 +12,13 @@ function getErrorMessageFromResponse(data: unknown): string {
   const d = data as Record<string, unknown>;
   if (typeof d.detail === "string") return d.detail;
   if (typeof d.message === "string") return d.message;
-  if (Array.isArray(d.non_field_errors) && d.non_field_errors[0]) return String(d.non_field_errors[0]);
-  const firstField = Object.keys(d).find((k) => Array.isArray(d[k]) && (d[k] as string[]).length);
-  if (firstField && Array.isArray(d[firstField])) return String((d[firstField] as string[])[0]);
+  if (Array.isArray(d.non_field_errors) && d.non_field_errors[0])
+    return String(d.non_field_errors[0]);
+  const firstField = Object.keys(d).find(
+    (k) => Array.isArray(d[k]) && (d[k] as string[]).length,
+  );
+  if (firstField && Array.isArray(d[firstField]))
+    return String((d[firstField] as string[])[0]);
   return "Something went wrong";
 }
 
@@ -45,9 +49,7 @@ export const signin = async (data: SignInParams) => {
 
 export const getUser = async (id: number) => {
   try {
-    const res = await fetch(
-      `${API_URL}/users/user-profiles/${id}`
-    );
+    const res = await fetch(`${API_URL}/users/user-profiles/${id}`);
     const body = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(getErrorMessageFromResponse(body));
     return body;
