@@ -8,7 +8,7 @@ import Protected from "./Protected";
 import Providers from "./Providers";
 
 export const metadata: Metadata = {
-  title: "ET-Car-Admin",
+  title: "Hulucars Admin",
 };
 
 export default async function RootLayout({
