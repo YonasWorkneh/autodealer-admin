@@ -29,7 +29,7 @@ export default function Header() {
 
   return (
     <div
-      className="flex items-center justify-between gap-4 sm:gap-6 mb-6 px-4 sm:px-6 fixed top-0 left-0 sm:left-20 w-full sm:w-[calc(100%-80px)] bg-white/70 z-40 py-3 sm:py-4"
+      className="flex items-center justify-between gap-4 sm:gap-6 mb-6 px-4 sm:px-6 fixed top-0 left-0 sm:left-24 w-full sm:w-[calc(100%-80px)] bg-white/70 z-40 py-3 sm:py-4"
       style={{ backdropFilter: "blur(20px)" }}
     >
       <div />{/* Right section */}

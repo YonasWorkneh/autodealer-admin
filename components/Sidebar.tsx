@@ -16,6 +16,7 @@ import {
   Headset,
   ShieldCheck,
   Building2,
+  Megaphone,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -47,6 +48,7 @@ export default function Sidebar() {
     { label: "Sales", href: "/sales", icon: TrendingUp },
     { label: "Brokers", href: "/brokers", icon: ShieldCheck },
     { label: "Enterprises", href: "/enterprises", icon: Building2 },
+    { label: "Adverts", href: "/advertisements", icon: Megaphone },
   ];
 
   const isAuthPage = pathName.includes("signin") || pathName.includes("signup");
@@ -55,19 +57,18 @@ export default function Sidebar() {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-20 bg-primary flex-col items-center py-6 space-y-6 fixed left-0 top-0 h-full z-20">
+      <aside className="hidden md:flex w-24 bg-primary flex-col items-center py-6 space-y-6 fixed left-0 top-0 h-full z-20">
         {/* logo */}
-        <Link href={"/"} className="flex items-center gap-2 cursor-pointer bg-white rounded-full size-[70px]">
+        <Link href={"/"} className="flex items-center cursor-pointer">
           <Image
-            src="/logo.svg"
+            src="/logo-white.png"
             alt="hulucars"
             width={140}
             height={40}
-            className="h-[50px] w-auto"
-            priority
+            className="h-[80px] w-[100px]!"
           />
         </Link>
-        <div className="flex flex-col space-y-10 my-30">
+        <div className="flex flex-col space-y-10 mt-14">
           {links.map((link) => {
             const active =
               link.href === "/"
