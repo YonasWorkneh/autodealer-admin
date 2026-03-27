@@ -3,35 +3,43 @@ import { API_URL } from "./config";
 import type { Enterprise } from "@/app/types/Enterprise";
 import type { DealerAction } from "@/app/types/Enterprise";
 
-async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const credential = await getCredentials();
-  const res = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      Authorization: `Bearer ${credential.access}`,
-      "Content-Type": "application/json",
-      ...(options?.headers || {}),
-    },
-  });
-
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    const errorMessage =
-      errorData.detail ||
-      errorData.message ||
-      `API error: ${res.status} ${res.statusText}`;
-    throw new Error(errorMessage);
-  }
-
-  return res.json() as Promise<T>;
-}
-
 export async function fetchDealers(): Promise<Enterprise[]> {
-  return fetcher<Enterprise[]>("/dealers/admin/dealers");
+  try {
+    const credential = await getCredentials();
+    const res = await fetch(`${API_URL}/dealers/admin/dealers`, {
+      headers: {
+        Authorization: `Bearer ${credential.access}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      const errorMessage =
+        errorData.detail ||
+        errorData.message ||
+        `API error: ${res.status} ${res.statusText}`;
+      throw new Error(errorMessage);
+    }
+
+    return res.json() as Promise<Enterprise[]>;
+  } catch (e) {
+    if (e instanceof Error) throw e;
+    throw new Error(String(e));
+  }
 }
 
 export type DealerActionPayload = {
   reason?: string;
+};
+
+export type RegisterDealerPayload = {
+  email: string;
+  password: string;
+  company_name: string;
+  license_number: string;
+  tax_id: string;
+  telebirr_account: string;
 };
 
 export async function dealerAction(
@@ -39,32 +47,67 @@ export async function dealerAction(
   action: DealerAction,
   payload?: DealerActionPayload,
 ): Promise<unknown> {
-  const credential = await getCredentials();
-  const body =
-    action === "reject" && payload != null
-      ? JSON.stringify({ reason: payload.reason ?? "" })
-      : undefined;
+  try {
+    const credential = await getCredentials();
+    const body =
+      action === "reject" && payload != null
+        ? JSON.stringify({ reason: payload.reason ?? "" })
+        : undefined;
 
-  const res = await fetch(
-    `${API_URL}/dealers/admin/dealers/${id}/${action}/`,
-    {
-      method: action === "verify" ? "PATCH" : "POST",
+    const res = await fetch(
+      `${API_URL}/dealers/admin/dealers/${id}/${action}/`,
+      {
+        method: action === "verify" ? "PATCH" : "POST",
+        headers: {
+          Authorization: `Bearer ${credential.access}`,
+          "Content-Type": "application/json",
+        },
+        ...(body !== undefined && { body }),
+      },
+    );
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      const errorMessage =
+        errorData.detail ||
+        errorData.message ||
+        `API error: ${res.status} ${res.statusText}`;
+      throw new Error(errorMessage);
+    }
+
+    return res.json() as Promise<unknown>;
+  } catch (e) {
+    if (e instanceof Error) throw e;
+    throw new Error(String(e));
+  }
+}
+
+export async function registerDealer(
+  payload: RegisterDealerPayload,
+): Promise<unknown> {
+  try {
+    const credential = await getCredentials();
+    const res = await fetch(`${API_URL}/users/auth/register_dealer/`, {
+      method: "POST",
       headers: {
         Authorization: `Bearer ${credential.access}`,
         "Content-Type": "application/json",
       },
-      ...(body !== undefined && { body }),
-    },
-  );
+      body: JSON.stringify(payload),
+    });
 
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    const errorMessage =
-      errorData.detail ||
-      errorData.message ||
-      `API error: ${res.status} ${res.statusText}`;
-    throw new Error(errorMessage);
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      const errorMessage =
+        errorData.detail ||
+        errorData.message ||
+        `API error: ${res.status} ${res.statusText}`;
+      throw new Error(errorMessage);
+    }
+
+    return res.json() as Promise<unknown>;
+  } catch (e) {
+    if (e instanceof Error) throw e;
+    throw new Error(String(e));
   }
-
-  return res.json() as Promise<unknown>;
 }

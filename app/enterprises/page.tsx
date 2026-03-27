@@ -6,6 +6,7 @@ import {
   Search,
   MoreVertical,
   Building2,
+  Plus,
   Phone,
   MapPin,
   FileText,
@@ -37,10 +38,10 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useDealers, useDealerAction } from "@/hooks/dealers";
+import { useDealers, useDealerAction, useRegisterDealer } from "@/hooks/dealers";
 import type { Enterprise } from "@/app/types/Enterprise";
 import type { DealerAction } from "@/app/types/Enterprise";
-import toast from "react-hot-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 const ACTION_CONFIG: Record<
   DealerAction,
@@ -206,12 +207,23 @@ function EnterpriseCard({
 }
 
 export default function EnterprisesPage() {
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const { data: dealers, isLoading, error } = useDealers();
   const actionMutation = useDealerAction();
+  const registerMutation = useRegisterDealer();
   const [actingId, setActingId] = useState<number | null>(null);
   const [rejectTargetId, setRejectTargetId] = useState<number | null>(null);
   const [rejectReason, setRejectReason] = useState("");
+  const [createOpen, setCreateOpen] = useState(false);
+  const [newDealerForm, setNewDealerForm] = useState({
+    email: "",
+    password: "",
+    company_name: "",
+    license_number: "",
+    tax_id: "",
+    telebirr_account: "",
+  });
 
   const filteredDealers = useMemo(() => {
     if (!dealers) return [];
@@ -239,13 +251,21 @@ export default function EnterprisesPage() {
     setActingId(id);
     try {
       await actionMutation.mutateAsync({ id, action, payload });
-      toast.success(`${ACTION_CONFIG[action].label} successful`);
+      toast({
+        variant: "success",
+        title: "Action successful",
+        description: `${ACTION_CONFIG[action].label} successful`,
+      });
       if (action === "reject") {
         setRejectTargetId(null);
         setRejectReason("");
       }
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Action failed");
+      toast({
+        variant: "destructive",
+        title: "Action failed",
+        description: e instanceof Error ? e.message : "Action failed",
+      });
     } finally {
       setActingId(null);
     }
@@ -259,6 +279,72 @@ export default function EnterprisesPage() {
   const submitReject = () => {
     if (rejectTargetId == null) return;
     handleAction(rejectTargetId, "reject", { reason: rejectReason });
+  };
+
+  const updateNewDealerField = (
+    field: keyof typeof newDealerForm,
+    value: string,
+  ) => {
+    setNewDealerForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const resetNewDealerForm = () => {
+    setNewDealerForm({
+      email: "",
+      password: "",
+      company_name: "",
+      license_number: "",
+      tax_id: "",
+      telebirr_account: "",
+    });
+  };
+
+  const submitCreateDealer = async () => {
+    const requiredFields: Array<keyof typeof newDealerForm> = [
+      "email",
+      "password",
+      "company_name",
+      "license_number",
+      "tax_id",
+      "telebirr_account",
+    ];
+
+    const hasMissing = requiredFields.some(
+      (key) => !newDealerForm[key].trim(),
+    );
+    if (hasMissing) {
+      toast({
+        variant: "destructive",
+        title: "Missing fields",
+        description: "Please fill in all fields",
+      });
+      return;
+    }
+
+    try {
+      await registerMutation.mutateAsync({
+        email: newDealerForm.email.trim(),
+        password: newDealerForm.password,
+        company_name: newDealerForm.company_name.trim(),
+        license_number: newDealerForm.license_number.trim(),
+        tax_id: newDealerForm.tax_id.trim(),
+        telebirr_account: newDealerForm.telebirr_account.trim(),
+      });
+      toast({
+        variant: "success",
+        title: "Enterprise created",
+        description: "Dealer registered successfully.",
+      });
+      setCreateOpen(false);
+      resetNewDealerForm();
+    } catch (e) {
+      toast({
+        variant: "destructive",
+        title: "Failed to create enterprise",
+        description:
+          e instanceof Error ? e.message : "Failed to register dealer",
+      });
+    }
   };
 
   const rejectTargetEnterprise = useMemo(
@@ -326,7 +412,7 @@ export default function EnterprisesPage() {
         </p>
       </div>
 
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between mb-6">
         <div className="relative w-full sm:w-96">
           <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
@@ -336,7 +422,129 @@ export default function EnterprisesPage() {
             className="pl-12 h-12 sm:h-14 rounded-full"
           />
         </div>
+        <Button onClick={() => setCreateOpen(true)} className="h-11 sm:h-12">
+          <Plus className="h-4 w-4 mr-2" />
+          Add new
+        </Button>
       </div>
+
+      <Dialog
+        open={createOpen}
+        onOpenChange={(open) => {
+          setCreateOpen(open);
+          if (!open) resetNewDealerForm();
+        }}
+      >
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <div className="flex flex-col items-center gap-2 mb-2">
+              <Image
+                src="/logo.svg"
+                alt="hulucars"
+                width={130}
+                height={32}
+                className="h-8 w-auto object-contain"
+              />
+            </div>
+            <DialogTitle className="text-center">Add New Enterprise</DialogTitle>
+          </DialogHeader>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="sm:col-span-2 space-y-2">
+              <Label htmlFor="new-enterprise-email">Email</Label>
+              <Input
+                id="new-enterprise-email"
+                type="email"
+                placeholder="user@example.com"
+                value={newDealerForm.email}
+                onChange={(e) => updateNewDealerField("email", e.target.value)}
+              />
+            </div>
+
+            <div className="sm:col-span-2 space-y-2">
+              <Label htmlFor="new-enterprise-password">Password</Label>
+              <Input
+                id="new-enterprise-password"
+                type="password"
+                placeholder="Enter password"
+                value={newDealerForm.password}
+                onChange={(e) => updateNewDealerField("password", e.target.value)}
+              />
+            </div>
+
+            <div className="sm:col-span-2 space-y-2">
+              <Label htmlFor="new-enterprise-company-name">Company name</Label>
+              <Input
+                id="new-enterprise-company-name"
+                placeholder="Company name"
+                value={newDealerForm.company_name}
+                onChange={(e) =>
+                  updateNewDealerField("company_name", e.target.value)
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="new-enterprise-license">License number</Label>
+              <Input
+                id="new-enterprise-license"
+                placeholder="License number"
+                value={newDealerForm.license_number}
+                onChange={(e) =>
+                  updateNewDealerField("license_number", e.target.value)
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="new-enterprise-tax">Tax ID</Label>
+              <Input
+                id="new-enterprise-tax"
+                placeholder="Tax ID"
+                value={newDealerForm.tax_id}
+                onChange={(e) => updateNewDealerField("tax_id", e.target.value)}
+              />
+            </div>
+
+            <div className="sm:col-span-2 space-y-2">
+              <Label htmlFor="new-enterprise-telebirr">Telebirr account</Label>
+              <Input
+                id="new-enterprise-telebirr"
+                placeholder="Telebirr account"
+                value={newDealerForm.telebirr_account}
+                onChange={(e) =>
+                  updateNewDealerField("telebirr_account", e.target.value)
+                }
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setCreateOpen(false);
+                resetNewDealerForm();
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={submitCreateDealer}
+              disabled={registerMutation.isPending}
+            >
+              {registerMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Creating...
+                </>
+              ) : (
+                "Create enterprise"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog
         open={rejectTargetId !== null}
