@@ -2,16 +2,6 @@
 
 import { useEffect, useState } from "react";
 import {
-  Search,
-  Grid3X3,
-  Calendar,
-  Car,
-  TrendingUp,
-  Users,
-  BarChart3,
-  Settings,
-  HelpCircle,
-  Bookmark,
   MoreHorizontal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -29,15 +19,28 @@ import { formatPrice } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-const filters = ["All", "Live", "Pending Review", "Suspended"];
+type ListingApprovalFilter = "all" | "approved" | "pending" | "rejected";
+
+const approvalTabTriggerActive =
+  "cursor-pointer data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none";
 
 export default function Page() {
   const router = useRouter();
   const [active, setActive] = useState("fixed-price");
+  const [approvalFilter, setApprovalFilter] =
+    useState<ListingApprovalFilter>("all");
   const { data: cars, isLoading } = useCars();
   const fixedPriceCars = cars?.filter((car) => car.sale_type === "fixed_price");
   const auctionCars = cars?.filter((car) => car.sale_type === "auction");
-  const filteredCars = active === "fixed-price" ? fixedPriceCars : auctionCars;
+  const saleTypeCars = active === "fixed-price" ? fixedPriceCars : auctionCars;
+
+  const filteredCars = saleTypeCars?.filter((car) => {
+    if (approvalFilter === "all") return true;
+    const status = (car.status ?? "").toLowerCase();
+    const bucket: Exclude<ListingApprovalFilter, "all"> =
+      status.includes("reject") ? "rejected" : status.includes("pending") ? "pending" : "approved";
+    return bucket === approvalFilter;
+  });
   const tabs = [
     {
       label: "Fixed Price",
@@ -72,21 +75,54 @@ export default function Page() {
         {/* Dashboard Content */}
         <div className="flex-1 p-4 md:p-6">
           {/* tabs */}
-          <div className="flex gap-2">
-            {tabs.map((tab) => {
-              return (
-                <Button
-                  key={tab.value}
-                  className={`cursor-pointer ${active === tab.value ? "bg-primary text-primary-foreground" : "bg-gray-100/50 text-gray-500"}`}
-                  onClick={() =>
-                    setActive(tab.value as "fixed-price" | "auction")
-                  }
-                >
-                  {tab.label}
-                </Button>
-              );
-            })}
-          </div>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+              <div className="flex gap-2">
+                {tabs.map((tab) => {
+                  return (
+                    <Button
+                      key={tab.value}
+                      className={`cursor-pointer ${active === tab.value ? "bg-primary text-primary-foreground" : "bg-gray-100/50 text-gray-500"}`}
+                      onClick={() =>
+                        setActive(tab.value as "fixed-price" | "auction")
+                      }
+                    >
+                      {tab.label}
+                    </Button>
+                  );
+                })}
+              </div>
+
+              <Tabs
+                value={approvalFilter}
+                onValueChange={(v) =>
+                  setApprovalFilter(v as ListingApprovalFilter)
+                }
+              >
+                <TabsList className="bg-muted/60">
+                  <TabsTrigger value="all" className={approvalTabTriggerActive}>
+                    All
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="approved"
+                    className={approvalTabTriggerActive}
+                  >
+                    Approved
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="pending"
+                    className={approvalTabTriggerActive}
+                  >
+                    Pending
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="rejected"
+                    className={approvalTabTriggerActive}
+                  >
+                    Rejected
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
           {/* Cars Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10 mt-4">
             {isLoading && (
@@ -116,8 +152,9 @@ export default function Page() {
                     No cars found
                   </div>
                   <p className="text-sm text-muted-foreground max-w-md">
-                    You haven’t added any listings yet. Get started by creating
-                    your first car listing.
+                    {cars?.length
+                      ? "No cars match your current filters."
+                      : "You haven’t added any listings yet. Get started by creating your first car listing."}
                   </p>
                   <Link
                     href={"/listing/new"}

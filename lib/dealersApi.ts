@@ -3,6 +3,45 @@ import { API_URL } from "./config";
 import type { Enterprise } from "@/app/types/Enterprise";
 import type { DealerAction } from "@/app/types/Enterprise";
 
+/** Normalize dealer API error JSON: e.g. `["Only pending dealers can be approved."]`, `{ detail }`, field errors. */
+function getDealerApiErrorMessage(errorData: unknown, res: Response): string {
+  const fallback = `Request failed (${res.status} ${res.statusText})`;
+
+  if (errorData == null) return fallback;
+
+  if (Array.isArray(errorData)) {
+    const strings = errorData.filter((x): x is string => typeof x === "string");
+    if (strings.length) return strings.join(" ");
+    return fallback;
+  }
+
+  if (typeof errorData === "object") {
+    const d = errorData as Record<string, unknown>;
+
+    const detail = d.detail;
+    if (typeof detail === "string") return detail;
+    if (Array.isArray(detail) && detail[0] != null) {
+      return detail.map((x) => String(x)).join(" ");
+    }
+
+    if (typeof d.message === "string") return d.message;
+
+    if (Array.isArray(d.non_field_errors) && d.non_field_errors.length) {
+      return String(d.non_field_errors[0]);
+    }
+
+    const firstField = Object.keys(d).find(
+      (k) =>
+        Array.isArray(d[k]) && (d[k] as unknown[]).length > 0,
+    );
+    if (firstField && Array.isArray(d[firstField])) {
+      return String((d[firstField] as unknown[])[0]);
+    }
+  }
+
+  return fallback;
+}
+
 export async function fetchDealers(): Promise<Enterprise[]> {
   try {
     const credential = await getCredentials();
@@ -14,12 +53,8 @@ export async function fetchDealers(): Promise<Enterprise[]> {
     });
 
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      const errorMessage =
-        errorData.detail ||
-        errorData.message ||
-        `API error: ${res.status} ${res.statusText}`;
-      throw new Error(errorMessage);
+      const errorData = await res.json().catch(() => null);
+      throw new Error(getDealerApiErrorMessage(errorData, res));
     }
 
     return res.json() as Promise<Enterprise[]>;
@@ -30,7 +65,7 @@ export async function fetchDealers(): Promise<Enterprise[]> {
 }
 
 export type DealerActionPayload = {
-  reason?: string;
+  rejection_reason?: string;
 };
 
 export type RegisterDealerPayload = {
@@ -49,10 +84,15 @@ export async function dealerAction(
 ): Promise<unknown> {
   try {
     const credential = await getCredentials();
-    const body =
-      action === "reject" && payload != null
-        ? JSON.stringify({ reason: payload.reason ?? "" })
-        : undefined;
+
+    let body: string | undefined;
+    if (action === "verify") {
+      body = JSON.stringify({ is_verified: true });
+    } else if (action === "reject" && payload != null) {
+      body = JSON.stringify({
+        rejection_reason: (payload.rejection_reason ?? "").trim(),
+      });
+    }
 
     const res = await fetch(
       `${API_URL}/dealers/admin/dealers/${id}/${action}/`,
@@ -67,12 +107,8 @@ export async function dealerAction(
     );
 
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      const errorMessage =
-        errorData.detail ||
-        errorData.message ||
-        `API error: ${res.status} ${res.statusText}`;
-      throw new Error(errorMessage);
+      const errorData = await res.json().catch(() => null);
+      throw new Error(getDealerApiErrorMessage(errorData, res));
     }
 
     return res.json() as Promise<unknown>;
@@ -97,12 +133,8 @@ export async function registerDealer(
     });
 
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      const errorMessage =
-        errorData.detail ||
-        errorData.message ||
-        `API error: ${res.status} ${res.statusText}`;
-      throw new Error(errorMessage);
+      const errorData = await res.json().catch(() => null);
+      throw new Error(getDealerApiErrorMessage(errorData, res));
     }
 
     return res.json() as Promise<unknown>;

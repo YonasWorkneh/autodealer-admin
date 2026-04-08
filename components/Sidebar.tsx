@@ -46,9 +46,7 @@ export default function Sidebar() {
     { label: "Makes", href: "/makes", icon: Tag },
     { label: "Users", href: "/users", icon: Users },
     { label: "Sales", href: "/sales", icon: TrendingUp },
-    { label: "Brokers", href: "/brokers", icon: ShieldCheck },
     { label: "Enterprises", href: "/enterprises", icon: Building2 },
-    { label: "Adverts", href: "/advertisements", icon: Megaphone },
   ];
 
   const isAuthPage = pathName.includes("signin") || pathName.includes("signup");

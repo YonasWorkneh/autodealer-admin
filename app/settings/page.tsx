@@ -49,6 +49,8 @@ export default function AccountSettingsPage() {
   const [showPassword, setShowPassword] = useState({
     new: false,
     confirm: false,
+    admin1: false,
+    admin2: false,
   });
 
   const [loading, setLoading] = useState({
@@ -92,6 +94,7 @@ export default function AccountSettingsPage() {
   };
 
   const handleProfileUpdate = async () => {
+
     if (!profile) return;
 
     setLoading((prev) => ({ ...prev, profile: true }));
@@ -363,18 +366,23 @@ export default function AccountSettingsPage() {
                             />
                             <button
                               type="button"
+                              aria-label={
+                                showPassword.new
+                                  ? "Hide new password"
+                                  : "Show new password"
+                              }
                               onClick={() =>
                                 setShowPassword({
                                   ...showPassword,
                                   new: !showPassword.new,
                                 })
                               }
-                              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                              className="absolute right-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-primary"
                             >
                               {showPassword.new ? (
-                                <EyeOff size={18} />
+                                <EyeOff className="size-[18px]" />
                               ) : (
-                                <Eye size={18} />
+                                <Eye className="size-[18px]" />
                               )}
                             </button>
                           </div>
@@ -399,18 +407,23 @@ export default function AccountSettingsPage() {
                             />
                             <button
                               type="button"
+                              aria-label={
+                                showPassword.confirm
+                                  ? "Hide confirm password"
+                                  : "Show confirm password"
+                              }
                               onClick={() =>
                                 setShowPassword({
                                   ...showPassword,
                                   confirm: !showPassword.confirm,
                                 })
                               }
-                              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                              className="absolute right-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-primary"
                             >
                               {showPassword.confirm ? (
-                                <EyeOff size={18} />
+                                <EyeOff className="size-[18px]" />
                               ) : (
-                                <Eye size={18} />
+                                <Eye className="size-[18px]" />
                               )}
                             </button>
                           </div>
@@ -529,33 +542,85 @@ export default function AccountSettingsPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="admin_password1">Password</Label>
-                      <Input
-                        id="admin_password1"
-                        type="password"
-                        value={adminForm.password1}
-                        onChange={(e) =>
-                          setAdminForm({
-                            ...adminForm,
-                            password1: e.target.value,
-                          })
-                        }
-                        className="py-6"
-                      />
+                      <div className="relative">
+                        <Input
+                          id="admin_password1"
+                          type={
+                            showPassword.admin1 ? "text" : "password"
+                          }
+                          autoComplete="new-password"
+                          value={adminForm.password1}
+                          onChange={(e) =>
+                            setAdminForm({
+                              ...adminForm,
+                              password1: e.target.value,
+                            })
+                          }
+                          className="py-6 pr-10"
+                        />
+                        <button
+                          type="button"
+                          aria-label={
+                            showPassword.admin1
+                              ? "Hide password"
+                              : "Show password"
+                          }
+                          onClick={() =>
+                            setShowPassword({
+                              ...showPassword,
+                              admin1: !showPassword.admin1,
+                            })
+                          }
+                          className="absolute right-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-primary"
+                        >
+                          {showPassword.admin1 ? (
+                            <EyeOff className="size-[18px]" />
+                          ) : (
+                            <Eye className="size-[18px]" />
+                          )}
+                        </button>
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="admin_password2">Confirm Password</Label>
-                      <Input
-                        id="admin_password2"
-                        type="password"
-                        value={adminForm.password2}
-                        onChange={(e) =>
-                          setAdminForm({
-                            ...adminForm,
-                            password2: e.target.value,
-                          })
-                        }
-                        className="py-6"
-                      />
+                      <div className="relative">
+                        <Input
+                          id="admin_password2"
+                          type={
+                            showPassword.admin2 ? "text" : "password"
+                          }
+                          autoComplete="new-password"
+                          value={adminForm.password2}
+                          onChange={(e) =>
+                            setAdminForm({
+                              ...adminForm,
+                              password2: e.target.value,
+                            })
+                          }
+                          className="py-6 pr-10"
+                        />
+                        <button
+                          type="button"
+                          aria-label={
+                            showPassword.admin2
+                              ? "Hide confirm password"
+                              : "Show confirm password"
+                          }
+                          onClick={() =>
+                            setShowPassword({
+                              ...showPassword,
+                              admin2: !showPassword.admin2,
+                            })
+                          }
+                          className="absolute right-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-primary"
+                        >
+                          {showPassword.admin2 ? (
+                            <EyeOff className="size-[18px]" />
+                          ) : (
+                            <Eye className="size-[18px]" />
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
 

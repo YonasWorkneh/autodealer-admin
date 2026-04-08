@@ -237,7 +237,7 @@ export async function approveCar(id: number) {
   const formData = new FormData();
   formData.append("verification_status", "verified");
   try {
-    const res = await fetch(`${API_URL}/inventory/cars/${id}/verify/`, {
+    const res = await fetch(`${API_URL}/inventory/car-verifications/${id}/verify/`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${credential.access}`,

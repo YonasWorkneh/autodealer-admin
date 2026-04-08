@@ -24,7 +24,7 @@ function getErrorMessageFromResponse(data: unknown): string {
 
 export const signin = async (data: SignInParams) => {
   try {
-    const res = await fetch(`${API_URL}/auth/login`, {
+    const res = await fetch(`${API_URL}/users/admin/login/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

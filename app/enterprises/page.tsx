@@ -39,9 +39,47 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useDealers, useDealerAction, useRegisterDealer } from "@/hooks/dealers";
+import type { DealerActionPayload } from "@/lib/dealersApi";
 import type { Enterprise } from "@/app/types/Enterprise";
 import type { DealerAction } from "@/app/types/Enterprise";
 import { useToast } from "@/components/ui/use-toast";
+
+function enterpriseStatusBadge(status: string) {
+  const s = (status || "").toUpperCase();
+  if (s.includes("SUSPEND")) {
+    return (
+      <Badge variant="destructive" className="rounded-full text-xs uppercase">
+        {status}
+      </Badge>
+    );
+  }
+  if (s.includes("REJECT")) {
+    return (
+      <Badge variant="destructive" className="rounded-full text-xs uppercase">
+        {status}
+      </Badge>
+    );
+  }
+  if (s.includes("PENDING") || s.includes("REVIEW")) {
+    return (
+      <Badge variant="secondary" className="rounded-full text-xs uppercase">
+        {status}
+      </Badge>
+    );
+  }
+  if (s.includes("ACTIVE") || s.includes("APPROV") || s.includes("VERIF")) {
+    return (
+      <Badge className="bg-emerald-600 text-white rounded-full text-xs uppercase">
+        {status}
+      </Badge>
+    );
+  }
+  return (
+    <Badge variant="outline" className="rounded-full text-xs uppercase">
+      {status || "—"}
+    </Badge>
+  );
+}
 
 const ACTION_CONFIG: Record<
   DealerAction,
@@ -117,17 +155,8 @@ function EnterpriseCard({
                 )}
               </div>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
-              {enterprise.is_verified ? (
-                <Badge className="bg-primary text-primary-foreground rounded-full text-xs">
-                  <ShieldCheck className="h-3 w-3 mr-1" />
-                  Verified
-                </Badge>
-              ) : (
-                <Badge variant="secondary" className="rounded-full text-xs">
-                  Pending
-                </Badge>
-              )}
+            <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+              {enterprise.status && enterpriseStatusBadge(enterprise.status)}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -234,11 +263,17 @@ export default function EnterprisesPage() {
       const company = (d.company_name || "").toLowerCase();
       const contact = (d.profile?.contact || "").toLowerCase();
       const license = (d.license_number || "").toLowerCase();
+      const telebirr = (d.telebirr_account || "").toLowerCase();
+      const status = (d.status || "").toLowerCase();
+      const role = (d.role || "").toLowerCase();
       return (
         name.includes(q) ||
         company.includes(q) ||
         contact.includes(q) ||
-        license.includes(q)
+        license.includes(q) ||
+        telebirr.includes(q) ||
+        status.includes(q) ||
+        role.includes(q)
       );
     });
   }, [dealers, searchQuery]);
@@ -246,7 +281,7 @@ export default function EnterprisesPage() {
   const handleAction = async (
     id: number,
     action: DealerAction,
-    payload?: { reason?: string }
+    payload?: DealerActionPayload,
   ) => {
     setActingId(id);
     try {
@@ -278,7 +313,17 @@ export default function EnterprisesPage() {
 
   const submitReject = () => {
     if (rejectTargetId == null) return;
-    handleAction(rejectTargetId, "reject", { reason: rejectReason });
+    const rejection_reason = rejectReason.trim();
+    if (!rejection_reason) {
+      toast({
+        variant: "destructive",
+        title: "Rejection reason required",
+        description:
+          "Please enter a rejection reason before rejecting this enterprise.",
+      });
+      return;
+    }
+    handleAction(rejectTargetId, "reject", { rejection_reason });
   };
 
   const updateNewDealerField = (
@@ -568,11 +613,11 @@ export default function EnterprisesPage() {
                     .filter(Boolean)
                     .join(" ")}
               </span>
-              . Optionally provide a reason (e.g. for the dealer to see).
+              . A rejection reason is required.
             </p>
           )}
           <div className="space-y-2">
-            <Label htmlFor="reject-reason">Reason (optional)</Label>
+            <Label htmlFor="reject-reason">Rejection reason</Label>
             <Textarea
               id="reject-reason"
               placeholder="e.g. Incomplete documents, invalid license..."

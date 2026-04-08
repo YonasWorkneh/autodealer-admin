@@ -1279,7 +1279,7 @@ export default function CarDetailsPage() {
               className="resize-none"
             />
           </div>
-          <AlertDialogFooter>
+          <AlertDialogFooter >
             <AlertDialogCancel disabled={rejectMutation.isPending}>
               Cancel
             </AlertDialogCancel>

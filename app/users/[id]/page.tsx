@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { API_URL } from "@/lib/config";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,31 +14,16 @@ import {
   Clock,
   Car,
   CheckCircle,
-  User,
-  Shield,
-  Activity,
-  MoreVertical,
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { getProfileById } from "@/lib/profileApi";
 import { UserProfile } from "@/app/types/Profile";
 import { formatDistanceToNow } from "date-fns";
-import { useToast } from "@/components/ui/use-toast";
-import { getCredentials } from "@/lib/credential";
 
 export default function UserDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const userId = params.id as string;
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [actionLoading, setActionLoading] = useState(false);
 
   const { data: user, isLoading, error } = useQuery<UserProfile>({
     queryKey: ["user", userId],
@@ -48,55 +31,6 @@ export default function UserDetailsPage() {
     enabled: !!userId,
   });
 
-  const handleUserAction = async (action: "approve" | "reactivate" | "reject" | "suspend") => {
-    // Check if user has broker_profile
-    if (!user?.broker_profile) {
-      toast({
-        title: "Error",
-        description: "Actions can only be performed on brokers.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setActionLoading(true);
-    try {
-      const credential = await getCredentials();
-
-      const response = await fetch(`${API_URL}/brokers/admin/${userId}/${action}/`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${credential.access}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        const message = errorData?.detail || errorData?.message || `Failed to ${action} user`;
-        throw new Error(message);
-      }
-
-      toast({
-        title: "Success",
-        description: `User ${action}d successfully.`,
-        variant: "success",
-      });
-
-      // Refetch user data
-      queryClient.invalidateQueries({ queryKey: ["user", userId] });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || `Failed to ${action} user.`,
-        variant: "destructive",
-      });
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  console.log("user", user);
   if (isLoading) {
     return (
       <div className="flex bg-background max-w-7xl mx-auto">
@@ -143,7 +77,7 @@ export default function UserDetailsPage() {
       buyer: { label: "User", variant: "secondary" },
     };
     // Default to secondary if role is not in map
-    const roleInfo = roleMap[role.toLowerCase()] || { label: role, variant: "secondary" };
+    const roleInfo = roleMap[role?.toLowerCase()] || { label: role, variant: "secondary" };
     return (
       <Badge variant={roleInfo.variant} className="capitalize">
         {roleInfo.label}
@@ -173,51 +107,22 @@ export default function UserDetailsPage() {
           >
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Users
           </Button>
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center overflow-hidden">
-                {user.image ? (
-                  <img src={user.image} alt={user.first_name} className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-2xl font-medium">{user.first_name?.[0]}</span>
-                )}
-              </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                  {user.first_name} {user.last_name}
-                </h1>
-                <div className="flex items-center gap-2">
-                  {getRoleBadge(user.role)}
-                  {getStatusBadge("Active")}
-                </div>
-              </div>
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+              {user.image ? (
+                <img src={user.image} alt={user.first_name} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-2xl font-medium">{user.first_name?.[0]}</span>
+              )}
             </div>
-            <div className="flex gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="cursor-pointer" disabled={actionLoading}>
-                    <MoreVertical className="h-4 w-4 mr-2" />
-                    Actions
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleUserAction("approve")}>
-                    Approve
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleUserAction("reactivate")}>
-                    Reactivate
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleUserAction("reject")}>
-                    Reject
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => handleUserAction("suspend")}
-                    className="text-destructive"
-                  >
-                    Suspend
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                {user.first_name} {user.last_name}
+              </h1>
+              <div className="flex items-center gap-2">
+                {getRoleBadge(user.role)}
+                {getStatusBadge("Active")}
+              </div>
             </div>
           </div>
         </div>
