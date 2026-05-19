@@ -3,6 +3,7 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { Toaster as HotToaster } from "react-hot-toast";
 import { cookies } from "next/headers";
 import Protected from "./Protected";
 import Providers from "./Providers";
@@ -38,6 +39,7 @@ html {
               <>{children}</>
             </Protected>
             <Toaster />
+            <HotToaster />
           </div>
         </Providers>
       </body>

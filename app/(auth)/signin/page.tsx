@@ -26,6 +26,8 @@ export default function SignIn() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
   const { handleSubmit, register, formState } = useForm();
+  const emailField = register("email", { required: "Email is required" });
+  const passwordField = register("password", { required: "Password is required" });
   const { errors } = formState;
   const [err, setErr] = useState("");
   const { setUser } = useUserStore();
@@ -75,16 +77,6 @@ export default function SignIn() {
       <CardContent>
         <form
           onSubmit={handleSubmit(onSubmit)}
-          onKeyDown={(e) => {
-            if (
-              e.key === "Enter" &&
-              (e.target as HTMLElement).tagName !== "TEXTAREA" &&
-              !(e.target as HTMLElement).closest("button")
-            ) {
-              e.preventDefault();
-              (e.currentTarget as HTMLFormElement).requestSubmit();
-            }
-          }}
           className="grid gap-4"
         >
           <div className="grid gap-2">
@@ -95,8 +87,8 @@ export default function SignIn() {
               id="email"
               type="email"
               placeholder="m@example.com"
-              {...register("email", { required: "Email is required" })}
-              onChange={() => setErr("")}
+              {...emailField}
+              onChange={(e) => { emailField.onChange(e); setErr(""); }}
             />
             {errors?.email && (
               <p className="text-red-400 text-sm">
@@ -123,8 +115,8 @@ export default function SignIn() {
                 type={showPassword ? "text" : "password"}
                 placeholder="password"
                 autoComplete="password"
-                {...register("password", { required: "Password is required" })}
-                onChange={() => setErr("")}
+                {...passwordField}
+                onChange={(e) => { passwordField.onChange(e); setErr(""); }}
               />
               <span
                 className="absolute right-5 top-[8px] cursor-pointer text-muted-foreground hover:text-primary transition-colors"

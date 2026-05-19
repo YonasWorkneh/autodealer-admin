@@ -15,7 +15,7 @@ async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
   });
 
   if (!res.ok) {
-    throw new Error(`API error: ${res.status} ${res.statusText}`);
+    throw new Error("Something went wrong. Please try again.");
   }
 
   return res.json() as Promise<T>;
@@ -82,7 +82,7 @@ export async function createMake(name: string) {
       const message =
         errorData.detail ||
         errorData.message ||
-        `Failed to create make (${res.status})`;
+        "Failed to create make.";
       throw new Error(message);
     }
 
@@ -118,7 +118,7 @@ export async function createModel({
       const message =
         errorData.detail ||
         errorData.message ||
-        `Failed to create model (${res.status})`;
+        "Failed to create model.";
       throw new Error(message);
     }
 
@@ -153,7 +153,7 @@ export async function deleteCar(id: number) {
   });
 
   if (!res.ok) {
-    throw new Error(`Delete failed: ${res.status} ${res.statusText}`);
+    throw new Error("Failed to delete car.");
   }
 
   // Return something serializable (plain object)
@@ -259,7 +259,7 @@ export async function approveCar(id: number) {
       const errorMessage =
         errorData.detail ||
         errorData.message ||
-        `Failed to approve car (${res.status})`;
+        "Failed to approve car.";
       throw new Error(errorMessage);
     }
 
@@ -295,7 +295,7 @@ export async function rejectCar(id: number, reason?: string) {
       const errorMessage =
         errorData.detail ||
         errorData.message ||
-        `Failed to reject car (${res.status})`;
+        "Failed to reject car.";
       throw new Error(errorMessage);
     }
 
@@ -328,7 +328,7 @@ export async function updateMake({ id, name }: { id: number; name: string }) {
       const message =
         errorData.detail ||
         errorData.message ||
-        `Failed to update make (${res.status})`;
+        "Failed to update make.";
       throw new Error(message);
     }
 
@@ -356,7 +356,7 @@ export async function deleteMake(id: number) {
       const message =
         errorData.detail ||
         errorData.message ||
-        `Failed to delete make (${res.status})`;
+        "Failed to delete make.";
       throw new Error(message);
     }
 
@@ -398,7 +398,7 @@ export async function updateModel({
       const message =
         errorData.detail ||
         errorData.message ||
-        `Failed to update model (${res.status})`;
+        "Failed to update model.";
       throw new Error(message);
     }
 
@@ -426,7 +426,7 @@ export async function deleteModel(id: number) {
       const message =
         errorData.detail ||
         errorData.message ||
-        `Failed to delete model (${res.status})`;
+        "Failed to delete model.";
       throw new Error(message);
     }
 

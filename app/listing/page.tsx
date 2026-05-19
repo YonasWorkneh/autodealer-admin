@@ -36,7 +36,7 @@ export default function Page() {
 
   const filteredCars = saleTypeCars?.filter((car) => {
     if (approvalFilter === "all") return true;
-    const status = (car.status ?? "").toLowerCase();
+    const status = (car.verification_status ?? "").toLowerCase();
     const bucket: Exclude<ListingApprovalFilter, "all"> =
       status.includes("reject") ? "rejected" : status.includes("pending") ? "pending" : "approved";
     return bucket === approvalFilter;

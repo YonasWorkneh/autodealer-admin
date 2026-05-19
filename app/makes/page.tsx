@@ -288,15 +288,7 @@ export default function MakesPage() {
         onSubmit={() => {
           const trimmed = makeName.trim();
           if (!trimmed) return;
-          createMakeMutation.mutate(trimmed, {
-            onSuccess: () => {
-              showToast("success", "Make created successfully.");
-              setMakeName("");
-              setIsMakeDialogOpen(false);
-            },
-            onError: (err) =>
-              showToast("error", err.message || "Failed to create make."),
-          });
+          createMakeMutation.mutate(trimmed);
         }}
         isSubmitting={createMakeMutation.isPending}
         title="Create New Make"
@@ -320,18 +312,7 @@ export default function MakesPage() {
           if (!editingMake) return;
           const trimmed = editingMakeName.trim();
           if (!trimmed) return;
-          updateMakeMutation.mutate(
-            { id: editingMake.id, name: trimmed },
-            {
-              onSuccess: () => {
-                showToast("success", "Make updated successfully.");
-                setEditingMake(null);
-                setEditingMakeName("");
-              },
-              onError: (err) =>
-                showToast("error", err.message || "Failed to update make."),
-            },
-          );
+          updateMakeMutation.mutate({ id: editingMake.id, name: trimmed });
         }}
         isSubmitting={updateMakeMutation.isPending}
         title="Edit Make"
@@ -356,22 +337,7 @@ export default function MakesPage() {
         onSubmit={() => {
           const trimmed = modelName.trim();
           if (!trimmed || selectedMakeId === "") return;
-          createModelMutation.mutate(
-            {
-              name: trimmed,
-              make: selectedMakeId as number,
-            },
-            {
-              onSuccess: () => {
-                showToast("success", "Model created successfully.");
-                setModelName("");
-                setSelectedMakeId("");
-                setIsModelDialogOpen(false);
-              },
-              onError: (err) =>
-                showToast("error", err.message || "Failed to create model."),
-            },
-          );
+          createModelMutation.mutate({ name: trimmed, make: selectedMakeId as number });
         }}
         isSubmitting={createModelMutation.isPending}
         title="Create New Model"
@@ -415,26 +381,11 @@ export default function MakesPage() {
           if (!editingModel) return;
           const trimmed = editingModelName.trim();
           if (!trimmed) return;
-          updateModelMutation.mutate(
-            {
-              id: editingModel.model.id,
-              name: trimmed,
-              make:
-                editingModelMakeId === ""
-                  ? editingModel.make.id
-                  : (editingModelMakeId as number),
-            },
-            {
-              onSuccess: () => {
-                showToast("success", "Model updated successfully.");
-                setEditingModel(null);
-                setEditingModelName("");
-                setEditingModelMakeId("");
-              },
-              onError: (err) =>
-                showToast("error", err.message || "Failed to update model."),
-            },
-          );
+          updateModelMutation.mutate({
+            id: editingModel.model.id,
+            name: trimmed,
+            make: editingModelMakeId === "" ? editingModel.make.id : (editingModelMakeId as number),
+          });
         }}
         isSubmitting={updateModelMutation.isPending}
         title="Edit Model"
@@ -667,9 +618,6 @@ function ModelsDialog({
                 >
                   <div className="space-y-1">
                     <span>{model.name}</span>
-                    <span className="block text-muted-foreground text-xs">
-                      Model ID: #{model.id}
-                    </span>
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -681,7 +629,7 @@ function ModelsDialog({
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align="end" className="z-[60000]">
                       <DropdownMenuItem
                         onClick={() => onEditModel(model, make)}
                       >
