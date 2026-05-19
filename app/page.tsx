@@ -82,6 +82,7 @@ export default function Page() {
   ];
 
   // Process popular cars to get top 3 makes
+  console.log("popular cars",popularCars);
   const popularMakes = popularCars?.reduce(
     (acc, car) => {
       const make = car.make;

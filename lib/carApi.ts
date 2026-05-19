@@ -223,11 +223,20 @@ export async function removeCarFavorite(id: number) {
   }
 }
 
+export interface PopularCarResponse{
+  count:number;
+  next:number;
+  previous:number;
+  results: FetchedCar[]
+}
+
 export async function getPopularCars() {
   try {
-    const popularCars = await fetcher<FetchedCar[]>("/inventory/popular-cars/");
-    return popularCars;
-  } catch (err) {
+    const popularCars = await fetcher<PopularCarResponse>("/inventory/popular-cars/");
+    console.log("popres",popularCars);
+    return popularCars.results;
+  } catch (err:any) {
+    console.error(err.message);
     throw err;
   }
 }
