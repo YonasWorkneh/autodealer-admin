@@ -282,7 +282,7 @@ export async function rejectCar(id: number, reason?: string) {
   formData.append("verification_status", "rejected");
   formData.append("reason", reason || "");
   try {
-    const res = await fetch(`${API_URL}/inventory/cars/${id}/verify/`, {
+    const res = await fetch(`${API_URL}/inventory/car-verifications/${id}/verify/`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${credential.access}`,

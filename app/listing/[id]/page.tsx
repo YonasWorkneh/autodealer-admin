@@ -186,7 +186,7 @@ export default function CarDetailsPage() {
   }, [car]);
 
   const approveMutation = useApproveCar(
-    (data) => {
+    () => {
       showToast(
         "success",
         `The car ${car?.make} ${car?.model} has been approved and is now live.`,
@@ -202,7 +202,7 @@ export default function CarDetailsPage() {
   );
 
   const rejectMutation = useRejectCar(
-    (data) => {
+    () => {
       const isPending = car?.verification_status === "pending";
       showToast(
         "success",
@@ -271,8 +271,6 @@ export default function CarDetailsPage() {
     );
   }
 
-  const featuredImage =
-    car.images.find((img) => img.is_featured) || car.images[0];
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % car.images.length);
@@ -399,6 +397,40 @@ export default function CarDetailsPage() {
                         {rejectMutation.isPending ? "Rejecting..." : "Reject"}
                       </Button>
                     </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Approve Button for Rejected Cars */}
+            {car.verification_status === "rejected" && (
+              <Card className="bg-red-50 border-red-200">
+                <CardContent className="p-4">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-2">
+                      <X className="h-5 w-5 text-red-600" />
+                      <div>
+                        <h3 className="font-semibold text-red-900">
+                          Listing Rejected
+                        </h3>
+                        <p className="text-sm text-red-700">
+                          This car listing has been rejected and is not visible to users
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="default"
+                      className="bg-green-600 hover:bg-green-700"
+                      onClick={() => setShowApproveDialog(true)}
+                      disabled={approveMutation.isPending}
+                    >
+                      {approveMutation.isPending ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Check className="mr-2 h-4 w-4" />
+                      )}
+                      {approveMutation.isPending ? "Approving..." : "Approve"}
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
