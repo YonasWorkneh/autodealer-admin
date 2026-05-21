@@ -37,9 +37,9 @@ export default function SignIn() {
     try {
       setLoading(true);
       setErr("");
-      const user = await signin(data);
-      if (!user.access) throw new Error("Error trying to log you in");
-      setUser(user.user);
+      const { user } = await signin(data);
+      if (!user) throw new Error("Error trying to log you in");
+      setUser(user);
       router.push("/");
       data;
     } catch (err: any) {
