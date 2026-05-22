@@ -3,6 +3,7 @@ import { Favorite } from "@/app/types/Favorite";
 import type { Make } from "@/app/types/Make";
 import type { Model } from "@/app/types/Model";
 import type { CarView } from "@/app/types/CarView";
+import type { Inspection } from "@/app/types/Inspection";
 import { getCredentials } from "./credential";
 import { API_URL } from "./config";
 
@@ -455,4 +456,46 @@ export async function getCarInspection(carId: number) {
       Authorization: `Bearer ${credential.access}`,
     },
   });
+}
+
+export async function fetchInspections(): Promise<Inspection[]> {
+  const credential = await getCredentials();
+  return fetcher<Inspection[]>("/inspections/", {
+    headers: {
+      Authorization: `Bearer ${credential.access}`,
+    },
+  });
+}
+
+export async function verifyInspection(
+  id: number,
+  payload: {
+    car_id: number;
+    inspected_by: string;
+    inspection_date: string;
+    remarks: string;
+    condition_status: string;
+    report_document: string;
+    status: "verified" | "rejected";
+    admin_remarks: string;
+  },
+) {
+  const credential = await getCredentials();
+  const res = await fetch(`${API_URL}/inspections/${id}/verify/`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${credential.access}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const message =
+      (body as any).detail ||
+      (body as any).message ||
+      `Failed to ${payload.status === "verified" ? "verify" : "reject"} inspection.`;
+    throw new Error(message);
+  }
+  return body;
 }

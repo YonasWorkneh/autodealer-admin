@@ -4,23 +4,18 @@ import {
   LayoutDashboard,
   CarFront,
   Users,
-  PackageCheck,
   Settings,
   LogOut,
   Menu,
   X,
   TrendingUp,
-  BarChart3,
-  Eye,
   Tag,
-  Headset,
-  ShieldCheck,
   Building2,
-  Megaphone,
+  ClipboardList,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/user";
 import { usePathname } from "next/navigation";
@@ -47,6 +42,7 @@ export default function Sidebar() {
     { label: "Users", href: "/users", icon: Users },
     { label: "Sales", href: "/sales", icon: TrendingUp },
     { label: "Enterprises", href: "/enterprises", icon: Building2 },
+    { label: "Inspections", href: "/inspections", icon: ClipboardList },
   ];
 
   const isAuthPage = pathName.includes("signin") || pathName.includes("signup");

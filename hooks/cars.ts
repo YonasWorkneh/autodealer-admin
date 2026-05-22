@@ -19,9 +19,12 @@ import {
   updateModel,
   deleteModel,
   fetchCarViews,
+  fetchInspections,
+  verifyInspection,
 } from "@/lib/carApi";
 import type { FetchedCar, FetchedCarDetail } from "@/app/types/Car";
 import type { CarView } from "@/app/types/CarView";
+import type { Inspection } from "@/app/types/Inspection";
 
 export function useCars() {
   return useQuery<FetchedCar[]>({
@@ -279,5 +282,28 @@ export function useCarViews(carId: number) {
     queryKey: ["car-views", carId],
     queryFn: () => fetchCarViews(carId),
     staleTime: 2 * 60 * 1000, // cache for 2 minutes
+  });
+}
+
+export function useInspections() {
+  return useQuery<Inspection[]>({
+    queryKey: ["inspections"],
+    queryFn: fetchInspections,
+  });
+}
+
+export function useVerifyInspection(
+  onSuccess?: () => void,
+  onError?: (error: Error) => void,
+) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: Parameters<typeof verifyInspection>[1] }) =>
+      verifyInspection(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inspections"] });
+      onSuccess?.();
+    },
+    onError: (error: Error) => onError?.(error),
   });
 }
