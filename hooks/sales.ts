@@ -6,9 +6,10 @@ import {
   updateSale,
   deleteSale,
   fetchLeadsByCarId,
+  fetchLeads,
 } from "@/lib/salesApi";
 import type { Sale } from "@/app/types/Sale";
-import type { Lead } from "@/app/types/Lead";
+import type { Lead, LeadListItem } from "@/app/types/Lead";
 
 export function useSales() {
   return useQuery<Sale[]>({
@@ -78,5 +79,12 @@ export function useLeadsByCarId(carId: number | null) {
     queryFn: () => fetchLeadsByCarId(carId as number),
     enabled: !!carId,
     staleTime: 2 * 60 * 1000,
+  });
+}
+
+export function useLeads() {
+  return useQuery<LeadListItem[]>({
+    queryKey: ["leads-all"],
+    queryFn: fetchLeads,
   });
 }

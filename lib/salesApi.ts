@@ -1,5 +1,5 @@
 import type { Sale } from "@/app/types/Sale";
-import type { Lead } from "@/app/types/Lead";
+import type { Lead, LeadListItem } from "@/app/types/Lead";
 import { getCredentials } from "./credential";
 import { API_URL } from "./config";
 
@@ -76,4 +76,8 @@ export async function deleteSale(
 
 export async function fetchLeadsByCarId(carId: number): Promise<Lead[]> {
   return fetcher<Lead[]>(`/sales/leads?car_id=${carId}`);
+}
+
+export async function fetchLeads(): Promise<LeadListItem[]> {
+  return fetcher<LeadListItem[]>("/sales/leads/");
 }
