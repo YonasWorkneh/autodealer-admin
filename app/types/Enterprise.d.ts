@@ -14,7 +14,8 @@ export interface Enterprise {
   company_name: string;
   license_number: string;
   tax_id: string;
-  telebirr_account: string;
+  telebirr_account: string | null;
+  business_license: string | null;
   /** e.g. "SUSPENDED", "PENDING", "ACTIVE" — backend-defined */
   status: string;
   is_verified: boolean;

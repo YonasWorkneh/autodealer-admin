@@ -17,6 +17,8 @@ import {
   RefreshCw,
   PauseCircle,
   Loader2,
+  Maximize2,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -119,119 +121,168 @@ function EnterpriseCard({
   onRejectClick: (id: number) => void;
   isPending: boolean;
 }) {
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const p = enterprise.profile;
   const name = [p?.first_name, p?.last_name].filter(Boolean).join(" ") || "—";
 
   return (
-    <Card className="border border-primary/10 overflow-hidden hover:shadow-md transition-shadow">
-      <CardContent className="p-0">
-        <div className="p-5">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
-                {p?.image ? (
-                  <Image
-                    src={p.image}
-                    alt={name}
-                    width={48}
-                    height={48}
-                    className="rounded-lg object-cover w-full h-full"
-                  />
-                ) : (
-                  <Building2 className="w-6 h-6 text-primary" />
-                )}
+    <>
+      <Card className="border border-primary/10 overflow-hidden hover:shadow-md transition-shadow">
+        <CardContent className="p-0">
+          {/* Business licence image */}
+          {enterprise.business_license && (
+            <div className="relative w-full h-40 bg-muted overflow-hidden">
+              <Image
+                src={enterprise.business_license}
+                alt="Business licence"
+                fill
+                className="object-cover"
+              />
+              <button
+                onClick={() => setLightboxOpen(true)}
+                className="absolute bottom-2 left-2 bg-black/50 hover:bg-black/70 text-white rounded-md p-1.5 transition-colors"
+                title="View fullscreen"
+              >
+                <Maximize2 className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+
+          <div className="p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
+                  {p?.image ? (
+                    <Image
+                      src={p.image}
+                      alt={name}
+                      width={48}
+                      height={48}
+                      className="rounded-lg object-cover w-full h-full"
+                    />
+                  ) : (
+                    <Building2 className="w-6 h-6 text-primary" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-foreground truncate">
+                    {enterprise.company_name || name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground truncate">
+                    {enterprise.company_name ? name : "—"}
+                  </p>
+                  {enterprise.role && (
+                    <Badge variant="secondary" className="mt-1 text-xs capitalize">
+                      {enterprise.role}
+                    </Badge>
+                  )}
+                </div>
               </div>
-              <div className="min-w-0">
-                <h3 className="font-semibold text-foreground truncate">
-                  {enterprise.company_name || name}
-                </h3>
-                <p className="text-sm text-muted-foreground truncate">
-                  {enterprise.company_name ? name : "—"}
-                </p>
-                {enterprise.role && (
-                  <Badge variant="secondary" className="mt-1 text-xs capitalize">
-                    {enterprise.role}
-                  </Badge>
-                )}
+              <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                {enterprise.status && enterpriseStatusBadge(enterprise.status)}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-9 w-9 border-primary/20 hover:bg-primary/5"
+                      disabled={isPending}
+                    >
+                      {isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <MoreVertical className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="min-w-40">
+                    {(Object.entries(ACTION_CONFIG) as [DealerAction, typeof ACTION_CONFIG.approve][]).map(
+                      ([action, { label, icon: Icon, variant }]) => (
+                        <DropdownMenuItem
+                          key={action}
+                          variant={variant}
+                          onClick={() =>
+                            action === "reject"
+                              ? onRejectClick(enterprise.id)
+                              : onAction(enterprise.id, action)
+                          }
+                          className="gap-2"
+                        >
+                          <Icon className="h-4 w-4" />
+                          {label}
+                        </DropdownMenuItem>
+                      )
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
-            <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
-              {enterprise.status && enterpriseStatusBadge(enterprise.status)}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-9 w-9 border-primary/20 hover:bg-primary/5"
-                    disabled={isPending}
-                  >
-                    {isPending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <MoreVertical className="h-4 w-4" />
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="min-w-40">
-                  {(Object.entries(ACTION_CONFIG) as [DealerAction, typeof ACTION_CONFIG.approve][]).map(
-                    ([action, { label, icon: Icon, variant }]) => (
-                      <DropdownMenuItem
-                        key={action}
-                        variant={variant}
-                        onClick={() =>
-                          action === "reject"
-                            ? onRejectClick(enterprise.id)
-                            : onAction(enterprise.id, action)
-                        }
-                        className="gap-2"
-                      >
-                        <Icon className="h-4 w-4" />
-                        {label}
-                      </DropdownMenuItem>
-                    )
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
+
+            <div className="mt-4 space-y-2 text-sm">
+              {p?.contact && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Phone className="h-4 w-4 shrink-0 text-primary/70" />
+                  <a href={`tel:${p.contact}`} className="hover:text-primary hover:underline">
+                    {p.contact}
+                  </a>
+                </div>
+              )}
+              {p?.address && (
+                <div className="flex items-start gap-2 text-muted-foreground">
+                  <MapPin className="h-4 w-4 shrink-0 text-primary/70 mt-0.5" />
+                  <span>{p.address}</span>
+                </div>
+              )}
+              {enterprise.license_number && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <FileText className="h-4 w-4 shrink-0 text-primary/70" />
+                  <span>License: {enterprise.license_number}</span>
+                </div>
+              )}
+              {enterprise.tax_id && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <FileText className="h-4 w-4 shrink-0 text-primary/70" />
+                  <span>Tax ID: {enterprise.tax_id}</span>
+                </div>
+              )}
+              {enterprise.telebirr_account && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <CreditCard className="h-4 w-4 shrink-0 text-primary/70" />
+                  <span>Telebirr: {enterprise.telebirr_account}</span>
+                </div>
+              )}
             </div>
           </div>
+        </CardContent>
+      </Card>
 
-          <div className="mt-4 space-y-2 text-sm">
-            {p?.contact && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Phone className="h-4 w-4 shrink-0 text-primary/70" />
-                <a href={`tel:${p.contact}`} className="hover:text-primary hover:underline">
-                  {p.contact}
-                </a>
-              </div>
-            )}
-            {p?.address && (
-              <div className="flex items-start gap-2 text-muted-foreground">
-                <MapPin className="h-4 w-4 shrink-0 text-primary/70 mt-0.5" />
-                <span>{p.address}</span>
-              </div>
-            )}
-            {enterprise.license_number && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <FileText className="h-4 w-4 shrink-0 text-primary/70" />
-                <span>License: {enterprise.license_number}</span>
-              </div>
-            )}
-            {enterprise.tax_id && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <FileText className="h-4 w-4 shrink-0 text-primary/70" />
-                <span>Tax ID: {enterprise.tax_id}</span>
-              </div>
-            )}
-            {enterprise.telebirr_account && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <CreditCard className="h-4 w-4 shrink-0 text-primary/70" />
-                <span>Telebirr: {enterprise.telebirr_account}</span>
-              </div>
-            )}
+      {/* Lightbox */}
+      {lightboxOpen && enterprise.business_license && (
+        <div
+          className="fixed inset-0 z-[60000] bg-black/90 flex items-center justify-center p-4"
+          onClick={() => setLightboxOpen(false)}
+        >
+          <button
+            className="absolute top-4 right-4 text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors"
+            onClick={() => setLightboxOpen(false)}
+          >
+            <X className="h-6 w-6" />
+          </button>
+          <div
+            className="relative max-w-4xl max-h-[90vh] w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              src={enterprise.business_license}
+              alt="Business licence — fullscreen"
+              width={1200}
+              height={900}
+              className="object-contain w-full h-full max-h-[90vh] rounded-lg"
+            />
           </div>
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </>
   );
 }
 
