@@ -1,6 +1,28 @@
 export type InspectionCondition = "excellent" | "good" | "fair" | "poor";
 export type InspectionStatus = "pending" | "verified" | "rejected";
 
+export interface Inspector {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  company_name: string;
+  license_number: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface CreateInspectorPayload {
+  email: string;
+  first_name: string;
+  last_name: string;
+  company_name: string;
+  license_number: string;
+  password: string;
+}
+
+export type UpdateInspectorPayload = Partial<Omit<CreateInspectorPayload, "password">>;
+
 export interface Inspection {
   id: number;
   car: {

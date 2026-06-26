@@ -3,7 +3,7 @@ import { Favorite } from "@/app/types/Favorite";
 import type { Make } from "@/app/types/Make";
 import type { Model } from "@/app/types/Model";
 import type { CarView } from "@/app/types/CarView";
-import type { Inspection } from "@/app/types/Inspection";
+import type { Inspection, Inspector, CreateInspectorPayload, UpdateInspectorPayload } from "@/app/types/Inspection";
 import { getCredentials } from "./credential";
 import { API_URL } from "./config";
 
@@ -498,4 +498,57 @@ export async function verifyInspection(
     throw new Error(message);
   }
   return body;
+}
+
+function getInspectorErrorMessage(data: unknown): string {
+  if (!data || typeof data !== "object") return "Something went wrong.";
+  const d = data as Record<string, unknown>;
+  if (typeof d.detail === "string") return d.detail;
+  if (typeof d.message === "string") return d.message;
+  const firstField = Object.keys(d).find((k) => Array.isArray(d[k]) && (d[k] as unknown[]).length);
+  if (firstField && Array.isArray(d[firstField])) return String((d[firstField] as unknown[])[0]);
+  return "Something went wrong.";
+}
+
+export async function fetchInspectors(): Promise<Inspector[]> {
+  const credential = await getCredentials();
+  return fetcher<Inspector[]>("/inspections/inspectors/", {
+    headers: { Authorization: `Bearer ${credential.access}` },
+  });
+}
+
+export async function createInspector(payload: CreateInspectorPayload): Promise<Inspector> {
+  const credential = await getCredentials();
+  const res = await fetch(`${API_URL}/inspections/inspectors/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${credential.access}` },
+    body: JSON.stringify(payload),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(getInspectorErrorMessage(body));
+  return body as Inspector;
+}
+
+export async function updateInspector(id: number, payload: UpdateInspectorPayload): Promise<Inspector> {
+  const credential = await getCredentials();
+  const res = await fetch(`${API_URL}/inspections/inspectors/${id}/`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${credential.access}` },
+    body: JSON.stringify(payload),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(getInspectorErrorMessage(body));
+  return body as Inspector;
+}
+
+export async function deleteInspector(id: number): Promise<void> {
+  const credential = await getCredentials();
+  const res = await fetch(`${API_URL}/inspections/inspectors/${id}/`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${credential.access}` },
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(getInspectorErrorMessage(body));
+  }
 }

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
+  fetchDealer,
   fetchDealers,
   dealerAction,
   registerDealer,
@@ -9,6 +10,14 @@ import type {
   DealerActionPayload,
   RegisterDealerPayload,
 } from "@/lib/dealersApi";
+
+export function useDealer(id: number) {
+  return useQuery({
+    queryKey: ["dealers", "admin", id],
+    queryFn: () => fetchDealer(id),
+    staleTime: 2 * 60 * 1000,
+  });
+}
 
 export function useDealers() {
   return useQuery({

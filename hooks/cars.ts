@@ -21,10 +21,14 @@ import {
   fetchCarViews,
   fetchInspections,
   verifyInspection,
+  fetchInspectors,
+  createInspector,
+  updateInspector,
+  deleteInspector,
 } from "@/lib/carApi";
 import type { FetchedCar, FetchedCarDetail } from "@/app/types/Car";
 import type { CarView } from "@/app/types/CarView";
-import type { Inspection } from "@/app/types/Inspection";
+import type { Inspection, Inspector, CreateInspectorPayload, UpdateInspectorPayload } from "@/app/types/Inspection";
 
 export function useCars() {
   return useQuery<FetchedCar[]>({
@@ -302,6 +306,60 @@ export function useVerifyInspection(
       verifyInspection(id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["inspections"] });
+      onSuccess?.();
+    },
+    onError: (error: Error) => onError?.(error),
+  });
+}
+
+export function useInspectors() {
+  return useQuery<Inspector[]>({
+    queryKey: ["inspectors"],
+    queryFn: fetchInspectors,
+    staleTime: 2 * 60 * 1000,
+  });
+}
+
+export function useCreateInspector(
+  onSuccess?: () => void,
+  onError?: (error: Error) => void,
+) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: CreateInspectorPayload) => createInspector(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inspectors"] });
+      onSuccess?.();
+    },
+    onError: (error: Error) => onError?.(error),
+  });
+}
+
+export function useUpdateInspector(
+  onSuccess?: () => void,
+  onError?: (error: Error) => void,
+) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: UpdateInspectorPayload }) =>
+      updateInspector(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inspectors"] });
+      onSuccess?.();
+    },
+    onError: (error: Error) => onError?.(error),
+  });
+}
+
+export function useDeleteInspector(
+  onSuccess?: () => void,
+  onError?: (error: Error) => void,
+) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => deleteInspector(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inspectors"] });
       onSuccess?.();
     },
     onError: (error: Error) => onError?.(error),

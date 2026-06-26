@@ -42,6 +42,28 @@ function getDealerApiErrorMessage(errorData: unknown, res: Response): string {
   return fallback;
 }
 
+export async function fetchDealer(id: number): Promise<Enterprise> {
+  try {
+    const credential = await getCredentials();
+    const res = await fetch(`${API_URL}/dealers/admin/dealers/${id}/`, {
+      headers: {
+        Authorization: `Bearer ${credential.access}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => null);
+      throw new Error(getDealerApiErrorMessage(errorData, res));
+    }
+
+    return res.json() as Promise<Enterprise>;
+  } catch (e) {
+    if (e instanceof Error) throw e;
+    throw new Error(String(e));
+  }
+}
+
 export async function fetchDealers(): Promise<Enterprise[]> {
   try {
     const credential = await getCredentials();
