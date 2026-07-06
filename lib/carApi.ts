@@ -562,6 +562,7 @@ export async function createInspection(formData: FormData): Promise<void> {
   });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(getInspectorErrorMessage(body));
+    // Throw JSON so callers can extract per-field errors
+    throw new Error(JSON.stringify(body));
   }
 }

@@ -39,7 +39,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { FetchedCar } from "@/app/types/Car";
 import { formatPrice } from "@/lib/utils";
 
-type ConditionStatus = "Excellent" | "Good" | "Fair" | "Poor";
+type ConditionStatus = "excellent" | "good" | "fair" | "poor";
 
 const EMPTY_FORM = {
   inspection_score: "",
@@ -47,7 +47,7 @@ const EMPTY_FORM = {
   accident_history: false,
   inspection_date: new Date().toISOString().split("T")[0],
   remarks: "",
-  condition_status: "Good" as ConditionStatus,
+  condition_status: "good" as ConditionStatus,
 };
 
 export default function NewInspectionPage() {
@@ -62,14 +62,30 @@ export default function NewInspectionPage() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
   const [dialogEl, setDialogEl] = useState<HTMLDivElement | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const clearFieldError = (key: string) =>
+    setFieldErrors((prev) => { const next = { ...prev }; delete next[key]; return next; });
 
   const mutation = useCreateInspection(
     () => {
       showToast("success", "Inspection submitted successfully.");
       router.push("/inspections");
     },
-    (err) => showToast("error", err.message),
+    (err) => {
+      try {
+        const body = JSON.parse(err.message) as Record<string, unknown>;
+        const parsed: Record<string, string> = {};
+        Object.entries(body).forEach(([k, v]) => {
+          parsed[k] = Array.isArray(v) ? String(v[0]) : String(v);
+        });
+        setFieldErrors(parsed);
+        showToast("error", "Please fix the errors highlighted in the form.");
+      } catch {
+        showToast("error", err.message);
+      }
+    },
   );
 
   const filtered = useMemo(() => {
@@ -288,20 +304,30 @@ export default function NewInspectionPage() {
                   max={100}
                   placeholder="92"
                   value={form.inspection_score}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, inspection_score: e.target.value }))
-                  }
+                  onChange={(e) => {
+                    clearFieldError("inspection_score");
+                    setForm((f) => ({ ...f, inspection_score: e.target.value }));
+                  }}
+                  className={fieldErrors.inspection_score ? "border-destructive focus-visible:ring-destructive/30" : ""}
                 />
+                {fieldErrors.inspection_score && (
+                  <p className="text-xs text-destructive">{fieldErrors.inspection_score}</p>
+                )}
               </div>
               <div className="space-y-1.5">
                 <Label>Inspection Date</Label>
                 <Input
                   type="date"
                   value={form.inspection_date}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, inspection_date: e.target.value }))
-                  }
+                  onChange={(e) => {
+                    clearFieldError("inspection_date");
+                    setForm((f) => ({ ...f, inspection_date: e.target.value }));
+                  }}
+                  className={fieldErrors.inspection_date ? "border-destructive focus-visible:ring-destructive/30" : ""}
                 />
+                {fieldErrors.inspection_date && (
+                  <p className="text-xs text-destructive">{fieldErrors.inspection_date}</p>
+                )}
               </div>
             </div>
 
@@ -310,49 +336,49 @@ export default function NewInspectionPage() {
               <Label>Condition Status</Label>
               <Select
                 value={form.condition_status}
-                onValueChange={(v) =>
-                  setForm((f) => ({ ...f, condition_status: v as ConditionStatus }))
-                }
+                onValueChange={(v) => {
+                  clearFieldError("condition_status");
+                  setForm((f) => ({ ...f, condition_status: v as ConditionStatus }));
+                }}
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger className={`w-full ${fieldErrors.condition_status ? "border-destructive" : ""}`}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent container={dialogEl}>
-                  <SelectItem value="Excellent">Excellent</SelectItem>
-                  <SelectItem value="Good">Good</SelectItem>
-                  <SelectItem value="Fair">Fair</SelectItem>
-                  <SelectItem value="Poor">Poor</SelectItem>
+                  <SelectItem value="excellent">Excellent</SelectItem>
+                  <SelectItem value="good">Good</SelectItem>
+                  <SelectItem value="fair">Fair</SelectItem>
+                  <SelectItem value="poor">Poor</SelectItem>
                 </SelectContent>
               </Select>
+              {fieldErrors.condition_status && (
+                <p className="text-xs text-destructive">{fieldErrors.condition_status}</p>
+              )}
             </div>
 
             {/* Toggles */}
             <div className="grid grid-cols-2 gap-4">
-              <label className="flex items-center gap-3 p-3 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors">
+              <label className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors ${fieldErrors.odometer_verified ? "border-destructive" : ""}`}>
                 <input
                   type="checkbox"
                   className="accent-primary h-4 w-4"
                   checked={form.odometer_verified}
-                  onChange={(e) =>
-                    setForm((f) => ({
-                      ...f,
-                      odometer_verified: e.target.checked,
-                    }))
-                  }
+                  onChange={(e) => {
+                    clearFieldError("odometer_verified");
+                    setForm((f) => ({ ...f, odometer_verified: e.target.checked }));
+                  }}
                 />
                 <span className="text-sm font-medium">Odometer Verified</span>
               </label>
-              <label className="flex items-center gap-3 p-3 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors">
+              <label className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors ${fieldErrors.accident_history ? "border-destructive" : ""}`}>
                 <input
                   type="checkbox"
                   className="accent-destructive h-4 w-4"
                   checked={form.accident_history}
-                  onChange={(e) =>
-                    setForm((f) => ({
-                      ...f,
-                      accident_history: e.target.checked,
-                    }))
-                  }
+                  onChange={(e) => {
+                    clearFieldError("accident_history");
+                    setForm((f) => ({ ...f, accident_history: e.target.checked }));
+                  }}
                 />
                 <span className="text-sm font-medium">Accident History</span>
               </label>
@@ -365,20 +391,27 @@ export default function NewInspectionPage() {
                 placeholder="Vehicle passed inspection. Engine, suspension and brakes are in good condition."
                 rows={3}
                 value={form.remarks}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, remarks: e.target.value }))
-                }
-                className="resize-none"
+                onChange={(e) => {
+                  clearFieldError("remarks");
+                  setForm((f) => ({ ...f, remarks: e.target.value }));
+                }}
+                className={`resize-none ${fieldErrors.remarks ? "border-destructive focus-visible:ring-destructive/30" : ""}`}
               />
+              {fieldErrors.remarks && (
+                <p className="text-xs text-destructive">{fieldErrors.remarks}</p>
+              )}
             </div>
 
             {/* PDF upload */}
             <div className="space-y-1.5">
               <Label>Signed Report (PDF)</Label>
               <div
-                className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:border-primary hover:bg-muted/30 transition-colors"
-                onClick={() => fileInputRef.current?.click()}
+                className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:border-primary hover:bg-muted/30 transition-colors ${fieldErrors.signed_report ? "border-destructive" : ""}`}
+                onClick={() => { clearFieldError("signed_report"); fileInputRef.current?.click(); }}
               >
+                {fieldErrors.signed_report && (
+                  <p className="text-xs text-destructive mb-1">{fieldErrors.signed_report}</p>
+                )}
                 {pdfFile ? (
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 text-sm text-foreground">
