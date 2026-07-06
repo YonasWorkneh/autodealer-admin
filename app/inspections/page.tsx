@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useUserStore } from "@/store/user";
 import {
   ClipboardList,
   Search,
@@ -521,6 +522,8 @@ function InspectorsTab() {
 export default function InspectionsPage() {
   const [search, setSearch] = useState("");
   const { data: inspections, isLoading, error } = useInspections();
+  const { user } = useUserStore();
+  const isInspector = user.role === "inspector";
 
   const filtered = inspections?.filter((i) => {
     if (!search) return true;
@@ -576,7 +579,7 @@ export default function InspectionsPage() {
       <Tabs defaultValue="inspections">
         <TabsList className="mb-6">
           <TabsTrigger value="inspections">Inspections</TabsTrigger>
-          <TabsTrigger value="inspectors">Inspectors</TabsTrigger>
+          {!isInspector && <TabsTrigger value="inspectors">Inspectors</TabsTrigger>}
         </TabsList>
 
         {/* ── Inspections tab ── */}
@@ -631,9 +634,11 @@ export default function InspectionsPage() {
         </TabsContent>
 
         {/* ── Inspectors tab ── */}
-        <TabsContent value="inspectors">
-          <InspectorsTab />
-        </TabsContent>
+        {!isInspector && (
+          <TabsContent value="inspectors">
+            <InspectorsTab />
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );

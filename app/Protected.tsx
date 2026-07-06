@@ -10,6 +10,7 @@ import Header from "@/components/Header";
 const queryClient = new QueryClient();
 
 const authRoutes = ["/signin", "/signup", "/forgot-password", "/reset"];
+const INSPECTOR_ALLOWED = ["/inspections", "/settings"];
 
 export default function Protected({
   children,
@@ -18,28 +19,24 @@ export default function Protected({
   children: ReactElement;
   isLogged: boolean;
 }) {
-  const { setUser } = useUserStore();
+  const { setUser, user } = useUserStore();
   const router = useRouter();
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
+  const [userLoaded, setUserLoaded] = useState(false);
 
   const isAuthRoute = authRoutes.some((route) => pathname?.startsWith(route));
 
   useEffect(() => {
     setMounted(true);
-    
-    // Allow auth routes without redirecting
-    if (isAuthRoute) {
-      return;
-    }
 
-    // Redirect to signin if not logged in and not on auth route
+    if (isAuthRoute) return;
+
     if (!isLogged) {
       router.push("/signin");
       return;
     }
 
-    // Refresh user credentials in the background
     const refreshUserCredentials = async () => {
       try {
         const res = await fetch("/api/me");
@@ -47,30 +44,46 @@ export default function Protected({
 
         if (!data.ok) throw new Error("error refreshing token.");
         if (!data.user) throw new Error("Error refreshing user.");
-        console.log(data.user);
         setUser(data.user);
       } catch (err: any) {
         console.error(err.message);
-        // Optionally redirect to signin on error
-        // router.push("/signin");
+      } finally {
+        setUserLoaded(true);
       }
     };
 
-    // Execute in background without blocking render
     refreshUserCredentials();
   }, [isLogged, router, setUser, isAuthRoute]);
 
-  // Render immediately without waiting
+  // Role-based route guard — runs whenever the role or path changes
+  useEffect(() => {
+    if (!userLoaded || isAuthRoute) return;
+    if (user.role === "inspector") {
+      const allowed = INSPECTOR_ALLOWED.some((p) => pathname?.startsWith(p));
+      if (!allowed) router.replace("/inspections");
+    }
+  }, [userLoaded, user.role, pathname, isAuthRoute, router]);
+
   if (!mounted) return null;
 
-  // For auth routes, render children directly without sidebar/header
   if (isAuthRoute) {
     return (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     );
   }
 
-  // For protected routes, render with sidebar and header
+  // While we don't yet know the role, show nothing to prevent a flash of
+  // restricted content before the redirect fires.
+  if (!userLoaded) return null;
+
+  // Inspector trying to access a restricted page — hold until redirect fires
+  if (
+    user.role === "inspector" &&
+    !INSPECTOR_ALLOWED.some((p) => pathname?.startsWith(p))
+  ) {
+    return null;
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <Sidebar />

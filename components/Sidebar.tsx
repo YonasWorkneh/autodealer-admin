@@ -31,14 +31,18 @@ const allLinks = [
   { label: "Settings",    href: "/settings",     icon: Settings },
 ];
 
-const primaryLinks = allLinks.slice(0, 4);
-const moreLinks    = allLinks.slice(4);
-
 export default function Sidebar() {
   const pathName = usePathname();
   const router = useRouter();
-  const { clearUser } = useUserStore();
+  const { clearUser, user } = useUserStore();
   const [showMore, setShowMore] = useState(false);
+
+  const isInspector = user.role === "inspector";
+  const navLinks = isInspector
+    ? allLinks.filter((l) => l.href === "/inspections" || l.href === "/settings")
+    : allLinks;
+  const primaryLinks = navLinks.slice(0, 4);
+  const moreLinks    = navLinks.slice(4);
 
   const logout = async () => {
     try {
@@ -71,7 +75,7 @@ export default function Sidebar() {
         </Link>
 
         <div className="flex flex-col space-y-10 mt-14">
-          {allLinks.slice(0, 7).map((link) => (
+          {navLinks.filter((l) => l.href !== "/settings").map((link) => (
             <Link
               href={link.href}
               key={link.href}
@@ -187,8 +191,8 @@ export default function Sidebar() {
               );
             })}
 
-            {/* More button */}
-            <button
+            {/* More button — only shown when there are overflow links */}
+            {moreLinks.length > 0 && <button
               onClick={() => setShowMore((v) => !v)}
               className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-2 px-1 transition-colors ${
                 showMore || moreIsActive
@@ -198,7 +202,7 @@ export default function Sidebar() {
             >
               <MoreHorizontal className="h-5 w-5 shrink-0" />
               <span className="text-[10px] font-medium leading-tight">More</span>
-            </button>
+            </button>}
           </div>
         </nav>
       </>
