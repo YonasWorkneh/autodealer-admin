@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useUserStore } from "@/store/user";
+import Link from "next/link";
 import {
   ClipboardList,
   Search,
@@ -547,11 +548,21 @@ export default function InspectionsPage() {
 
   return (
     <div className="p-4 sm:p-8 max-w-7xl">
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-semibold mb-1">Car Inspections</h1>
-        <p className="text-muted-foreground text-sm sm:text-base">
-          Review and manage all vehicle inspection reports.
-        </p>
+      <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-semibold mb-1">Car Inspections</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
+            Review and manage all vehicle inspection reports.
+          </p>
+        </div>
+        {isInspector && (
+          <Link href="/inspections/new">
+            <Button size="sm" className="shrink-0">
+              <Plus className="h-4 w-4 mr-2" />
+              Create Inspection
+            </Button>
+          </Link>
+        )}
       </div>
 
       {/* Summary cards */}

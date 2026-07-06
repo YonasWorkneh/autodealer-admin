@@ -552,3 +552,16 @@ export async function deleteInspector(id: number): Promise<void> {
     throw new Error(getInspectorErrorMessage(body));
   }
 }
+
+export async function createInspection(formData: FormData): Promise<void> {
+  const credential = await getCredentials();
+  const res = await fetch(`${API_URL}/inspections/`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${credential.access}` },
+    body: formData,
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(getInspectorErrorMessage(body));
+  }
+}

@@ -120,6 +120,7 @@ export type FetchedCar = {
   model: string;
   year: number;
   price: string; // decimal stored as string
+  vin?: string;
   model_ref: number;
   make_ref: number;
   body_type:

@@ -25,6 +25,7 @@ import {
   createInspector,
   updateInspector,
   deleteInspector,
+  createInspection,
 } from "@/lib/carApi";
 import type { FetchedCar, FetchedCarDetail } from "@/app/types/Car";
 import type { CarView } from "@/app/types/CarView";
@@ -360,6 +361,21 @@ export function useDeleteInspector(
     mutationFn: (id: number) => deleteInspector(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["inspectors"] });
+      onSuccess?.();
+    },
+    onError: (error: Error) => onError?.(error),
+  });
+}
+
+export function useCreateInspection(
+  onSuccess?: () => void,
+  onError?: (error: Error) => void,
+) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (formData: FormData) => createInspection(formData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inspections"] });
       onSuccess?.();
     },
     onError: (error: Error) => onError?.(error),
