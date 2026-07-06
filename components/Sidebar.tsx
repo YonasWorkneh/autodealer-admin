@@ -133,7 +133,7 @@ export default function Sidebar() {
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <div className="grid grid-cols-4 gap-0">
+            <div className="grid grid-cols-5 gap-0">
               {moreLinks.map((link) => {
                 const active = isActive(link.href);
                 return (
@@ -154,6 +154,14 @@ export default function Sidebar() {
                   </Link>
                 );
               })}
+              {/* Logout */}
+              <button
+                onClick={() => { setShowMore(false); logout(); }}
+                className="flex flex-col items-center justify-center gap-1 py-4 px-2 transition-colors text-red-300 hover:text-red-200 hover:bg-white/10"
+              >
+                <LogOut className="h-5 w-5 shrink-0" />
+                <span className="text-[11px] font-medium leading-tight text-center">Logout</span>
+              </button>
             </div>
           </div>
         )}
