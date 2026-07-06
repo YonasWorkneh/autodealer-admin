@@ -5,6 +5,7 @@ type UserStore = {
   email: string;
   first_name: string;
   last_name: string;
+  role?: string;
   profile_image?: string;
   description?: string;
   is_active?: boolean;

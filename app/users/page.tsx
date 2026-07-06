@@ -733,7 +733,7 @@ export default function Page() {
                         <ChevronLeft className="h-4 w-4" />
                         Previous
                       </Button>
-                      <div className="flex items-center gap-1">
+                      <div className="flex flex-wrap items-center gap-1">
                         {getPageNumbers().map((page, index) =>
                           page === "..." ? (
                             <span
@@ -963,7 +963,7 @@ export default function Page() {
                     <ChevronLeft className="h-4 w-4" />
                     Previous
                   </Button>
-                  <div className="flex items-center gap-1">
+                  <div className="flex flex-wrap items-center gap-1">
                     {getPageNumbers().map((page, index) =>
                       page === "..." ? (
                         <span

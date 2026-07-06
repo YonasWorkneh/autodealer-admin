@@ -74,7 +74,7 @@ export default function Protected({
   return (
     <QueryClientProvider client={queryClient}>
       <Sidebar />
-      <main className="flex-1 md:ml-16 max-h-screen p-4 py-0 bg-white pt-20">
+      <main className="flex-1 md:ml-16 max-h-screen p-4 py-0 bg-white pt-20 pb-20 md:pb-0">
         <Header />
         <div className="root">{children}</div>
       </main>

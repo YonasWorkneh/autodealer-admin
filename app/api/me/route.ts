@@ -36,16 +36,22 @@ export async function GET() {
       path: "/",
       maxAge: 60 * 60 * 24 * 30,
     });
-    const res = await fetch(`${API_URL_SERVER}/auth/user/`, {
-      headers: { Authorization: `Bearer ${data?.access}` },
-    });
-    if (!res.ok) throw new Error("Failed to fetch user.");
-    const user = await res.json();
+    const [userRes, profileRes] = await Promise.all([
+      fetch(`${API_URL_SERVER}/auth/user/`, {
+        headers: { Authorization: `Bearer ${data?.access}` },
+      }),
+      fetch(`${API_URL_SERVER}/users/profiles/me/`, {
+        headers: { Authorization: `Bearer ${data?.access}` },
+      }),
+    ]);
+    if (!userRes.ok) throw new Error("Failed to fetch user.");
+    const user = await userRes.json();
+    const role = profileRes.ok ? (await profileRes.json()).role : undefined;
     return Response.json(
       {
         ok: true,
         message: "succesfully refreshed tokens.",
-        user,
+        user: { ...user, role },
       },
       { status: 200 },
     );

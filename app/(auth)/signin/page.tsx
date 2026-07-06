@@ -50,7 +50,7 @@ export default function SignIn() {
   };
 
   return (
-    <Card className="w-[380px] sm:w-[450px] border-primary/10 shadow-lg">
+    <Card className="w-full max-w-[450px] border-primary/10 shadow-lg">
       <CardHeader>
         <Link
           href={"/"}

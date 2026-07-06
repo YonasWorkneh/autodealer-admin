@@ -274,7 +274,7 @@ export default function EnterprisesPage() {
         <div className="relative w-full sm:w-96 mb-6">
           <Skeleton className="h-12 w-full rounded-full" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card key={i} className="border border-primary/10">
               <CardContent className="p-5">
@@ -520,7 +520,7 @@ export default function EnterprisesPage() {
       </Dialog>
 
       {filteredDealers.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
           {filteredDealers.map((enterprise) => (
             <EnterpriseCard
               key={enterprise.id}

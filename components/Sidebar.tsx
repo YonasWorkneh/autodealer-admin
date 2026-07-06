@@ -1,31 +1,44 @@
 "use client";
 
+import { useState } from "react";
 import {
   LayoutDashboard,
   CarFront,
   Users,
   Settings,
   LogOut,
-  Menu,
-  X,
   TrendingUp,
   Tag,
   Building2,
   ClipboardList,
+  MoreHorizontal,
+  X,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/user";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+
+const allLinks = [
+  { label: "Dashboard",   href: "/",            icon: LayoutDashboard },
+  { label: "Cars",        href: "/listing",      icon: CarFront },
+  { label: "Makes",       href: "/makes",        icon: Tag },
+  { label: "Users",       href: "/users",        icon: Users },
+  { label: "Sales",       href: "/sales",        icon: TrendingUp },
+  { label: "Enterprises", href: "/enterprises",  icon: Building2 },
+  { label: "Inspections", href: "/inspections",  icon: ClipboardList },
+  { label: "Settings",    href: "/settings",     icon: Settings },
+];
+
+const primaryLinks = allLinks.slice(0, 4);
+const moreLinks    = allLinks.slice(4);
 
 export default function Sidebar() {
-  const [isOpen, setIsOpen] = useState(false);
   const pathName = usePathname();
   const router = useRouter();
   const { clearUser } = useUserStore();
+  const [showMore, setShowMore] = useState(false);
 
   const logout = async () => {
     try {
@@ -35,25 +48,19 @@ export default function Sidebar() {
     router.push("/signin");
   };
 
-  const links = [
-    { label: "Dashboard", href: "/", icon: LayoutDashboard },
-    { label: "Cars", href: "/listing", icon: CarFront },
-    { label: "Makes", href: "/makes", icon: Tag },
-    { label: "Users", href: "/users", icon: Users },
-    { label: "Sales", href: "/sales", icon: TrendingUp },
-    { label: "Enterprises", href: "/enterprises", icon: Building2 },
-    { label: "Inspections", href: "/inspections", icon: ClipboardList },
-  ];
-
   const isAuthPage = pathName.includes("signin") || pathName.includes("signup");
   if (isAuthPage) return null;
 
+  const isActive = (href: string) =>
+    href === "/" ? pathName === href : pathName.startsWith(href);
+
+  const moreIsActive = moreLinks.some((l) => isActive(l.href));
+
   return (
     <>
-      {/* Desktop Sidebar */}
+      {/* ── Desktop sidebar ──────────────────────────────────────── */}
       <aside className="hidden md:flex w-24 bg-primary flex-col items-center py-6 space-y-6 fixed left-0 top-0 h-full z-20">
-        {/* logo */}
-        <Link href={"/"} className="flex items-center cursor-pointer">
+        <Link href="/" className="flex items-center cursor-pointer">
           <Image
             src="/logo-white.png"
             alt="hulucars"
@@ -62,33 +69,29 @@ export default function Sidebar() {
             className="h-[80px] w-[100px]!"
           />
         </Link>
+
         <div className="flex flex-col space-y-10 mt-14">
-          {links.map((link) => {
-            const active =
-              link.href === "/"
-                ? pathName === link.href
-                : pathName.includes(link.href);
-            return (
-              <Link
-                href={link.href}
-                key={link.href}
-                className={`group relative hover:bg-[#fff] hover:text-primary cursor-pointer size-10 rounded-full grid place-items-center transition-colors ${
-                  active
-                    ? " bg-white text-primary"
-                    : "text-primary-foreground bg-transparent"
-                }`}
-              >
-                <link.icon className="h-6 w-6" />
-                <span className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50">
-                  {link.label}
-                </span>
-              </Link>
-            );
-          })}
+          {allLinks.slice(0, 7).map((link) => (
+            <Link
+              href={link.href}
+              key={link.href}
+              className={`group relative hover:bg-white hover:text-primary cursor-pointer size-10 rounded-full grid place-items-center transition-colors ${
+                isActive(link.href)
+                  ? "bg-white text-primary"
+                  : "text-primary-foreground bg-transparent"
+              }`}
+            >
+              <link.icon className="h-6 w-6" />
+              <span className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50">
+                {link.label}
+              </span>
+            </Link>
+          ))}
         </div>
+
         <div className="flex gap-10 flex-col text-white absolute bottom-10">
           <Link
-            href={"/settings"}
+            href="/settings"
             className="group relative text-primary-foreground hover:bg-white hover:text-primary cursor-pointer size-10 rounded-full grid place-items-center transition-colors"
           >
             <Settings className="size-5" />
@@ -108,94 +111,89 @@ export default function Sidebar() {
         </div>
       </aside>
 
-      {/* Mobile Hamburger */}
-      <div className="md:hidden fixed top-4 left-2 z-50">
-        <button
-          onClick={() => setIsOpen(true)}
-          className="p-2 bg-primary text-primary-foreground rounded-md"
-        >
-          <Menu size={24} />
-        </button>
-      </div>
+      {/* ── Mobile bottom tab bar ─────────────────────────────────── */}
+      <>
+        {/* "More" panel backdrop */}
+        {showMore && (
+          <div
+            className="md:hidden fixed inset-0 z-40"
+            onClick={() => setShowMore(false)}
+          />
+        )}
 
-      {/* Mobile Sidebar */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.aside
-            initial={{ x: "-100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "-100%" }}
-            transition={{ type: "tween", duration: 0.3 }}
-            className="fixed top-0 left-0 h-full w-64 bg-primary flex flex-col py-6 px-4 z-[10000]"
-          >
-            <div className="flex justify-between items-center px-2">
-              <Link
-                href={"/"}
-                className="flex items-center gap-2 cursor-pointer"
-              >
-                <Image
-                  src="/logo.svg"
-                  alt="hulucars"
-                  width={140}
-                  height={40}
-                  className="h-28 w-auto"
-                  priority
-                />
-              </Link>
+        {/* "More" panel — slides up above the tab bar */}
+        {showMore && (
+          <div className="md:hidden fixed bottom-16 left-0 right-0 z-50 bg-primary border-t border-white/10 shadow-2xl">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+              <span className="text-white text-sm font-semibold">More</span>
               <button
-                onClick={() => setIsOpen(false)}
-                className="p-2 text-white rounded-md"
+                onClick={() => setShowMore(false)}
+                className="text-white/60 hover:text-white transition-colors"
               >
-                <X size={24} />
+                <X className="h-4 w-4" />
               </button>
             </div>
-
-            <nav className="mt-10 flex flex-col space-y-6">
-              {links.map((link) => {
-                const active =
-                  link.href === "/"
-                    ? pathName === link.href
-                    : pathName.includes(link.href);
+            <div className="grid grid-cols-4 gap-0">
+              {moreLinks.map((link) => {
+                const active = isActive(link.href);
                 return (
                   <Link
-                    href={link.href}
                     key={link.href}
-                    onClick={() => setIsOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-2 rounded-lg ${
+                    href={link.href}
+                    onClick={() => setShowMore(false)}
+                    className={`flex flex-col items-center justify-center gap-1 py-4 px-2 transition-colors ${
                       active
-                        ? "bg-white text-primary"
-                        : "text-white hover:bg-white/10"
+                        ? "text-white bg-white/15"
+                        : "text-white/60 hover:text-white hover:bg-white/10"
                     }`}
                   >
-                    <link.icon className="h-5 w-5" />
-                    {link.label}
+                    <link.icon className={`h-5 w-5 shrink-0 ${active ? "scale-110" : ""} transition-transform`} />
+                    <span className="text-[11px] font-medium leading-tight text-center">
+                      {link.label}
+                    </span>
                   </Link>
                 );
               })}
-            </nav>
-
-            <div className="mt-auto flex flex-col gap-4 px-4 text-white">
-              <Link
-                href={"/settings"}
-                onClick={() => setIsOpen(false)}
-                className={`flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 ${
-                  pathName.includes("/settings")
-                    ? "!bg-white text-black"
-                    : "text-white hover:bg-white/10"
-                }`}
-              >
-                <Settings className="h-5 w-5" /> Settings
-              </Link>
-              <button
-                onClick={logout}
-                className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10"
-              >
-                <LogOut className="h-5 w-5" /> Logout
-              </button>
             </div>
-          </motion.aside>
+          </div>
         )}
-      </AnimatePresence>
+
+        {/* Tab bar */}
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-primary border-t border-white/10">
+          <div className="flex items-stretch">
+            {primaryLinks.map((link) => {
+              const active = isActive(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-2 px-1 transition-colors ${
+                    active
+                      ? "text-white bg-white/15"
+                      : "text-white/60 hover:text-white hover:bg-white/10"
+                  }`}
+                >
+                  <link.icon className={`h-5 w-5 shrink-0 ${active ? "scale-110" : ""} transition-transform`} />
+                  <span className="text-[10px] font-medium leading-tight">{link.label}</span>
+                </Link>
+              );
+            })}
+
+            {/* More button */}
+            <button
+              onClick={() => setShowMore((v) => !v)}
+              className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-2 px-1 transition-colors ${
+                showMore || moreIsActive
+                  ? "text-white bg-white/15"
+                  : "text-white/60 hover:text-white hover:bg-white/10"
+              }`}
+            >
+              <MoreHorizontal className="h-5 w-5 shrink-0" />
+              <span className="text-[10px] font-medium leading-tight">More</span>
+            </button>
+          </div>
+        </nav>
+      </>
     </>
   );
 }

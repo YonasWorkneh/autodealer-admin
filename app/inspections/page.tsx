@@ -358,6 +358,7 @@ function InspectorsTab() {
       {isLoading ? (
         <Card>
           <CardContent className="p-0">
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -376,6 +377,7 @@ function InspectorsTab() {
                 ))}
               </TableBody>
             </Table>
+            </div>
           </CardContent>
         </Card>
       ) : error ? (
@@ -397,6 +399,7 @@ function InspectorsTab() {
       ) : (
         <Card>
           <CardContent className="p-0">
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -456,6 +459,7 @@ function InspectorsTab() {
                 ))}
               </TableBody>
             </Table>
+            </div>
           </CardContent>
         </Card>
       )}
@@ -589,7 +593,7 @@ export default function InspectionsPage() {
           </div>
 
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
               {Array.from({ length: 6 }).map((_, i) => (
                 <Card key={i}>
                   <CardHeader className="pb-3"><Skeleton className="h-5 w-48" /></CardHeader>
@@ -609,7 +613,7 @@ export default function InspectionsPage() {
               </CardContent>
             </Card>
           ) : filtered && filtered.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
               {filtered.map((inspection) => (
                 <InspectionCard key={inspection.id} inspection={inspection} />
               ))}

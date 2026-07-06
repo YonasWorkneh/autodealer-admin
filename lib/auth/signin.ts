@@ -32,6 +32,7 @@ export const signin = async (data: SignInParams) => {
       body: JSON.stringify(data),
     });
     const body = await res.json().catch(() => ({}));
+    console.log("[signin] status:", res.status, "body:", body);
     if (!res.ok) throw new Error(getErrorMessageFromResponse(body));
     const user = body;
     if (!user?.access)

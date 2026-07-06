@@ -107,8 +107,8 @@ export default function UserDetailsPage() {
           >
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Users
           </Button>
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center overflow-hidden shrink-0">
               {user.image ? (
                 <img src={user.image} alt={user.first_name} className="w-full h-full object-cover" />
               ) : (
@@ -140,7 +140,7 @@ export default function UserDetailsPage() {
                   <Mail className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">Email</p>
-                    <p className="font-semibold">{user.email || "N/A"}</p>
+                    <p className="font-semibold break-all">{user.email || "N/A"}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">

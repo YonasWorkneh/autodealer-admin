@@ -77,6 +77,11 @@ function statusBadge(status: string) {
   );
 }
 
+function isImageUrl(url: string) {
+  const ext = url.split("?")[0].split(".").pop()?.toLowerCase();
+  return ["jpg", "jpeg", "png", "gif", "webp", "svg", "bmp"].includes(ext ?? "");
+}
+
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", {
     year: "numeric",
@@ -203,19 +208,36 @@ export default function EnterpriseDetailPage() {
         {/* Business licence banner */}
         {enterprise.business_license && (
           <div className="relative w-full h-52 bg-muted">
-            <Image
-              src={enterprise.business_license}
-              alt="Business licence"
-              fill
-              className="object-cover"
-            />
-            <button
-              onClick={() => setLightboxOpen(true)}
-              className="absolute bottom-3 left-3 bg-black/50 hover:bg-black/70 text-white rounded-md p-2 transition-colors"
-              title="View fullscreen"
-            >
-              <Maximize2 className="h-4 w-4" />
-            </button>
+            {isImageUrl(enterprise.business_license) ? (
+              <>
+                <Image
+                  src={enterprise.business_license}
+                  alt="Business licence"
+                  fill
+                  className="object-cover"
+                />
+                <button
+                  onClick={() => setLightboxOpen(true)}
+                  className="absolute bottom-3 left-3 bg-black/50 hover:bg-black/70 text-white rounded-md p-2 transition-colors"
+                  title="View fullscreen"
+                >
+                  <Maximize2 className="h-4 w-4" />
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => setLightboxOpen(true)}
+                className="flex flex-col items-center justify-center w-full h-full gap-2 hover:bg-muted/80 transition-colors"
+              >
+                <FileText className="h-12 w-12 text-primary/50" />
+                <span className="text-sm font-medium text-muted-foreground">
+                  Business License (PDF)
+                </span>
+                <span className="text-xs text-primary underline">
+                  Click to view
+                </span>
+              </button>
+            )}
           </div>
         )}
 
@@ -500,13 +522,21 @@ export default function EnterpriseDetailPage() {
             className="relative max-w-4xl max-h-[90vh] w-full"
             onClick={(e) => e.stopPropagation()}
           >
-            <Image
-              src={enterprise.business_license}
-              alt="Business licence — fullscreen"
-              width={1200}
-              height={900}
-              className="object-contain w-full h-full max-h-[90vh] rounded-lg"
-            />
+            {isImageUrl(enterprise.business_license) ? (
+              <Image
+                src={enterprise.business_license}
+                alt="Business licence — fullscreen"
+                width={1200}
+                height={900}
+                className="object-contain w-full h-full max-h-[90vh] rounded-lg"
+              />
+            ) : (
+              <iframe
+                src={enterprise.business_license}
+                title="Business licence PDF"
+                className="w-full h-[85vh] rounded-lg bg-white"
+              />
+            )}
           </div>
         </div>
       )}

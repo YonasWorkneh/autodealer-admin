@@ -591,7 +591,7 @@ function ModelsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl w-[600px] max-h-[70vh] px-0 pb-0">
+      <DialogContent className="max-w-2xl w-full max-h-[70vh] px-0 pb-0">
         <DialogHeader className="px-6 pt-6">
           <DialogTitle>Models for {make?.name}</DialogTitle>
           <DialogDescription>
@@ -680,7 +680,7 @@ function MakeDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg w-[580px] py-10">
+      <DialogContent className="max-w-lg w-full py-10">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
@@ -750,7 +750,7 @@ function ModelDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg w-[580px] py-10">
+      <DialogContent className="max-w-lg w-full py-10">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
