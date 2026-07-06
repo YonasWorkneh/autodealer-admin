@@ -63,7 +63,7 @@ export default function Sidebar() {
   return (
     <>
       {/* ── Desktop sidebar ──────────────────────────────────────── */}
-      <aside className="hidden md:flex w-24 bg-primary flex-col items-center py-6 fixed left-0 top-0 h-full z-20">
+      <aside className="hidden md:flex w-24 bg-primary flex-col items-center py-6 fixed left-0 top-0 h-full z-20 overflow-x-hidden">
         <Link href="/" className="flex items-center cursor-pointer shrink-0">
           <Image
             src="/logo-white.png"
@@ -75,7 +75,7 @@ export default function Sidebar() {
         </Link>
 
         {/* Nav links — scrollable so they never overlap the bottom buttons */}
-        <div className="flex flex-col items-center gap-8 mt-10 flex-1 overflow-y-auto py-2 w-full scrollbar-none">
+        <div className="flex flex-col items-center gap-8 mt-10 flex-1 overflow-y-auto overflow-x-hidden py-2 w-full [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-white/10 [&::-webkit-scrollbar-thumb]:bg-white/40 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/60">
           {navLinks.filter((l) => l.href !== "/settings").map((link) => (
             <Link
               href={link.href}
@@ -173,7 +173,7 @@ export default function Sidebar() {
         )}
 
         {/* Tab bar */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-primary border-t border-white/10">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-primary border-t border-white/10 overflow-x-hidden">
           <div className="flex items-stretch">
             {primaryLinks.map((link) => {
               const active = isActive(link.href);
