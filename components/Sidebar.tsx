@@ -63,8 +63,8 @@ export default function Sidebar() {
   return (
     <>
       {/* ── Desktop sidebar ──────────────────────────────────────── */}
-      <aside className="hidden md:flex w-24 bg-primary flex-col items-center py-6 space-y-6 fixed left-0 top-0 h-full z-20">
-        <Link href="/" className="flex items-center cursor-pointer">
+      <aside className="hidden md:flex w-24 bg-primary flex-col items-center py-6 fixed left-0 top-0 h-full z-20">
+        <Link href="/" className="flex items-center cursor-pointer shrink-0">
           <Image
             src="/logo-white.png"
             alt="hulucars"
@@ -74,12 +74,13 @@ export default function Sidebar() {
           />
         </Link>
 
-        <div className="flex flex-col space-y-10 mt-14">
+        {/* Nav links — scrollable so they never overlap the bottom buttons */}
+        <div className="flex flex-col items-center gap-8 mt-10 flex-1 overflow-y-auto py-2 w-full scrollbar-none">
           {navLinks.filter((l) => l.href !== "/settings").map((link) => (
             <Link
               href={link.href}
               key={link.href}
-              className={`group relative hover:bg-white hover:text-primary cursor-pointer size-10 rounded-full grid place-items-center transition-colors ${
+              className={`group relative hover:bg-white hover:text-primary cursor-pointer size-10 rounded-full grid place-items-center transition-colors shrink-0 ${
                 isActive(link.href)
                   ? "bg-white text-primary"
                   : "text-primary-foreground bg-transparent"
@@ -93,13 +94,14 @@ export default function Sidebar() {
           ))}
         </div>
 
-        <div className="flex gap-10 flex-col text-white absolute bottom-10">
+        {/* Settings + Logout — always visible at the bottom */}
+        <div className="flex flex-col items-center gap-6 pb-6 shrink-0">
           <Link
             href="/settings"
             className="group relative text-primary-foreground hover:bg-white hover:text-primary cursor-pointer size-10 rounded-full grid place-items-center transition-colors"
           >
             <Settings className="size-5" />
-            <span className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50">
+            <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50">
               Settings
             </span>
           </Link>
@@ -108,7 +110,7 @@ export default function Sidebar() {
             className="group relative text-primary-foreground hover:bg-white hover:text-primary cursor-pointer size-10 rounded-full grid place-items-center transition-colors"
           >
             <LogOut className="size-5" />
-            <span className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 text-white text-xs font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50">
+            <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 text-white text-xs font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50">
               Logout
             </span>
           </button>

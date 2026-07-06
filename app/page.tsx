@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { CarFront, Users, Car, DollarSign } from "lucide-react";
+import { CarFront, Users, Car } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,11 +13,6 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import {
   Bar,
   BarChart,
   CartesianGrid,
@@ -26,6 +20,7 @@ import {
   Pie,
   PieChart,
   ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
@@ -145,23 +140,17 @@ export default function Page() {
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 min-w-0">
           {/* Sales Trend */}
-          <Card>
+          <Card className="min-w-0">
             <CardHeader>
               <CardTitle>Sales & Revenue Trend</CardTitle>
               <CardDescription>
                 Monthly sales volume and revenue performance
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <ChartContainer
-                config={{
-                  sales: { label: "Sales", color: "var(--primary)" },
-                  revenue: { label: "Revenue", color: "var(--primary)" },
-                }}
-                className="h-[250px] sm:h-[300px]"
-              >
+            <CardContent className="overflow-hidden">
+              <div className="h-[250px] sm:h-[280px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={salesData}>
                     <CartesianGrid
@@ -169,35 +158,24 @@ export default function Page() {
                       stroke="#522084"
                       strokeOpacity={0.1}
                     />
-                    <XAxis
-                      dataKey="month"
-                      stroke="#522084"
-                      strokeOpacity={0.6}
-                    />
+                    <XAxis dataKey="month" stroke="#522084" strokeOpacity={0.6} />
                     <YAxis stroke="#522084" strokeOpacity={0.6} />
-                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Tooltip />
                     <Bar dataKey="sales" fill="#522084" />
                   </BarChart>
                 </ResponsiveContainer>
-              </ChartContainer>
+              </div>
             </CardContent>
           </Card>
 
-          {/* Customer Segments */}
-          <Card>
+          {/* Popular cars */}
+          <Card className="min-w-0">
             <CardHeader>
               <CardTitle>Popular cars</CardTitle>
               <CardDescription>Distribution of popular cars</CardDescription>
             </CardHeader>
-            <CardContent>
-              <ChartContainer
-                config={{
-                  new: { label: "New Customers", color: "#522084" },
-                  returning: { label: "Returning", color: "#6B3FA3" },
-                  referrals: { label: "Referrals", color: "#8459C2" },
-                }}
-                className="h-[250px] sm:h-[300px]"
-              >
+            <CardContent className="overflow-hidden">
+              <div className="h-[250px] sm:h-[280px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -212,10 +190,10 @@ export default function Page() {
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Tooltip />
                   </PieChart>
                 </ResponsiveContainer>
-              </ChartContainer>
+              </div>
             </CardContent>
           </Card>
         </div>
