@@ -26,10 +26,17 @@ import {
   updateInspector,
   deleteInspector,
   createInspection,
+  fetchMakeRequests,
+  approveMakeRequest,
+  rejectMakeRequest,
+  fetchModelRequests,
+  approveModelRequest,
+  rejectModelRequest,
 } from "@/lib/carApi";
 import type { FetchedCar, FetchedCarDetail } from "@/app/types/Car";
 import type { CarView } from "@/app/types/CarView";
 import type { Inspection, Inspector, CreateInspectorPayload, UpdateInspectorPayload } from "@/app/types/Inspection";
+import type { MakeRequest, ModelRequest } from "@/app/types/Requests";
 
 export function useCars() {
   return useQuery<FetchedCar[]>({
@@ -376,6 +383,85 @@ export function useCreateInspection(
     mutationFn: (formData: FormData) => createInspection(formData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["inspections"] });
+      onSuccess?.();
+    },
+    onError: (error: Error) => onError?.(error),
+  });
+}
+
+export function useMakeRequests() {
+  return useQuery<MakeRequest[]>({
+    queryKey: ["make-requests"],
+    queryFn: fetchMakeRequests,
+  });
+}
+
+export function useApproveMakeRequest(
+  onSuccess?: () => void,
+  onError?: (error: Error) => void,
+) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => approveMakeRequest(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["make-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["makes"] });
+      onSuccess?.();
+    },
+    onError: (error: Error) => onError?.(error),
+  });
+}
+
+export function useRejectMakeRequest(
+  onSuccess?: () => void,
+  onError?: (error: Error) => void,
+) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: number; reason: string }) =>
+      rejectMakeRequest(id, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["make-requests"] });
+      onSuccess?.();
+    },
+    onError: (error: Error) => onError?.(error),
+  });
+}
+
+export function useModelRequests() {
+  return useQuery<ModelRequest[]>({
+    queryKey: ["model-requests"],
+    queryFn: fetchModelRequests,
+  });
+}
+
+export function useApproveModelRequest(
+  onSuccess?: () => void,
+  onError?: (error: Error) => void,
+) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => approveModelRequest(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["model-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["makes"] });
+      queryClient.invalidateQueries({ queryKey: ["models"] });
+      onSuccess?.();
+    },
+    onError: (error: Error) => onError?.(error),
+  });
+}
+
+export function useRejectModelRequest(
+  onSuccess?: () => void,
+  onError?: (error: Error) => void,
+) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: number; reason: string }) =>
+      rejectModelRequest(id, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["model-requests"] });
       onSuccess?.();
     },
     onError: (error: Error) => onError?.(error),

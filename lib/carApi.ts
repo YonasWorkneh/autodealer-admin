@@ -4,6 +4,7 @@ import type { Make } from "@/app/types/Make";
 import type { Model } from "@/app/types/Model";
 import type { CarView } from "@/app/types/CarView";
 import type { Inspection, Inspector, CreateInspectorPayload, UpdateInspectorPayload } from "@/app/types/Inspection";
+import type { MakeRequest, ModelRequest } from "@/app/types/Requests";
 import { getCredentials } from "./credential";
 import { API_URL } from "./config";
 
@@ -564,5 +565,75 @@ export async function createInspection(formData: FormData): Promise<void> {
     const body = await res.json().catch(() => ({}));
     // Throw JSON so callers can extract per-field errors
     throw new Error(JSON.stringify(body));
+  }
+}
+
+export async function fetchMakeRequests(): Promise<MakeRequest[]> {
+  const credential = await getCredentials();
+  return fetcher<MakeRequest[]>("/inventory/make-requests/", {
+    headers: { Authorization: `Bearer ${credential.access}` },
+  });
+}
+
+export async function approveMakeRequest(id: number): Promise<void> {
+  const credential = await getCredentials();
+  const res = await fetch(`${API_URL}/inventory/make-requests/${id}/approve/`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${credential.access}` },
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error((body as any).detail || (body as any).message || "Failed to approve make request.");
+  }
+}
+
+export async function rejectMakeRequest(id: number, reason: string): Promise<void> {
+  const credential = await getCredentials();
+  const res = await fetch(`${API_URL}/inventory/make-requests/${id}/reject/`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${credential.access}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ reason }),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error((body as any).detail || (body as any).message || "Failed to reject make request.");
+  }
+}
+
+export async function fetchModelRequests(): Promise<ModelRequest[]> {
+  const credential = await getCredentials();
+  return fetcher<ModelRequest[]>("/inventory/model-requests/", {
+    headers: { Authorization: `Bearer ${credential.access}` },
+  });
+}
+
+export async function approveModelRequest(id: number): Promise<void> {
+  const credential = await getCredentials();
+  const res = await fetch(`${API_URL}/inventory/model-requests/${id}/approve/`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${credential.access}` },
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error((body as any).detail || (body as any).message || "Failed to approve model request.");
+  }
+}
+
+export async function rejectModelRequest(id: number, reason: string): Promise<void> {
+  const credential = await getCredentials();
+  const res = await fetch(`${API_URL}/inventory/model-requests/${id}/reject/`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${credential.access}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ reason }),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error((body as any).detail || (body as any).message || "Failed to reject model request.");
   }
 }

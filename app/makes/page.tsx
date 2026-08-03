@@ -10,11 +10,16 @@ import {
   Tag,
   Loader2,
   MoreHorizontal,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Inbox,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -30,9 +35,16 @@ import {
   useUpdateModel,
   useDeleteMake,
   useDeleteModel,
+  useMakeRequests,
+  useApproveMakeRequest,
+  useRejectMakeRequest,
+  useModelRequests,
+  useApproveModelRequest,
+  useRejectModelRequest,
 } from "@/hooks/cars";
 import type { Make } from "@/app/types/Make";
 import type { Model } from "@/app/types/Model";
+import type { MakeRequest, ModelRequest } from "@/app/types/Requests";
 import { useToast } from "@/hooks/use-toast";
 import {
   Select,
@@ -70,8 +82,21 @@ export default function MakesPage() {
     model: Model;
     make: Make;
   } | null>(null);
+
+  // Reject dialogs
+  const [rejectingMakeReq, setRejectingMakeReq] = useState<MakeRequest | null>(null);
+  const [rejectingModelReq, setRejectingModelReq] = useState<ModelRequest | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
+
   const { data: makes, isLoading, error } = useMakes();
+  const { data: makeRequests } = useMakeRequests();
+  const { data: modelRequests } = useModelRequests();
   const { showToast } = useToast();
+
+  const pendingMakeReqs = makeRequests?.filter((r) => r.status === "pending") ?? [];
+  const pendingModelReqs = modelRequests?.filter((r) => r.status === "pending") ?? [];
+  const totalPending = pendingMakeReqs.length + pendingModelReqs.length;
+
   const createMakeMutation = useCreateMake(
     () => {
       showToast("success", "Make created successfully.");
@@ -119,6 +144,31 @@ export default function MakesPage() {
       setModelToDelete(null);
     },
     (err) => showToast("error", err.message || "Failed to delete model."),
+  );
+
+  const approveMakeReqMutation = useApproveMakeRequest(
+    () => showToast("success", "Make request approved."),
+    (err) => showToast("error", err.message || "Failed to approve."),
+  );
+  const rejectMakeReqMutation = useRejectMakeRequest(
+    () => {
+      showToast("success", "Make request rejected.");
+      setRejectingMakeReq(null);
+      setRejectReason("");
+    },
+    (err) => showToast("error", err.message || "Failed to reject."),
+  );
+  const approveModelReqMutation = useApproveModelRequest(
+    () => showToast("success", "Model request approved."),
+    (err) => showToast("error", err.message || "Failed to approve."),
+  );
+  const rejectModelReqMutation = useRejectModelRequest(
+    () => {
+      showToast("success", "Model request rejected.");
+      setRejectingModelReq(null);
+      setRejectReason("");
+    },
+    (err) => showToast("error", err.message || "Failed to reject."),
   );
 
   const filteredMakes =
@@ -184,69 +234,110 @@ export default function MakesPage() {
           Car Makes & Models
         </h1>
         <p className="text-muted-foreground text-sm sm:text-base">
-          Explore available car makes and their associated models.
+          Explore available car makes, models, and pending requests.
         </p>
       </div>
 
-      {/* Search and Actions */}
-      <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="relative w-full sm:w-96">
-          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <input
-            type="text"
-            placeholder="Search car make..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 pr-4 py-3 w-full rounded-full border border-input bg-background focus:outline-none focus:ring-0 focus:border-primary"
-          />
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setIsMakeDialogOpen(true)}
-            className="cursor-pointer"
-          >
-            Add Make
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setIsModelDialogOpen(true)}
-            className="cursor-pointer"
-          >
-            Add Model
-          </Button>
-        </div>
-      </div>
+      <Tabs defaultValue="catalog">
+        <TabsList className="mb-6">
+          <TabsTrigger value="catalog">Catalog</TabsTrigger>
+          <TabsTrigger value="requests" className="gap-2">
+            Requests
+            {totalPending > 0 && (
+              <Badge className="h-5 min-w-5 px-1.5 text-xs">
+                {totalPending}
+              </Badge>
+            )}
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Makes List */}
-      {filteredMakes.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredMakes.map((make) => (
-            <MakeCard
-              key={make.id}
-              make={make}
-              onOpen={() => setActiveMakeId(make.id)}
-              onEdit={() => {
-                setEditingMake(make);
-                setEditingMakeName(make.name);
-              }}
-              onDelete={() => setMakeToDelete(make)}
-            />
-          ))}
-        </div>
-      ) : (
-        <Card className="p-6 border border-border">
-          <CardContent className="text-center space-y-2">
-            <Car className="h-10 w-10 text-muted-foreground mx-auto" />
-            <h3 className="text-lg font-semibold">No Makes Found</h3>
-            <p className="text-muted-foreground">
-              {searchQuery
-                ? "No car makes match your search criteria."
-                : "No car makes available at the moment."}
-            </p>
-          </CardContent>
-        </Card>
-      )}
+        {/* ── Catalog Tab ── */}
+        <TabsContent value="catalog">
+          <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="relative w-full sm:w-96">
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <input
+                type="text"
+                placeholder="Search car make..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-12 pr-4 py-3 w-full rounded-full border border-input bg-background focus:outline-none focus:ring-0 focus:border-primary"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setIsMakeDialogOpen(true)}
+                className="cursor-pointer"
+              >
+                Add Make
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setIsModelDialogOpen(true)}
+                className="cursor-pointer"
+              >
+                Add Model
+              </Button>
+            </div>
+          </div>
+
+          {filteredMakes.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredMakes.map((make) => (
+                <MakeCard
+                  key={make.id}
+                  make={make}
+                  onOpen={() => setActiveMakeId(make.id)}
+                  onEdit={() => {
+                    setEditingMake(make);
+                    setEditingMakeName(make.name);
+                  }}
+                  onDelete={() => setMakeToDelete(make)}
+                />
+              ))}
+            </div>
+          ) : (
+            <Card className="p-6 border border-border">
+              <CardContent className="text-center space-y-2">
+                <Car className="h-10 w-10 text-muted-foreground mx-auto" />
+                <h3 className="text-lg font-semibold">No Makes Found</h3>
+                <p className="text-muted-foreground">
+                  {searchQuery
+                    ? "No car makes match your search criteria."
+                    : "No car makes available at the moment."}
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        {/* ── Requests Tab ── */}
+        <TabsContent value="requests" className="space-y-8">
+          <RequestsSection
+            title="Make Requests"
+            requests={makeRequests ?? []}
+            onApprove={(id) => approveMakeReqMutation.mutate(id)}
+            onReject={(req) => {
+              setRejectingMakeReq(req as MakeRequest);
+              setRejectReason("");
+            }}
+            approvingId={approveMakeReqMutation.isPending ? approveMakeReqMutation.variables : undefined}
+          />
+          <RequestsSection
+            title="Model Requests"
+            requests={modelRequests ?? []}
+            onApprove={(id) => approveModelReqMutation.mutate(id)}
+            onReject={(req) => {
+              setRejectingModelReq(req as ModelRequest);
+              setRejectReason("");
+            }}
+            approvingId={approveModelReqMutation.isPending ? approveModelReqMutation.variables : undefined}
+          />
+        </TabsContent>
+      </Tabs>
+
+      {/* ── Modals ── */}
       {activeMakeId !== null && (
         <ModelsDialog
           make={makes?.find((m) => m.id === activeMakeId) || null}
@@ -279,9 +370,7 @@ export default function MakesPage() {
         open={isMakeDialogOpen}
         onOpenChange={(open) => {
           setIsMakeDialogOpen(open);
-          if (!open) {
-            setMakeName("");
-          }
+          if (!open) setMakeName("");
         }}
         name={makeName}
         setName={setMakeName}
@@ -395,19 +484,13 @@ export default function MakesPage() {
 
       <Dialog
         open={makeToDelete !== null}
-        onOpenChange={(open) => {
-          if (!open) {
-            setMakeToDelete(null);
-          }
-        }}
+        onOpenChange={(open) => { if (!open) setMakeToDelete(null); }}
       >
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Delete Make</DialogTitle>
             <DialogDescription>
-              {`Are you sure you want to delete the make "${
-                makeToDelete?.name ?? ""
-              }"? This action cannot be undone.`}
+              {`Are you sure you want to delete the make "${makeToDelete?.name ?? ""}"? This action cannot be undone.`}
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2 pt-4">
@@ -421,20 +504,12 @@ export default function MakesPage() {
             </Button>
             <Button
               variant="destructive"
-              onClick={() => {
-                if (!makeToDelete) return;
-                deleteMakeMutation.mutate(makeToDelete.id);
-              }}
+              onClick={() => { if (!makeToDelete) return; deleteMakeMutation.mutate(makeToDelete.id); }}
               disabled={deleteMakeMutation.isPending}
             >
               {deleteMakeMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Deleting...
-                </>
-              ) : (
-                "Delete Make"
-              )}
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Deleting...</>
+              ) : "Delete Make"}
             </Button>
           </div>
         </DialogContent>
@@ -442,22 +517,14 @@ export default function MakesPage() {
 
       <Dialog
         open={modelToDelete !== null}
-        onOpenChange={(open) => {
-          if (!open) {
-            setModelToDelete(null);
-          }
-        }}
+        onOpenChange={(open) => { if (!open) setModelToDelete(null); }}
       >
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Delete Model</DialogTitle>
             <DialogDescription>
-              {`Are you sure you want to delete the model "${
-                modelToDelete?.model.name ?? ""
-              }"${
-                modelToDelete?.make
-                  ? ` from make "${modelToDelete.make.name}"`
-                  : ""
+              {`Are you sure you want to delete the model "${modelToDelete?.model.name ?? ""}"${
+                modelToDelete?.make ? ` from make "${modelToDelete.make.name}"` : ""
               }? This action cannot be undone.`}
             </DialogDescription>
           </DialogHeader>
@@ -472,27 +539,225 @@ export default function MakesPage() {
             </Button>
             <Button
               variant="destructive"
-              onClick={() => {
-                if (!modelToDelete) return;
-                deleteModelMutation.mutate(modelToDelete.model.id);
-              }}
+              onClick={() => { if (!modelToDelete) return; deleteModelMutation.mutate(modelToDelete.model.id); }}
               disabled={deleteModelMutation.isPending}
             >
               {deleteModelMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Deleting...
-                </>
-              ) : (
-                "Delete Model"
-              )}
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Deleting...</>
+              ) : "Delete Model"}
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reject Make Request dialog */}
+      <Dialog
+        open={rejectingMakeReq !== null}
+        onOpenChange={(open) => { if (!open) { setRejectingMakeReq(null); setRejectReason(""); } }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Reject Make Request</DialogTitle>
+            <DialogDescription>
+              Provide a reason for rejecting &quot;{rejectingMakeReq?.requested_name}&quot;.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <textarea
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              placeholder="Enter rejection reason..."
+              rows={3}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-primary resize-none"
+            />
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => { setRejectingMakeReq(null); setRejectReason(""); }}
+                className="bg-gray-100 hover:bg-gray-200"
+                disabled={rejectMakeReqMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                disabled={!rejectReason.trim() || rejectMakeReqMutation.isPending}
+                onClick={() => {
+                  if (!rejectingMakeReq) return;
+                  rejectMakeReqMutation.mutate({ id: rejectingMakeReq.id, reason: rejectReason.trim() });
+                }}
+              >
+                {rejectMakeReqMutation.isPending ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Rejecting...</>
+                ) : "Reject"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reject Model Request dialog */}
+      <Dialog
+        open={rejectingModelReq !== null}
+        onOpenChange={(open) => { if (!open) { setRejectingModelReq(null); setRejectReason(""); } }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Reject Model Request</DialogTitle>
+            <DialogDescription>
+              Provide a reason for rejecting &quot;{rejectingModelReq?.requested_name}&quot;.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <textarea
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              placeholder="Enter rejection reason..."
+              rows={3}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:border-primary resize-none"
+            />
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => { setRejectingModelReq(null); setRejectReason(""); }}
+                className="bg-gray-100 hover:bg-gray-200"
+                disabled={rejectModelReqMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                disabled={!rejectReason.trim() || rejectModelReqMutation.isPending}
+                onClick={() => {
+                  if (!rejectingModelReq) return;
+                  rejectModelReqMutation.mutate({ id: rejectingModelReq.id, reason: rejectReason.trim() });
+                }}
+              >
+                {rejectModelReqMutation.isPending ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Rejecting...</>
+                ) : "Reject"}
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
     </div>
   );
 }
+
+// ── Request status badge ──────────────────────────────────────────────────────
+
+function StatusBadge({ status }: { status: string }) {
+  if (status === "pending") {
+    return (
+      <Badge variant="secondary" className="gap-1 text-yellow-700 bg-yellow-100 border-yellow-200">
+        <Clock className="h-3 w-3" />
+        Pending
+      </Badge>
+    );
+  }
+  if (status === "approved") {
+    return (
+      <Badge variant="secondary" className="gap-1 text-green-700 bg-green-100 border-green-200">
+        <CheckCircle className="h-3 w-3" />
+        Approved
+      </Badge>
+    );
+  }
+  return (
+    <Badge variant="secondary" className="gap-1 text-red-700 bg-red-100 border-red-200">
+      <XCircle className="h-3 w-3" />
+      Rejected
+    </Badge>
+  );
+}
+
+// ── Requests section ──────────────────────────────────────────────────────────
+
+function RequestsSection({
+  title,
+  requests,
+  onApprove,
+  onReject,
+  approvingId,
+}: {
+  title: string;
+  requests: MakeRequest[];
+  onApprove: (id: number) => void;
+  onReject: (req: MakeRequest) => void;
+  approvingId?: number;
+}) {
+  return (
+    <div>
+      <h2 className="text-lg font-semibold mb-3">{title}</h2>
+      {requests.length === 0 ? (
+        <Card className="border border-border">
+          <CardContent className="py-10 flex flex-col items-center gap-2 text-muted-foreground">
+            <Inbox className="h-8 w-8" />
+            <p className="text-sm">No requests yet.</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {requests.map((req) => (
+            <Card key={req.id} className="border border-border">
+              <CardContent className="py-4 px-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="space-y-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-medium">{req.requested_name}</span>
+                    <StatusBadge status={req.status} />
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Requested by{" "}
+                    <span className="font-medium">{req.requested_by_email}</span>
+                    {" · "}
+                    {new Date(req.created_at).toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </p>
+                  {req.status === "rejected" && req.rejection_reason && (
+                    <p className="text-xs text-destructive mt-0.5">
+                      Reason: {req.rejection_reason}
+                    </p>
+                  )}
+                </div>
+                {req.status === "pending" && (
+                  <div className="flex gap-2 shrink-0">
+                    <Button
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                      disabled={approvingId === req.id}
+                      onClick={() => onApprove(req.id)}
+                    >
+                      {approvingId === req.id ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <CheckCircle className="h-3.5 w-3.5 mr-1" />
+                      )}
+                      Approve
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => onReject(req)}
+                    >
+                      <XCircle className="h-3.5 w-3.5 mr-1" />
+                      Reject
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Existing sub-components ───────────────────────────────────────────────────
 
 function MakeCard({
   make,
@@ -505,13 +770,8 @@ function MakeCard({
   onEdit: () => void;
   onDelete: () => void;
 }) {
-  const handleTriggerClick = (event: MouseEvent) => {
-    event.stopPropagation();
-  };
-
-  const handleItemClick = (event: MouseEvent) => {
-    event.stopPropagation();
-  };
+  const handleTriggerClick = (event: MouseEvent) => { event.stopPropagation(); };
+  const handleItemClick = (event: MouseEvent) => { event.stopPropagation(); };
 
   return (
     <Card
@@ -525,9 +785,7 @@ function MakeCard({
           </div>
           <div>
             <CardTitle className="text-lg font-semibold">{make.name}</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Click to view models
-            </p>
+            <p className="text-sm text-muted-foreground">Click to view models</p>
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -569,23 +827,13 @@ function ModelsDialog({
   onEditModel: (model: Model, make: Make | null) => void;
   onDeleteModel: (model: Model, make: Make | null) => void;
 }) {
-  const {
-    data: models,
-    isLoading,
-    error,
-  } = useModels(open && make ? make.id : undefined);
+  const { data: models, isLoading, error } = useModels(open && make ? make.id : undefined);
   const filteredModels =
     models?.filter((model) => {
       if (!make) return false;
-      if (model.make_id !== undefined) {
-        return model.make_id === make.id;
-      }
-      if (typeof model.make === "number") {
-        return model.make === make.id;
-      }
-      if (typeof model.make === "object" && model.make !== null) {
-        return (model.make as Make).id === make.id;
-      }
+      if (model.make_id !== undefined) return model.make_id === make.id;
+      if (typeof model.make === "number") return model.make === make.id;
+      if (typeof model.make === "object" && model.make !== null) return (model.make as Make).id === make.id;
       return true;
     }) || [];
 
@@ -621,18 +869,12 @@ function ModelsDialog({
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 p-0"
-                      >
+                      <Button variant="ghost" size="icon" className="h-7 w-7 p-0">
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="z-[60000]">
-                      <DropdownMenuItem
-                        onClick={() => onEditModel(model, make)}
-                      >
+                      <DropdownMenuItem onClick={() => onEditModel(model, make)}>
                         Edit Model
                       </DropdownMenuItem>
                       <DropdownMenuItem
@@ -706,13 +948,8 @@ function MakeDialog({
             </Button>
             <Button onClick={onSubmit} disabled={!name.trim() || isSubmitting}>
               {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                submitLabel
-              )}
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</>
+              ) : submitLabel}
             </Button>
           </div>
         </div>
@@ -760,9 +997,7 @@ function ModelDialog({
             <label className="text-sm font-medium">Select Make</label>
             <Select
               value={selectedMakeId === "" ? "" : String(selectedMakeId)}
-              onValueChange={(value) =>
-                setSelectedMakeId(value ? Number(value) : "")
-              }
+              onValueChange={(value) => setSelectedMakeId(value ? Number(value) : "")}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Choose a make" />
@@ -799,13 +1034,8 @@ function ModelDialog({
               disabled={!name.trim() || selectedMakeId === "" || isSubmitting}
             >
               {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                submitLabel
-              )}
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</>
+              ) : submitLabel}
             </Button>
           </div>
         </div>
