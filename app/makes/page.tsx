@@ -313,27 +313,51 @@ export default function MakesPage() {
         </TabsContent>
 
         {/* ── Requests Tab ── */}
-        <TabsContent value="requests" className="space-y-8">
-          <RequestsSection
-            title="Make Requests"
-            requests={makeRequests ?? []}
-            onApprove={(id) => approveMakeReqMutation.mutate(id)}
-            onReject={(req) => {
-              setRejectingMakeReq(req as MakeRequest);
-              setRejectReason("");
-            }}
-            approvingId={approveMakeReqMutation.isPending ? approveMakeReqMutation.variables : undefined}
-          />
-          <RequestsSection
-            title="Model Requests"
-            requests={modelRequests ?? []}
-            onApprove={(id) => approveModelReqMutation.mutate(id)}
-            onReject={(req) => {
-              setRejectingModelReq(req as ModelRequest);
-              setRejectReason("");
-            }}
-            approvingId={approveModelReqMutation.isPending ? approveModelReqMutation.variables : undefined}
-          />
+        <TabsContent value="requests">
+          <Tabs defaultValue="makes">
+            <TabsList className="mb-6">
+              <TabsTrigger value="makes" className="gap-2">
+                Make Requests
+                {pendingMakeReqs.length > 0 && (
+                  <Badge className="h-5 min-w-5 px-1.5 text-xs">
+                    {pendingMakeReqs.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="models" className="gap-2">
+                Model Requests
+                {pendingModelReqs.length > 0 && (
+                  <Badge className="h-5 min-w-5 px-1.5 text-xs">
+                    {pendingModelReqs.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="makes">
+              <RequestsSection
+                requests={makeRequests ?? []}
+                onApprove={(id) => approveMakeReqMutation.mutate(id)}
+                onReject={(req) => {
+                  setRejectingMakeReq(req as MakeRequest);
+                  setRejectReason("");
+                }}
+                approvingId={approveMakeReqMutation.isPending ? approveMakeReqMutation.variables : undefined}
+              />
+            </TabsContent>
+
+            <TabsContent value="models">
+              <RequestsSection
+                requests={modelRequests ?? []}
+                onApprove={(id) => approveModelReqMutation.mutate(id)}
+                onReject={(req) => {
+                  setRejectingModelReq(req as ModelRequest);
+                  setRejectReason("");
+                }}
+                approvingId={approveModelReqMutation.isPending ? approveModelReqMutation.variables : undefined}
+              />
+            </TabsContent>
+          </Tabs>
         </TabsContent>
       </Tabs>
 
@@ -675,13 +699,11 @@ function StatusBadge({ status }: { status: string }) {
 // ── Requests section ──────────────────────────────────────────────────────────
 
 function RequestsSection({
-  title,
   requests,
   onApprove,
   onReject,
   approvingId,
 }: {
-  title: string;
   requests: MakeRequest[];
   onApprove: (id: number) => void;
   onReject: (req: MakeRequest) => void;
@@ -689,7 +711,6 @@ function RequestsSection({
 }) {
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-3">{title}</h2>
       {requests.length === 0 ? (
         <Card className="border border-border">
           <CardContent className="py-10 flex flex-col items-center gap-2 text-muted-foreground">
