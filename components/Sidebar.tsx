@@ -13,6 +13,7 @@ import {
   ClipboardList,
   MoreHorizontal,
   X,
+  Flag,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -28,6 +29,7 @@ const allLinks = [
   { label: "Sales",       href: "/sales",        icon: TrendingUp },
   { label: "Enterprises", href: "/enterprises",  icon: Building2 },
   { label: "Inspections", href: "/inspections",  icon: ClipboardList },
+  { label: "Reports",     href: "/reports",      icon: Flag },
   { label: "Settings",    href: "/settings",     icon: Settings },
 ];
 
@@ -139,7 +141,7 @@ export default function Sidebar() {
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <div className="grid grid-cols-5 gap-0">
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-0">
               {moreLinks.map((link) => {
                 const active = isActive(link.href);
                 return (
