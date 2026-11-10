@@ -1,112 +1,128 @@
+"use client";
+
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { Building2, FileText, ExternalLink, Download } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Phone,
-  Mail,
-  MapPin,
-  FileText,
-  Edit,
-  Trash2,
-  Building2,
-  CircleCheckBig,
-} from "lucide-react";
+import type { Enterprise } from "@/app/types/Enterprise";
 
-interface Contact {
-  id: number;
-  name: string;
-  subtitle: string;
-  phone: string;
-  email: string;
-  address: string;
-  status: "ACTIVE" | "INACTIVE";
-}
-
-interface ContactCardProps {
-  contact: Contact;
-}
-
-export default function EnterpriseCard({ contact }: ContactCardProps) {
+export function enterpriseStatusBadge(status: string) {
+  const s = (status || "").toUpperCase();
+  if (s.includes("SUSPEND")) {
+    return (
+      <Badge variant="destructive" className="rounded-full text-xs uppercase">
+        {status}
+      </Badge>
+    );
+  }
+  if (s.includes("REJECT")) {
+    return (
+      <Badge variant="destructive" className="rounded-full text-xs uppercase">
+        {status}
+      </Badge>
+    );
+  }
+  if (s.includes("PENDING") || s.includes("REVIEW")) {
+    return (
+      <Badge variant="secondary" className="rounded-full text-xs uppercase">
+        {status}
+      </Badge>
+    );
+  }
+  if (s.includes("ACTIVE") || s.includes("APPROV") || s.includes("VERIF")) {
+    return (
+      <Badge className="bg-emerald-600 text-white rounded-full text-xs uppercase">
+        {status}
+      </Badge>
+    );
+  }
   return (
-    <Card className="w-full max-w-sm bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-      <CardContent className="p-6">
-        {/* Header with icon, name and status */}
-        <div className="flex items-start justify-between gap-2 mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-white" />
+    <Badge variant="outline" className="rounded-full text-xs uppercase">
+      {status || "—"}
+    </Badge>
+  );
+}
+
+export interface EnterpriseCardProps {
+  enterprise: Enterprise;
+}
+
+export default function EnterpriseCard({ enterprise }: EnterpriseCardProps) {
+  const router = useRouter();
+  const p = enterprise.profile;
+  const name = [p?.first_name, p?.last_name].filter(Boolean).join(" ") || "—";
+
+  return (
+    <Card
+      onClick={() => router.push(`/enterprises/${enterprise.id}`)}
+      className="border border-primary/10 overflow-hidden hover:shadow-md transition-shadow cursor-pointer flex flex-col justify-between"
+    >
+      <CardContent className="p-5 flex-1 flex flex-col justify-between gap-3">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0 overflow-hidden">
+              {p?.image ? (
+                <Image
+                  src={p.image}
+                  alt={name}
+                  width={40}
+                  height={40}
+                  className="object-cover w-full h-full"
+                />
+              ) : (
+                <Building2 className="w-5 h-5 text-primary" />
+              )}
             </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 text-sm">
-                {contact.name}
+            <div className="min-w-0">
+              <h3 className="font-semibold text-foreground truncate">
+                {enterprise.company_name || name}
               </h3>
-              <p className="text-xs text-gray-500">{contact.subtitle}</p>
+              {enterprise.company_name && (
+                <p className="text-xs text-muted-foreground truncate">{name}</p>
+              )}
             </div>
           </div>
-          <div className="flex gap-1 items-center">
-            <CircleCheckBig size={18} className="text-green-600" />
-            <Badge
-              variant="secondary"
-              className="bg-green-100 px-2 py-1 text-green-700 rounded-full hover:bg-green-100 text-xs font-medium"
-            >
-              {contact.status}
-            </Badge>
-          </div>
+          {enterprise.status && enterpriseStatusBadge(enterprise.status)}
         </div>
 
-        {/* Contact details */}
-        <div className="space-y-3 mb-6">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Phone className="w-4 h-4" />
-            <span>{contact.phone}</span>
+        {enterprise.business_license && (
+          <div
+            className="mt-2 pt-3 border-t border-border flex items-center justify-between gap-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <span className="text-xs text-muted-foreground flex items-center gap-1.5 min-w-0">
+              <FileText className="h-3.5 w-3.5 text-primary shrink-0" />
+              <span className="truncate">License PDF</span>
+            </span>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <a
+                href={enterprise.business_license}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80 font-medium px-2 py-1 rounded-md border border-primary/20 hover:bg-primary/10 transition-colors"
+                title="Open business license in new tab"
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                <span>Open</span>
+              </a>
+              <a
+                href={enterprise.business_license}
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground font-medium px-2 py-1 rounded-md border border-border hover:bg-muted transition-colors"
+                title="Download business license PDF"
+              >
+                <Download className="h-3.5 w-3.5" />
+                <span>Download</span>
+              </a>
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Mail className="w-4 h-4" />
-            <span className="truncate">{contact.email}</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <MapPin className="w-4 h-4" />
-            <span>{contact.address}</span>
-          </div>
-        </div>
-
-        {/* Footer with dropdown and actions */}
-        <div className="flex items-center justify-between">
-          <Select defaultValue="active">
-            <SelectTrigger className="text-xs border-gray-200">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 text-gray-400 hover:text-gray-600"
-            >
-              <Edit className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 text-gray-400 hover:text-red-600"
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );
 }
+
+export { EnterpriseCard };

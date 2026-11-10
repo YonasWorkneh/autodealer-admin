@@ -17,8 +17,8 @@ import {
   RefreshCw,
   PauseCircle,
   Loader2,
-  Maximize2,
-  X,
+  ExternalLink,
+  Download,
   Calendar,
   ChevronDown,
 } from "lucide-react";
@@ -77,11 +77,6 @@ function statusBadge(status: string) {
   );
 }
 
-function isImageUrl(url: string) {
-  const ext = url.split("?")[0].split(".").pop()?.toLowerCase();
-  return ["jpg", "jpeg", "png", "gif", "webp", "svg", "bmp"].includes(ext ?? "");
-}
-
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", {
     year: "numeric",
@@ -108,7 +103,6 @@ export default function EnterpriseDetailPage() {
   const actionMutation = useDealerAction();
   const { toast } = useToast();
 
-  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [rejectOpen, setRejectOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [actingAction, setActingAction] = useState<DealerAction | null>(null);
@@ -205,39 +199,58 @@ export default function EnterpriseDetailPage() {
 
       {/* Header card */}
       <Card className="border border-primary/10 overflow-hidden mb-6">
-        {/* Business licence banner */}
+        {/* Business licence PDF actions */}
         {enterprise.business_license && (
-          <div className="relative w-full h-52 bg-muted">
-            {isImageUrl(enterprise.business_license) ? (
-              <>
-                <Image
-                  src={enterprise.business_license}
-                  alt="Business licence"
-                  fill
-                  className="object-cover"
-                />
-                <button
-                  onClick={() => setLightboxOpen(true)}
-                  className="absolute bottom-3 left-3 bg-black/50 hover:bg-black/70 text-white rounded-md p-2 transition-colors"
-                  title="View fullscreen"
-                >
-                  <Maximize2 className="h-4 w-4" />
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => setLightboxOpen(true)}
-                className="flex flex-col items-center justify-center w-full h-full gap-2 hover:bg-muted/80 transition-colors"
+          <div className="p-4 sm:p-5 bg-primary/5 border-b border-primary/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <FileText className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">
+                  Business License Document
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {enterprise.license_number
+                    ? `License #${enterprise.license_number} (PDF)`
+                    : "PDF Document"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+                className="gap-1.5 cursor-pointer bg-background"
               >
-                <FileText className="h-12 w-12 text-primary/50" />
-                <span className="text-sm font-medium text-muted-foreground">
-                  Business License (PDF)
-                </span>
-                <span className="text-xs text-primary underline">
-                  Click to view
-                </span>
-              </button>
-            )}
+                <a
+                  href={enterprise.business_license}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  <span>Open in New Tab</span>
+                </a>
+              </Button>
+
+              <Button
+                size="sm"
+                asChild
+                className="gap-1.5 cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                <a
+                  href={enterprise.business_license}
+                  download
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Download className="h-4 w-4" />
+                  <span>Download PDF</span>
+                </a>
+              </Button>
+            </div>
           </div>
         )}
 
@@ -365,16 +378,44 @@ export default function EnterpriseDetailPage() {
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             {enterprise.license_number && (
-              <div className="flex items-center gap-3 text-muted-foreground">
-                <FileText className="h-4 w-4 shrink-0 text-primary/70" />
-                <div>
-                  <p className="text-xs text-muted-foreground/70 uppercase tracking-wide">
-                    License
-                  </p>
-                  <p className="text-foreground font-medium">
-                    {enterprise.license_number}
-                  </p>
+              <div className="flex items-center justify-between gap-3 text-muted-foreground">
+                <div className="flex items-center gap-3 min-w-0">
+                  <FileText className="h-4 w-4 shrink-0 text-primary/70" />
+                  <div>
+                    <p className="text-xs text-muted-foreground/70 uppercase tracking-wide">
+                      License
+                    </p>
+                    <p className="text-foreground font-medium truncate">
+                      {enterprise.license_number}
+                    </p>
+                  </div>
                 </div>
+                {enterprise.business_license && (
+                  <div className="flex items-center gap-2 shrink-0">
+                    <a
+                      href={enterprise.business_license}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-primary hover:underline font-medium"
+                      title="Open business license in new tab"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      <span>Open</span>
+                    </a>
+                    <span className="text-muted-foreground/40">|</span>
+                    <a
+                      href={enterprise.business_license}
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-primary hover:underline font-medium"
+                      title="Download business license PDF"
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      <span>Download</span>
+                    </a>
+                  </div>
+                )}
               </div>
             )}
             {enterprise.tax_id && (
@@ -505,41 +546,6 @@ export default function EnterpriseDetailPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Lightbox */}
-      {lightboxOpen && enterprise.business_license && (
-        <div
-          className="fixed inset-0 z-[60000] bg-black/90 flex items-center justify-center p-4"
-          onClick={() => setLightboxOpen(false)}
-        >
-          <button
-            className="absolute top-4 right-4 text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors"
-            onClick={() => setLightboxOpen(false)}
-          >
-            <X className="h-6 w-6" />
-          </button>
-          <div
-            className="relative max-w-4xl max-h-[90vh] w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {isImageUrl(enterprise.business_license) ? (
-              <Image
-                src={enterprise.business_license}
-                alt="Business licence — fullscreen"
-                width={1200}
-                height={900}
-                className="object-contain w-full h-full max-h-[90vh] rounded-lg"
-              />
-            ) : (
-              <iframe
-                src={enterprise.business_license}
-                title="Business licence PDF"
-                className="w-full h-[85vh] rounded-lg bg-white"
-              />
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
